@@ -1,7 +1,8 @@
 import classNames from 'classnames/bind';
 import styles from './Header.module.scss';
 import images from '~/assets/images';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import useOnClickOutside from '~/hooks/useOnclickOutside';
 
 const cx = classNames.bind(styles);
 
@@ -98,6 +99,17 @@ function Header() {
     ];
 
     const [menuActive, setMenuActive] = useState('Home');
+    const refAddNew = useRef();
+    const [showPopperAddNew, setShowPopperAddNew] = useState(false);
+
+    const toggleShowPopperAdNew = () => {
+        setShowPopperAddNew(!showPopperAddNew);
+    };
+    const hiddenPopperAddNew = () => {
+        setShowPopperAddNew(false);
+    };
+
+    useOnClickOutside(refAddNew, hiddenPopperAddNew);
 
     return (
         <div className={cx('header-container')}>
@@ -114,7 +126,7 @@ function Header() {
                     </div>
                 </div>
 
-                {/* Navbar */}
+                {/* Navbar Common */}
                 <div id="navbar" className={cx('navbar-menu', 'hide')}>
                     <div className={cx('navbar-menu-top')}>
                         <img className={cx('avatar')} alt="" src={images.avatarDefault} />
@@ -213,13 +225,48 @@ function Header() {
                     <div className={cx('separate')}></div>
 
                     {/* Add More */}
-                    <div className={cx('add-more')}>
-                        <span>
-                            <img className={cx('icon')} alt="" src={images.addIcon} />
-                        </span>
-                        <span>
-                            <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
-                        </span>
+                    <div ref={refAddNew} onClick={toggleShowPopperAdNew} className={cx('wrap-button')}>
+                        <div className={cx('add-more')}>
+                            <span>
+                                <img className={cx('icon')} alt="" src={images.addIcon} />
+                            </span>
+                            <span>
+                                <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                            </span>
+                        </div>
+
+                        <div
+                            className={showPopperAddNew === true ? cx('popper-add-new') : cx('popper-add-new', 'none')}
+                        >
+                            <div className={cx('popper-list')}>
+                                <div className={cx('popper-item')}>
+                                    <img className={cx('icon')} alt="" src={images.categoryIcon} />
+                                    <span>New Category - Product</span>
+                                </div>
+                                <div className={cx('popper-item')}>
+                                    <img className={cx('icon')} alt="" src={images.productIcon} />
+                                    <span>New Product</span>
+                                </div>
+                                <div className={cx('separate')}></div>
+                                <div className={cx('popper-item')}>
+                                    <img className={cx('icon')} alt="" src={images.categoryIcon} />
+                                    <span>New Category - Nutrition</span>
+                                </div>
+                                <div className={cx('popper-item')}>
+                                    <img className={cx('icon')} alt="" src={images.nutritionIcon} />
+                                    <span>New Nutrition</span>
+                                </div>
+                                <div className={cx('separate')}></div>
+                                <div className={cx('popper-item')}>
+                                    <img className={cx('icon')} alt="" src={images.categoryIcon} />
+                                    <span>New Category - Event</span>
+                                </div>
+                                <div className={cx('popper-item')}>
+                                    <img className={cx('icon')} alt="" src={images.heartIcon} />
+                                    <span>New Event</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Notification */}
@@ -234,6 +281,8 @@ function Header() {
                             <img className={cx('avatar-img')} alt="" src={images.avatarDefault} />
                         </figure>
                     </div>
+
+                    {/* User Sidebar */}
                 </div>
             </div>
         </div>

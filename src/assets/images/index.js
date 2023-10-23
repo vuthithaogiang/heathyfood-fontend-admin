@@ -20,6 +20,7 @@ const images = {
     giftIcon: require('~/assets/images/gift-icon.svg').default,
     trashIcon: require('~/assets/images/trash-icon.svg').default,
     xBorderIcon: require('~/assets/images/x-borboer-icon.svg').default,
+    plusIcon: require('~/assets/images/plus-icon.svg').default,
 };
 
 export default images;
