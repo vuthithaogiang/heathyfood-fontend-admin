@@ -1,0 +1,97 @@
+@use './theme';
+@use './base';
+@use './abstract';
+
+@import 'normalize.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+@font-face {
+    font-family: 'Gordita';
+    src: url('/assets/font-grodita/Gordita-Light.woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Gordita';
+    src: url('/assets/font-grodita/Gordita-MediumItalic.woff2');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Gordita';
+    src: url('/assets/font-grodita/Gordita-Medium.woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Gordita';
+    src: url('/assets/font-grodita/Gordita-Black.woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: 'Gordita', sans-serif;
+    // font-family: 'Inter', sans-serif;
+    font-size: 62.5%;
+}
+
+body {
+    font-size: 1.6rem;
+    color: var(--text-color);
+}
+
+/* Sroll bar */
+html ::-webkit-scrollbar {
+    border-radius: 0px;
+    width: 8px;
+}
+
+html ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(22, 24, 35, 0.06);
+}
+
+html ::-webkit-scrollbar-track {
+    border-radius: 0px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+a[href] {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 300;
+}
+
+button,
+input,
+[tabindex] {
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+button,
+input,
+textarea select {
+    font-family: inherit;
+    color: inherit;
+}
+
+ul,
+li {
+    list-style: none;
+}
+
+.icon {
+    filter: var(--icon-color);
+}
