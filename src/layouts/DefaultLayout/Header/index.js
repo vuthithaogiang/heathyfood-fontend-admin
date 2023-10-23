@@ -238,6 +238,7 @@ function Header() {
                         <div
                             className={showPopperAddNew === true ? cx('popper-add-new') : cx('popper-add-new', 'none')}
                         >
+                            <img className={cx('arrow-up')} alt="" src={images.arrowUp} />
                             <div className={cx('popper-list')}>
                                 <div className={cx('popper-item')}>
                                     <img className={cx('icon')} alt="" src={images.categoryIcon} />
@@ -271,9 +272,9 @@ function Header() {
 
                     {/* Notification */}
 
-                    <div className={cx('notification')}>
+                    <button className={cx('notification', 'js-toggle')} toggle-target="#popper-notification">
                         <img className={cx('icon')} alt="" src={images.bellIcon} />
-                    </div>
+                    </button>
 
                     {/* Avatar */}
                     <div className={cx('avatar')}>
@@ -282,7 +283,28 @@ function Header() {
                         </figure>
                     </div>
 
-                    {/* User Sidebar */}
+                    {/* Notiification*/}
+
+                    <div id="popper-notification" className={cx('popper-notofication', 'hide')}>
+                        <div className={cx('notification-top')}>
+                            <div className={cx('wrap-user-info')}>
+                                <img className={cx('avatar')} alt="" src={images.avatarDefault} />
+                                <span>vuthithaogiang</span>
+                            </div>
+                            <button className={cx('close-btn', 'js-toggle')} toggle-target="#popper-notification">
+                                <img className={cx('icon')} alt="" src={images.xIcon} />
+                            </button>
+                        </div>
+                        <div className={cx('inner-notification')}>
+                            <header>
+                                <img className={cx('icon')} alt="" src={images.bellIcon} />
+                                <span>Notification</span>
+                            </header>
+                            <span className={cx('alert')}>No notification current</span>
+                        </div>
+                    </div>
+
+                    <div className={cx('popper-overlay', 'js-toggle')} toggle-target="#popper-notification"></div>
                 </div>
             </div>
         </div>

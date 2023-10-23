@@ -162,6 +162,15 @@
     opacity: 1;
 }
 
+.popper-notofication[class$='show'] ~ .popper-overlay {
+    visibility: visible;
+    opacity: 1;
+}
+
+.popper-notofication[class$='show'] {
+    translate: 0;
+}
+
 //NAVBAR MENU
 .navbar-menu {
     translate: -100%;
@@ -266,7 +275,8 @@
     }
 }
 
-.navbar-overlay {
+.navbar-overlay,
+.popper-overlay {
     visibility: hidden;
     opacity: 0;
     position: fixed;
@@ -320,6 +330,13 @@
 .wrap-button {
     position: relative;
 
+    .arrow-up {
+        height: 20.5px;
+        position: absolute;
+        top: -11px;
+        right: 4px;
+    }
+
     .popper-add-new {
         width: 250px;
         position: absolute;
@@ -332,7 +349,7 @@
         opacity: 1;
         visibility: visible;
         scale: 1;
-        transform-origin: top right;
+        transform-origin: 90% top;
         transition: opacity, scale, visibility;
         transition-duration: 0.5s;
     }
@@ -375,4 +392,73 @@
     opacity: 0;
     visibility: hidden;
     scale: 0;
+}
+
+.popper-notofication {
+    translate: 100%;
+    position: fixed;
+    z-index: 91;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 350px;
+    // inset: 0 calc(100% - 350px) 0 0;
+    background-color: #fff;
+    border-top-left-radius: 20px;
+    transition: translate 0.5s;
+}
+
+.notification-top {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .wrap-user-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .avatar {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .close-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+
+        &:hover {
+            background-color: #f0f0f0;
+        }
+
+        img {
+            margin: auto;
+            cursor: pointer;
+        }
+    }
+}
+
+.inner-notification {
+    padding: 0 16px 50px 16px;
+    height: calc(100vh - 50px);
+    overflow-y: scroll;
+
+    header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+    }
+    span.alert {
+        display: block;
+        font-size: 1.3rem;
+        margin-top: 22px;
+    }
 }
