@@ -3,6 +3,8 @@ import styles from './Header.module.scss';
 import images from '~/assets/images';
 import { useEffect, useState, useRef } from 'react';
 import useOnClickOutside from '~/hooks/useOnclickOutside';
+import { useNavigate } from 'react-router-dom';
+import { Editor } from 'primereact/editor';
 
 const cx = classNames.bind(styles);
 
@@ -49,58 +51,70 @@ function Header() {
             id: 1,
             title: 'Home',
             icon: images.homeIcon,
+            to: '/',
         },
         {
             id: 2,
             title: 'Product Category',
             icon: images.categoryIcon,
+            to: '/admin/product-category',
         },
         {
             id: 3,
             title: 'Product',
             icon: images.productIcon,
+            to: '/admin/products',
         },
 
         {
             id: 4,
             title: 'Nutrition Category',
             icon: images.categoryIcon,
+            to: '/',
         },
         {
             id: 5,
             title: 'Nutrition',
             icon: images.nutritionIcon,
+            to: '/',
         },
         {
             id: 6,
             title: 'Order',
             icon: images.cartIcon,
+            to: '/',
         },
         {
             id: 7,
             title: 'Customer',
             icon: images.userIcon,
+            to: '/',
         },
         {
             id: 8,
             title: 'Category Event',
             icon: images.heartIcon,
+            to: '/',
         },
         {
             id: 9,
             title: 'Event',
             icon: images.giftIcon,
+            to: '/',
         },
         {
             id: 10,
             title: 'Blog',
             icon: images.blogIcon,
+            to: '/',
         },
     ];
 
     const [menuActive, setMenuActive] = useState('Home');
     const refAddNew = useRef();
     const [showPopperAddNew, setShowPopperAddNew] = useState(false);
+    const navigate = useNavigate();
+    const [text, setText] = useState('');
 
     const toggleShowPopperAdNew = () => {
         setShowPopperAddNew(!showPopperAddNew);
@@ -144,7 +158,10 @@ function Header() {
                             {MENU.map((item) => (
                                 <div
                                     className={menuActive === item.title ? cx('menu-item', 'active') : cx('menu-item')}
-                                    onClick={() => setMenuActive(item.title)}
+                                    onClick={() => {
+                                        setMenuActive(item.title);
+                                        navigate(item.to);
+                                    }}
                                 >
                                     <button>
                                         <img className={cx('icon')} alt="" src={item.icon} />
@@ -240,32 +257,45 @@ function Header() {
                         >
                             <img className={cx('arrow-up')} alt="" src={images.arrowUp} />
                             <div className={cx('popper-list')}>
-                                <div className={cx('popper-item')}>
+                                {/* Add new category product */}
+                                <button
+                                    className={cx('popper-item', 'js-toggle')}
+                                    toggle-target="#add-category-product"
+                                >
                                     <img className={cx('icon')} alt="" src={images.categoryIcon} />
                                     <span>New Category - Product</span>
-                                </div>
-                                <div className={cx('popper-item')}>
+                                </button>
+                                {/* Add new Product */}
+                                <button className={cx('popper-item', 'js-toggle')} toggle-target="#add-product">
                                     <img className={cx('icon')} alt="" src={images.productIcon} />
                                     <span>New Product</span>
-                                </div>
+                                </button>
                                 <div className={cx('separate')}></div>
-                                <div className={cx('popper-item')}>
+                                {/* Add new Category Nutrition */}
+                                <button
+                                    className={cx('popper-item', 'js-toggle')}
+                                    toggle-target="#add-category-nutrition"
+                                >
                                     <img className={cx('icon')} alt="" src={images.categoryIcon} />
                                     <span>New Category - Nutrition</span>
-                                </div>
-                                <div className={cx('popper-item')}>
+                                </button>
+                                {/* Add new Nutrition */}
+                                <button className={cx('popper-item', 'js-toggle')} toggle-target="#add-nutrition">
                                     <img className={cx('icon')} alt="" src={images.nutritionIcon} />
                                     <span>New Nutrition</span>
-                                </div>
+                                </button>
+
                                 <div className={cx('separate')}></div>
-                                <div className={cx('popper-item')}>
+                                {/* Add new Category event */}
+                                <button className={cx('popper-item', 'js-toggle')} toggle-target="#add-category-event">
                                     <img className={cx('icon')} alt="" src={images.categoryIcon} />
                                     <span>New Category - Event</span>
-                                </div>
-                                <div className={cx('popper-item')}>
+                                </button>
+                                {/* Add new Event */}
+                                <button className={cx('popper-item', 'js-toggle')} toggle-target="#add-event">
                                     <img className={cx('icon')} alt="" src={images.heartIcon} />
                                     <span>New Event</span>
-                                </div>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -305,6 +335,121 @@ function Header() {
                     </div>
 
                     <div className={cx('popper-overlay', 'js-toggle')} toggle-target="#popper-notification"></div>
+
+                    {/* Form add new Category Product */}
+                    <div id="add-category-product" className={cx('add-category-product', 'hide')}>
+                        <div className={cx('wrap-form')}>
+                            <header>
+                                <h3>Add New Category Product</h3>
+                                <button className={cx('js-toggle')} toggle-target="#add-category-product">
+                                    <img className={cx('icon')} alt="" src={images.xIcon} />
+                                </button>
+                            </header>
+                            <form method="post" onSubmit={(e) => e.preventDefault()}>
+                                <div className={cx('form-group')}>
+                                    <label className={cx('form-label')}>Name*</label>
+                                    <input
+                                        className={cx('form-input')}
+                                        type="text"
+                                        name="name"
+                                        placeholder="Name category"
+                                    />
+                                </div>
+
+                                <div className={cx('form-group')}>
+                                    <label className={cx('form-label')}>Description*</label>
+                                    <Editor
+                                        value={text}
+                                        onTextChange={(e) => setText(e.htmlValue)}
+                                        style={{ height: '220px' }}
+                                    />
+                                </div>
+
+                                <div className={cx('form-buttons')}>
+                                    <button type="submit">Submit</button>
+                                    <button className={cx('js-toggle')} toggle-target="#add-category-product">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div
+                        className={cx('category-product-overlay', 'js-toggle')}
+                        toggle-target="#add-category-product"
+                    ></div>
+
+                    {/* Form ad new Product */}
+                    <div id="add-product" className={cx('add-product', 'hide')}>
+                        <div className={cx('wrap-inner')}>
+                            <header>
+                                <h3>Add new Product</h3>
+                                <button className={cx('js-toggle')} toggle-target="#add-product">
+                                    <img className={cx('icon')} alt="" src={images.xIcon} />
+                                </button>
+                            </header>
+                        </div>
+                    </div>
+
+                    <div className={cx('product-overlay', 'js-toggle')} toggle-target="#add-product"></div>
+
+                    {/* Form add new Categoty Nutrition */}
+                    <div id="add-category-nutrition" className={cx('add-category-nutrition', 'hide')}>
+                        <div className={cx('wrap-inner')}>
+                            <header>
+                                <h3>Add new Category Nutrition</h3>
+                                <button className={cx('js-toggle')} toggle-target="#add-category-nutrition">
+                                    <img className={cx('icon')} alt="" src={images.xIcon} />
+                                </button>
+                            </header>
+                        </div>
+                    </div>
+                    <div
+                        className={cx('category-nutrition-overlay', 'js-toggle')}
+                        toggle-target="#add-category-nutrition"
+                    ></div>
+
+                    {/* Form add new  Nutrition */}
+                    <div id="add-nutrition" className={cx('add-nutrition', 'hide')}>
+                        <div className={cx('wrap-inner')}>
+                            <header>
+                                <h3>Add new Category Nutrition</h3>
+                                <button className={cx('js-toggle')} toggle-target="#add-nutrition">
+                                    <img className={cx('icon')} alt="" src={images.xIcon} />
+                                </button>
+                            </header>
+                        </div>
+                    </div>
+                    <div className={cx('nutrition-overlay', 'js-toggle')} toggle-target="#add-nutrition"></div>
+
+                    {/* Form add new Categoty Event */}
+                    <div id="add-category-event" className={cx('add-category-event', 'hide')}>
+                        <div className={cx('wrap-inner')}>
+                            <header>
+                                <h3>Add new Category Nutrition</h3>
+                                <button className={cx('js-toggle')} toggle-target="#add-category-event">
+                                    <img className={cx('icon')} alt="" src={images.xIcon} />
+                                </button>
+                            </header>
+                        </div>
+                    </div>
+                    <div
+                        className={cx('category-event-overlay', 'js-toggle')}
+                        toggle-target="#add-category-event"
+                    ></div>
+
+                    {/* Form add new  Event */}
+                    <div id="add-event" className={cx('add-event', 'hide')}>
+                        <div className={cx('wrap-inner')}>
+                            <header>
+                                <h3>Add new Category Nutrition</h3>
+                                <button className={cx('js-toggle')} toggle-target="#add-event">
+                                    <img className={cx('icon')} alt="" src={images.xIcon} />
+                                </button>
+                            </header>
+                        </div>
+                    </div>
+                    <div className={cx('event-overlay', 'js-toggle')} toggle-target="#add-event"></div>
                 </div>
             </div>
         </div>
