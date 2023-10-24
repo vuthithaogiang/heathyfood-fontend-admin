@@ -568,6 +568,33 @@
     }
 }
 
+.form-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    button {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 1.5rem;
+        color: #686767;
+        border: 1px solid #c8ccd0;
+        padding: 6px 8px;
+        border-radius: 6px;
+        transition: background-color 0.5s;
+
+        img {
+            width: 14px;
+        }
+
+        &:hover {
+            background-color: #f1f1f1;
+        }
+    }
+}
+
 // Overlay
 .category-product-overlay,
 .product-overlay,

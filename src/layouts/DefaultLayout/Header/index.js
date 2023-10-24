@@ -217,6 +217,12 @@ function Header() {
         };
     }, [previewThumbThird]);
 
+    function clearAllFile() {
+        setPreviewThumb(null);
+        setPreviewThumbSecond(null);
+        setPreviewThumbThird(null);
+    }
+
     return (
         <div className={cx('header-container')}>
             <div className={cx('header-inner')}>
@@ -595,11 +601,17 @@ function Header() {
                                     </div>
 
                                     <div className={cx('form-row-upload')}>
-                                        <label className={cx('form-label')}>
-                                            Upload Thumbnail
-                                            <span className={cx('note')}>*can upload min 1 & max 3</span>
-                                        </label>
+                                        <div className={cx('form-label-row')}>
+                                            <label className={cx('form-label')}>
+                                                Upload Thumbnail
+                                                <span className={cx('note')}>*can upload min 1 & max 3</span>
+                                            </label>
 
+                                            <button onClick={() => clearAllFile()}>
+                                                <img className={cx('icon')} alt="" src={images.cleanIcon} />
+                                                Clear
+                                            </button>
+                                        </div>
                                         <div className={cx('container-files')}>
                                             {/* Thumb 1 */}
                                             <input

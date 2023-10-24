@@ -23,6 +23,7 @@ const images = {
     plusIcon: require('~/assets/images/plus-icon.svg').default,
     arrowUp: require('~/assets/images/arrow-up.png'),
     arrowIcon: require('~/assets/images/arrow-icon.svg').default,
+    cleanIcon: require('~/assets/images/clean-icon.svg').default,
 };
 
 export default images;
