@@ -110,11 +110,45 @@ function Header() {
         },
     ];
 
+    const FAKE_CATEGORIES_PRODUCT = [
+        {
+            id: 1,
+            name: 'Vegetables',
+        },
+        {
+            id: 2,
+            name: 'Fast Food',
+        },
+        {
+            id: 3,
+            name: 'Snacks',
+        },
+    ];
+
+    const FAKE_STATUS_PRODUCT = ['New Arrival', 'Upcoming', 'Invaiable', 'Sold Out', 'Vailable', 'Best Seller'];
+
     const [menuActive, setMenuActive] = useState('Home');
     const refAddNew = useRef();
     const [showPopperAddNew, setShowPopperAddNew] = useState(false);
     const navigate = useNavigate();
-    const [text, setText] = useState('');
+    const [descCategoryProduct, setDescCategoryProduct] = useState('');
+    const [descProduct, setDescProduct] = useState('');
+
+    const [showOptionStatusProduct, setShowOptionStatusProduct] = useState(false);
+    const refOptionStatusProduct = useRef();
+    const [statusProduct, setStatusProduct] = useState(null);
+
+    const [showOptionCategoryProduct, setShowOptionCategoryProduct] = useState(false);
+    const refOptionCategoryProduct = useRef();
+    const [categoryProduct, setCategoryProduct] = useState(null);
+
+    const toggleShowOptionCategoryProduct = () => {
+        setShowOptionCategoryProduct(!showOptionCategoryProduct);
+    };
+
+    const toggleShowOptionStatusProduct = () => {
+        setShowOptionStatusProduct(!showOptionStatusProduct);
+    };
 
     const toggleShowPopperAdNew = () => {
         setShowPopperAddNew(!showPopperAddNew);
@@ -123,7 +157,65 @@ function Header() {
         setShowPopperAddNew(false);
     };
 
+    const hiddenOptionStatusPorduct = () => {
+        setShowOptionStatusProduct(false);
+    };
+
+    const hiddenOptionCategoryProduct = () => {
+        setShowOptionCategoryProduct(false);
+    };
+
     useOnClickOutside(refAddNew, hiddenPopperAddNew);
+    useOnClickOutside(refOptionStatusProduct, hiddenOptionStatusPorduct);
+    useOnClickOutside(refOptionCategoryProduct, hiddenOptionCategoryProduct);
+
+    // thumb 1
+    const [previewThumb, setPreviewThumb] = useState(null);
+    const handlePreviewAvatar = (e) => {
+        const file = e.target.files[0];
+
+        file.preview = URL.createObjectURL(file);
+        setPreviewThumb(file.preview);
+    };
+
+    useEffect(() => {
+        //clean up
+        return () => {
+            URL.revokeObjectURL(previewThumb);
+        };
+    }, [previewThumb]);
+
+    //thumb 2
+    const [previewThumbSecond, setPreviewThumbSecond] = useState(null);
+    const handlePreviewThumbSecond = (e) => {
+        const file = e.target.files[0];
+
+        file.preview = URL.createObjectURL(file);
+        setPreviewThumbSecond(file.preview);
+    };
+
+    useEffect(() => {
+        //clean up
+        return () => {
+            URL.revokeObjectURL(previewThumbSecond);
+        };
+    }, [previewThumbSecond]);
+
+    //thumb 3
+    const [previewThumbThird, setPreviewThumbThird] = useState(null);
+    const handlePreviewThumbThird = (e) => {
+        const file = e.target.files[0];
+
+        file.preview = URL.createObjectURL(file);
+        setPreviewThumbThird(file.preview);
+    };
+
+    useEffect(() => {
+        //clean up
+        return () => {
+            URL.revokeObjectURL(previewThumbThird);
+        };
+    }, [previewThumbThird]);
 
     return (
         <div className={cx('header-container')}>
@@ -359,8 +451,8 @@ function Header() {
                                 <div className={cx('form-group')}>
                                     <label className={cx('form-label')}>Description*</label>
                                     <Editor
-                                        value={text}
-                                        onTextChange={(e) => setText(e.htmlValue)}
+                                        value={descCategoryProduct}
+                                        onTextChange={(e) => setDescCategoryProduct(e.htmlValue)}
                                         style={{ height: '220px' }}
                                     />
                                 </div>
@@ -388,6 +480,221 @@ function Header() {
                                     <img className={cx('icon')} alt="" src={images.xIcon} />
                                 </button>
                             </header>
+                            <div className={cx('content')}>
+                                <form method="post" onSubmit={(e) => e.preventDefault()}>
+                                    <div className={cx('form-group')}>
+                                        <label className={cx('form-label')}>Name</label>
+                                        <input type="text" className={cx('form-input')} placeholder="Name product" />
+                                    </div>
+                                    <div className={cx('form-group')}>
+                                        <label className={cx('form-label')}>Brand</label>
+                                        <input type="text" className={cx('form-input')} placeholder="Belong to Brand" />
+                                    </div>
+                                    <div className={cx('form-group')}>
+                                        <label className={cx('form-label')}>Description</label>
+                                        <Editor
+                                            value={descProduct}
+                                            onTextChange={(e) => setDescProduct(e.htmlValue)}
+                                            style={{ height: '220px' }}
+                                        />
+                                    </div>
+
+                                    <div className={cx('form-row')}>
+                                        <div className={cx('form-group')}>
+                                            <label className={cx('form-label')}>Quantity</label>
+                                            <input type="text" className={cx('form-input')} placeholder="10" />
+                                        </div>
+                                        <div className={cx('form-group')}>
+                                            <label className={cx('form-label')}>Price</label>
+                                            <input type="text" className={cx('form-input')} placeholder="$12" />
+                                        </div>
+                                    </div>
+
+                                    <div className={cx('form-row')}>
+                                        <div className={cx('form-status-product')}>
+                                            <div
+                                                onClick={toggleShowOptionStatusProduct}
+                                                ref={refOptionStatusProduct}
+                                                className={cx('form-group', 'product')}
+                                            >
+                                                <label className={cx('form-label')}>Status</label>
+                                                <div className={cx('wrap-select')}>
+                                                    <span>
+                                                        {statusProduct === null ? 'Select Status' : statusProduct}
+                                                    </span>
+                                                    <img
+                                                        className={
+                                                            showOptionStatusProduct === true
+                                                                ? cx('icon', 'icon-rotate')
+                                                                : cx('icon')
+                                                        }
+                                                        alt=""
+                                                        src={images.arrowIcon}
+                                                    />
+                                                </div>
+                                                <div
+                                                    className={
+                                                        showOptionStatusProduct === true
+                                                            ? cx('wrap-options')
+                                                            : cx('wrap-options', 'none')
+                                                    }
+                                                >
+                                                    {FAKE_STATUS_PRODUCT.map((item) => (
+                                                        <div
+                                                            onClick={() => setStatusProduct(item)}
+                                                            className={cx('option')}
+                                                            key={item}
+                                                        >
+                                                            <span>{item}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className={cx('form-category-product')}>
+                                            <div
+                                                ref={refOptionCategoryProduct}
+                                                onClick={toggleShowOptionCategoryProduct}
+                                                className={cx('form-group', 'product')}
+                                            >
+                                                <label className={cx('form-label')}>Belong To Category</label>
+                                                <div className={cx('wrap-select')}>
+                                                    <span>
+                                                        {categoryProduct === null ? 'Select Category' : categoryProduct}
+                                                    </span>
+                                                    <img
+                                                        className={
+                                                            showOptionCategoryProduct === true
+                                                                ? cx('icon', 'icon-rotate')
+                                                                : cx('icon')
+                                                        }
+                                                        alt=""
+                                                        src={images.arrowIcon}
+                                                    />
+                                                </div>
+                                                <div
+                                                    className={
+                                                        showOptionCategoryProduct === true
+                                                            ? cx('wrap-options')
+                                                            : cx('wrap-options', 'none')
+                                                    }
+                                                >
+                                                    {FAKE_CATEGORIES_PRODUCT.map((item, index) => (
+                                                        <div
+                                                            onClick={() => setCategoryProduct(item.name)}
+                                                            className={cx('option')}
+                                                            key={index}
+                                                        >
+                                                            <span>{item.name}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className={cx('form-row-upload')}>
+                                        <label className={cx('form-label')}>
+                                            Upload Thumbnail
+                                            <span className={cx('note')}>*can upload min 1 & max 3</span>
+                                        </label>
+
+                                        <div className={cx('container-files')}>
+                                            {/* Thumb 1 */}
+                                            <input
+                                                type="file"
+                                                id="previewOne"
+                                                onChange={handlePreviewAvatar}
+                                                name="previewOne"
+                                                hidden
+                                            />
+                                            <label
+                                                htmlFor="previewOne"
+                                                className={
+                                                    previewThumb === null
+                                                        ? cx('file-thumb')
+                                                        : cx('file-thumb', 'not-border')
+                                                }
+                                            >
+                                                {previewThumb === null ? (
+                                                    <>
+                                                        <img className={cx('icon')} alt="" src={images.plusIcon} />
+                                                        <span>Add Thumbnail</span>
+                                                    </>
+                                                ) : (
+                                                    <img className={cx('preview-img')} alt="" src={previewThumb} />
+                                                )}
+                                            </label>
+
+                                            {/* Thumb 2 */}
+
+                                            <input
+                                                type="file"
+                                                id="previewSecond"
+                                                onChange={handlePreviewThumbSecond}
+                                                name="previewSecond"
+                                                hidden
+                                            />
+
+                                            <label
+                                                htmlFor="previewSecond"
+                                                className={
+                                                    previewThumbSecond === null
+                                                        ? cx('file-thumb')
+                                                        : cx('file-thumb', 'not-border')
+                                                }
+                                            >
+                                                {previewThumbSecond === null ? (
+                                                    <>
+                                                        <img className={cx('icon')} alt="" src={images.plusIcon} />
+                                                        <span>Add Thumbnail</span>
+                                                    </>
+                                                ) : (
+                                                    <img
+                                                        className={cx('preview-img')}
+                                                        alt=""
+                                                        src={previewThumbSecond}
+                                                    />
+                                                )}
+                                            </label>
+
+                                            {/* Thumb 3 */}
+                                            <input
+                                                type="file"
+                                                id="previewThird"
+                                                onChange={handlePreviewThumbThird}
+                                                name="previewThird"
+                                                hidden
+                                            />
+                                            <label
+                                                htmlFor="previewThird"
+                                                className={
+                                                    previewThumbThird === null
+                                                        ? cx('file-thumb')
+                                                        : cx('file-thumb', 'not-border')
+                                                }
+                                            >
+                                                {previewThumbThird === null ? (
+                                                    <>
+                                                        <img className={cx('icon')} alt="" src={images.plusIcon} />
+                                                        <span>Add Thumbnail</span>
+                                                    </>
+                                                ) : (
+                                                    <img className={cx('preview-img')} alt="" src={previewThumbThird} />
+                                                )}
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div className={cx('form-buttons')}>
+                                        <button type="submit">Submit</button>
+                                        <button className={cx('js-toggle')} toggle-target="#add-product">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
 

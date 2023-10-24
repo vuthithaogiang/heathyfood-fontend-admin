@@ -22,6 +22,7 @@ const images = {
     xBorderIcon: require('~/assets/images/x-borboer-icon.svg').default,
     plusIcon: require('~/assets/images/plus-icon.svg').default,
     arrowUp: require('~/assets/images/arrow-up.png'),
+    arrowIcon: require('~/assets/images/arrow-icon.svg').default,
 };
 
 export default images;
