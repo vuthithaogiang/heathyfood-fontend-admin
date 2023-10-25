@@ -91,7 +91,7 @@ function Header() {
             id: 7,
             title: 'Customer',
             icon: images.userIcon,
-            to: '/',
+            to: '/admin/customers',
         },
         {
             id: 8,
