@@ -24,6 +24,11 @@ const images = {
     arrowUp: require('~/assets/images/arrow-up.png'),
     arrowIcon: require('~/assets/images/arrow-icon.svg').default,
     cleanIcon: require('~/assets/images/clean-icon.svg').default,
+    arrowRightIcon: require('~/assets/images/arrow-right-icon.svg').default,
+    filterIcon: require('~/assets/images/filter-icon.svg').default,
+    clockIcon: require('~/assets/images/clock-icon.svg').default,
+    starIcon: require('~/assets/images/star-icon.svg').default,
+    tagIcon: require('~/assets/images/tag-icon.svg').default,
 };
 
 export default images;

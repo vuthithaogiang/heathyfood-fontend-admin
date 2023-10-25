@@ -133,6 +133,10 @@
         img {
             margin: auto;
         }
+
+        &:hover {
+            background-color: #f2f2f2;
+        }
     }
 
     .avatar {
@@ -578,11 +582,11 @@
         display: flex;
         align-items: center;
         gap: 4px;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         color: #686767;
         border: 1px solid #c8ccd0;
         padding: 6px 8px;
-        border-radius: 6px;
+        border-radius: 8px;
         transition: background-color 0.5s;
 
         img {

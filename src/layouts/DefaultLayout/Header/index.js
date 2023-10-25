@@ -761,7 +761,7 @@ function Header() {
                     <div id="add-event" className={cx('add-event', 'hide')}>
                         <div className={cx('wrap-inner')}>
                             <header>
-                                <h3>Add new Category Nutrition</h3>
+                                <h3>Add new Event</h3>
                                 <button className={cx('js-toggle')} toggle-target="#add-event">
                                     <img className={cx('icon')} alt="" src={images.xIcon} />
                                 </button>
