@@ -18,6 +18,9 @@ function ProductCategory() {
     const [listCategory, setListCategory] = useState(null);
     const [nameEdit, setNameEdit] = useState(null);
     const [descCategoryEdit, setDescCategoryEdit] = useState(null);
+    const [errorMessageEdit, setErrorMessageEdit] = useState(null);
+    const [successMessageEdit, setSuccessMessageEdit] = useState(null);
+    const [categoryIdEdit, setCategoryIdEdit] = useState(null);
 
     const [infoApi, setInfoApi] = useState(null);
 
@@ -56,7 +59,7 @@ function ProductCategory() {
         }
 
         initJsToggle();
-    }, []);
+    }, [listCategory]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -119,8 +122,30 @@ function ProductCategory() {
         setLoading(true);
 
         try {
+            console.log(categoryIdEdit);
+            console.log(nameEdit);
+            console.log(descCategoryEdit);
+
+            const response = await axios.post(
+                `/api/category-product/edit/${categoryIdEdit}`,
+                {
+                    name: nameEdit,
+                    description: descCategoryEdit,
+                },
+                {
+                    withCredentials: true,
+                },
+            );
+
+            console.log(response.data);
+
+            setSuccessMessageEdit('Edit complete.');
+            setErrorMessageEdit(null);
             setLoading(false);
         } catch (error) {
+            console.log(error);
+            setErrorMessageEdit('The name has already been taken.');
+            setSuccessMessageEdit(null);
             setLoading(false);
         }
     };
@@ -345,8 +370,11 @@ function ProductCategory() {
                                             className={cx('js-toggle')}
                                             toggle-target="#edit-category-product-form"
                                             onClick={() => {
+                                                setLoading(true);
+                                                setCategoryIdEdit(row.id);
                                                 setNameEdit(row.name);
                                                 setDescCategoryEdit(row.description);
+                                                setLoading(false);
                                             }}
                                         >
                                             Edit
@@ -417,15 +445,15 @@ function ProductCategory() {
                 <div id="edit-category-product-form" className={cx('add-category-product', 'hide')}>
                     <div className={cx('wrap-form')}>
                         <header>
-                            <h3>Add New Category Product</h3>
+                            <h3>Edit Category Product</h3>
                             <button className={cx('js-toggle')} toggle-target="#edit-category-product-form">
                                 <img className={cx('icon')} alt="" src={images.xIcon} />
                             </button>
                         </header>
 
-                        {errorMessage !== null && <p className={cx('error-message')}>{errorMessage}</p>}
-                        {successMessage !== null && <p className={cx('success-message')}>{successMessage}</p>}
-                        <form onSubmit={handleEditForm}>
+                        {errorMessageEdit !== null && <p className={cx('error-message')}>{errorMessageEdit}</p>}
+                        {successMessageEdit !== null && <p className={cx('success-message')}>{successMessageEdit}</p>}
+                        <form method="post" onSubmit={handleEditForm}>
                             <div className={cx('form-group')}>
                                 <label className={cx('form-label')}>Name*</label>
                                 <input
