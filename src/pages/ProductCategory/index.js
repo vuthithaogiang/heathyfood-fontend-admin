@@ -43,17 +43,12 @@ function ProductCategory() {
                     requestAnimationFrame(() => {
                         $(target).classList.toggle('hide', !isHidden);
                         $(target).classList.toggle('show', isHidden);
+
+                        $(target).classList.toggle('hide', setSuccessMessage(null));
+                        $(target).classList.toggle('hide', setErrorMessage(null));
+                        $(target).classList.toggle('hide', setErrorMessageEdit(null));
+                        $(target).classList.toggle('hide', setSuccessMessageEdit(null));
                     });
-                };
-            });
-
-            const links = $$('.js-dropdown-list > li > a');
-
-            links.forEach((link) => {
-                link.onclick = () => {
-                    if (window.innerWidth > 991) return;
-                    const item = link.closest('li');
-                    item.classList.toggle('navbar-item--active');
                 };
             });
         }
@@ -88,11 +83,11 @@ function ProductCategory() {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
 
         console.log(descCategoryProduct);
 
         try {
+            setLoading(true);
             const response = await axios.post(
                 '/api/category-product/store',
                 {
@@ -105,13 +100,17 @@ function ProductCategory() {
             );
 
             console.log(response.data);
+
             setSuccessMessage('Add new category product successfuly.');
+
             setErrorMessage(null);
+
             setLoading(false);
             setName('');
             setDescCategoryProduct('');
         } catch (error) {
             setErrorMessage('This Category has been taken.');
+
             setSuccessMessage(null);
             setLoading(false);
         }
@@ -370,11 +369,9 @@ function ProductCategory() {
                                             className={cx('js-toggle')}
                                             toggle-target="#edit-category-product-form"
                                             onClick={() => {
-                                                setLoading(true);
                                                 setCategoryIdEdit(row.id);
                                                 setNameEdit(row.name);
                                                 setDescCategoryEdit(row.description);
-                                                setLoading(false);
                                             }}
                                         >
                                             Edit
@@ -429,9 +426,9 @@ function ProductCategory() {
                                 >
                                     Submit
                                 </button>
-                                <button className={cx('js-toggle')} toggle-target="#add-category-product-form">
+                                <span className={cx('js-toggle')} toggle-target="#add-category-product-form">
                                     Cancel
-                                </button>
+                                </span>
                             </div>
                         </form>
                     </div>
@@ -482,9 +479,9 @@ function ProductCategory() {
                                 >
                                     Submit
                                 </button>
-                                <button className={cx('js-toggle')} toggle-target="#edit-category-product-form">
+                                <span className={cx('js-toggle')} toggle-target="#edit-category-product-form">
                                     Cancel
-                                </button>
+                                </span>
                             </div>
                         </form>
                     </div>
