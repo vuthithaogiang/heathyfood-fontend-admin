@@ -16,6 +16,10 @@ function ProductCategory() {
     const [errorMessage, setErrorMessage] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [listCategory, setListCategory] = useState(null);
+    const [nameEdit, setNameEdit] = useState(null);
+    const [descCategoryEdit, setDescCategoryEdit] = useState(null);
+
+    const [infoApi, setInfoApi] = useState(null);
 
     useEffect(() => {
         const $ = document.querySelector.bind(document);
@@ -66,7 +70,8 @@ function ProductCategory() {
                 console.log(response.data);
 
                 if (response.data) {
-                    setListCategory(response.data);
+                    setInfoApi(response.data);
+                    setListCategory(response.data.data);
                 }
 
                 setLoading(false);
@@ -109,6 +114,17 @@ function ProductCategory() {
         }
     };
 
+    const handleEditForm = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+        }
+    };
+
     const formatDate = (dateString) => {
         const dateObject = new Date(dateString);
         const months = [
@@ -132,6 +148,39 @@ function ProductCategory() {
 
         const formattedDate = `${day} ${month} ${year}`; // Combine day, month, and year
         return formattedDate;
+    };
+
+    const handleNextPage = async () => {
+        setLoading(true);
+
+        try {
+            const response = await axios.get(infoApi.next_page_url);
+
+            console.log(response);
+            setInfoApi(response.data);
+            setListCategory(response.data.data);
+
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            console.log(error);
+        }
+    };
+
+    const handlePreviousPage = async () => {
+        setLoading(true);
+
+        try {
+            const response = await axios.get(infoApi.prev_page_url);
+
+            console.log(response.data);
+            setInfoApi(response.data);
+            setListCategory(response.data.data);
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
     };
 
     return (
@@ -203,6 +252,7 @@ function ProductCategory() {
                             <span>New</span>
                         </button>
                     </div>
+
                     <div className={cx('form-search')}>
                         <form method="post" onSubmit={(e) => e.preventDefault()}>
                             <img className={cx('icon')} alt="" src={images.searchIncon} />
@@ -210,6 +260,22 @@ function ProductCategory() {
                         </form>
                     </div>
                 </div>
+                {infoApi ? (
+                    <div className={cx('paginations')}>
+                        {infoApi.prev_page_url ? (
+                            <button onClick={handlePreviousPage}>
+                                <img className={cx('icon')} alt="" src={images.arrowLeftIcon} /> <span>Previous</span>
+                            </button>
+                        ) : null}
+
+                        {infoApi.next_page_url ? (
+                            <button onClick={handleNextPage}>
+                                <span>Next</span> <img className={cx('icon')} alt="" src={images.arrowRightIcon} />{' '}
+                            </button>
+                        ) : null}
+                    </div>
+                ) : null}
+
                 <div className={cx('list-categoty')}>
                     {listCategory !== null && (
                         <div className={cx('container-table')}>
@@ -258,14 +324,33 @@ function ProductCategory() {
                                     <p className={cx('desc-category-content', 'table-data', 'desc')}>
                                         {row.description}
                                     </p>
-                                    <p className={cx('table-data', 'status')}>
+                                    <p
+                                        className={
+                                            row.status === 1
+                                                ? cx('table-data', 'status')
+                                                : cx('table-data', 'status', 'inactive')
+                                        }
+                                    >
                                         {row.status === 1 ? 'Avaiable' : 'Inavailable'}
                                         <button className={cx('switch-status-btn')}>
-                                            <img className={cx('icon')} alt="" src={images.penIcon} />
+                                            {row.status === 1 ? (
+                                                <img className={cx('icon')} alt="" src={images.lockIcon} />
+                                            ) : (
+                                                <img className={cx('icon')} alt="" src={images.upgradeIcon} />
+                                            )}
                                         </button>
                                     </p>
                                     <div className={cx('action-btns')}>
-                                        <button>Edit</button>
+                                        <button
+                                            className={cx('js-toggle')}
+                                            toggle-target="#edit-category-product-form"
+                                            onClick={() => {
+                                                setNameEdit(row.name);
+                                                setDescCategoryEdit(row.description);
+                                            }}
+                                        >
+                                            Edit
+                                        </button>
                                         <span className={cx('separate')}></span>
                                         <button>Delete</button>
                                     </div>
@@ -329,6 +414,58 @@ function ProductCategory() {
                 ></div>
 
                 {/* Form edit Category Product */}
+                <div id="edit-category-product-form" className={cx('add-category-product', 'hide')}>
+                    <div className={cx('wrap-form')}>
+                        <header>
+                            <h3>Add New Category Product</h3>
+                            <button className={cx('js-toggle')} toggle-target="#edit-category-product-form">
+                                <img className={cx('icon')} alt="" src={images.xIcon} />
+                            </button>
+                        </header>
+
+                        {errorMessage !== null && <p className={cx('error-message')}>{errorMessage}</p>}
+                        {successMessage !== null && <p className={cx('success-message')}>{successMessage}</p>}
+                        <form onSubmit={handleEditForm}>
+                            <div className={cx('form-group')}>
+                                <label className={cx('form-label')}>Name*</label>
+                                <input
+                                    value={nameEdit}
+                                    onChange={(e) => setNameEdit(e.target.value)}
+                                    className={cx('form-input')}
+                                    type="text"
+                                    name="name"
+                                    placeholder="Name category"
+                                />
+                            </div>
+
+                            <div className={cx('form-group')}>
+                                <label className={cx('form-label')}>Description*</label>
+                                <Editor
+                                    value={descCategoryEdit}
+                                    onTextChange={(e) => setDescCategoryEdit(e.textValue)}
+                                    style={{ height: '220px' }}
+                                />
+                            </div>
+
+                            <div className={cx('form-buttons')}>
+                                <button
+                                    disabled={nameEdit === '' || descCategoryEdit === '' ? true : false}
+                                    type="submit"
+                                >
+                                    Submit
+                                </button>
+                                <button className={cx('js-toggle')} toggle-target="#edit-category-product-form">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div
+                    className={cx('category-product-overlay', 'js-toggle')}
+                    toggle-target="#edit-category-product-form"
+                ></div>
             </div>
 
             {loading && (

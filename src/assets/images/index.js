@@ -30,6 +30,9 @@ const images = {
     starIcon: require('~/assets/images/star-icon.svg').default,
     tagIcon: require('~/assets/images/tag-icon.svg').default,
     penIcon: require('~/assets/images/pen-icon.svg').default,
+    lockIcon: require('~/assets/images/lock-icon.svg').default,
+    upgradeIcon: require('~/assets/images/upgrade-icon.svg').default,
+    arrowLeftIcon: require('~/assets/images/arrow-left-icon.svg').default,
 };
 
 export default images;

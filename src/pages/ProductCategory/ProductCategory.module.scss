@@ -107,7 +107,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 
     .title {
         display: flex;
@@ -433,7 +433,7 @@
 
     .table-data.status {
         position: relative;
-        padding-left: 20px;
+        padding-left: 24px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -443,16 +443,22 @@
             position: absolute;
             content: '';
             top: 36%;
-            left: 8px;
+            left: 10px;
             width: 6px;
             border-radius: 50%;
             height: 6px;
-            background-color: #1f883d;
+            background-color: #218bff;
         }
 
         &:hover .switch-status-btn {
             opacity: 1;
             visibility: visible;
+        }
+    }
+
+    .table-data.status.inactive {
+        &::before {
+            background-color: #d90f0f;
         }
     }
 
@@ -486,9 +492,16 @@
             border: 1px solid #d0d7de;
             padding: 2px 10px;
             border-radius: 20px;
+        }
 
+        button:nth-child(1) {
             &:hover {
                 color: #218bff;
+            }
+        }
+        button:nth-child(3) {
+            &:hover {
+                color: #d90f0f;
             }
         }
     }
@@ -513,5 +526,40 @@
     img {
         width: 15px;
         margin: auto;
+    }
+}
+
+.paginations {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    // justify-content: flex-end;
+    gap: 8px;
+    button {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        background: #f8f8fb;
+        box-shadow: 0px 20px 60px 10px vrgba(237, 237, 246, 0.2);
+        transition: background-color 0.5s;
+
+        span {
+            color: #1a162e;
+            font-size: 1.4rem;
+            font-weight: 400;
+            line-height: 1.43;
+        }
+
+        &:hover {
+            background-color: #ececec;
+        }
+
+        img {
+            margin: auto;
+            width: 8px;
+        }
     }
 }
