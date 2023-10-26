@@ -36,7 +36,7 @@ const useAxios = () => {
 
                 if (
                     error?.response?.data &&
-                    error.response.data.message === 'Token has expired' &&
+                    error.response.data.message === 'Access Denied As You are not Admin.' &&
                     !prevRequest?.sent
                 ) {
                     console.log('Token expired!!');

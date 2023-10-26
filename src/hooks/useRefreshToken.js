@@ -26,7 +26,7 @@ const useRefreshToken = () => {
         } catch (error) {
             console.log(error);
 
-            if (error?.response?.data?.message === 'The token has been blacklisted') {
+            if (error?.response?.data?.message === 'Access Denied As You are not Admin.') {
                 setAuth({});
             }
 

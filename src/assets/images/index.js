@@ -29,6 +29,7 @@ const images = {
     clockIcon: require('~/assets/images/clock-icon.svg').default,
     starIcon: require('~/assets/images/star-icon.svg').default,
     tagIcon: require('~/assets/images/tag-icon.svg').default,
+    penIcon: require('~/assets/images/pen-icon.svg').default,
 };
 
 export default images;
