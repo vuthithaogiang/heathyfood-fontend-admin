@@ -56,28 +56,28 @@ function ProductCategory() {
         initJsToggle();
     }, [listCategory]);
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            setLoading(true);
+    const fetchCategories = async () => {
+        setLoading(true);
 
-            try {
-                const response = await axios.get('/api/category-product/getAll', {
-                    withCredentials: true,
-                });
+        try {
+            const response = await axios.get('/api/category-product/getAll', {
+                withCredentials: true,
+            });
 
-                console.log(response.data);
+            console.log(response.data);
 
-                if (response.data) {
-                    setInfoApi(response.data);
-                    setListCategory(response.data.data);
-                }
-
-                setLoading(false);
-            } catch (error) {
-                setLoading(false);
+            if (response.data) {
+                setInfoApi(response.data);
+                setListCategory(response.data.data);
             }
-        };
 
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchCategories(); // eslint-disable-next-line
     }, [successMessage]);
 
@@ -200,6 +200,52 @@ function ProductCategory() {
             console.log(response.data);
             setInfoApi(response.data);
             setListCategory(response.data.data);
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
+    };
+
+    const handleSetSatusInactive = async (category) => {
+        setLoading(true);
+
+        console.log(category.id);
+
+        try {
+            const response = await axios.post(`/api/category-product/in-available/${category.id}`, {
+                withCredentials: true,
+            });
+
+            console.log(response.data.success);
+
+            if (response.data.success === 'true') {
+                fetchCategories();
+            }
+
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
+    };
+
+    const handleSetStatusActive = async (category) => {
+        setLoading(true);
+
+        console.log(category.id);
+
+        try {
+            const response = await axios.post(`/api/category-product/restore/${category.id}`, {
+                withCredentials: true,
+            });
+
+            console.log(response.data.success);
+
+            if (response.data.success === 'true') {
+                fetchCategories();
+            }
+
             setLoading(false);
         } catch (error) {
             console.log(error);
@@ -358,9 +404,19 @@ function ProductCategory() {
                                         {row.status === 1 ? 'Avaiable' : 'Inavailable'}
                                         <button className={cx('switch-status-btn')}>
                                             {row.status === 1 ? (
-                                                <img className={cx('icon')} alt="" src={images.lockIcon} />
+                                                <img
+                                                    onClick={() => handleSetSatusInactive(row)}
+                                                    className={cx('icon')}
+                                                    alt=""
+                                                    src={images.lockIcon}
+                                                />
                                             ) : (
-                                                <img className={cx('icon')} alt="" src={images.upgradeIcon} />
+                                                <img
+                                                    onClick={() => handleSetStatusActive(row)}
+                                                    className={cx('icon')}
+                                                    alt=""
+                                                    src={images.upgradeIcon}
+                                                />
                                             )}
                                         </button>
                                     </p>

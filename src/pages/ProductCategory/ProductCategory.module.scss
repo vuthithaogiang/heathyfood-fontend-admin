@@ -545,7 +545,7 @@
         gap: 10px;
         padding: 6px 14px;
         border-radius: 20px;
-        background: #f8f8fb;
+        background-color: #ececec;
         box-shadow: 0px 20px 60px 10px vrgba(237, 237, 246, 0.2);
         transition: background-color 0.5s;
 
@@ -557,7 +557,7 @@
         }
 
         &:hover {
-            background-color: #ececec;
+            background-color: #dde8f4c4;
         }
 
         img {
