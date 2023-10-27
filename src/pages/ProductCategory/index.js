@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Editor } from 'primereact/editor';
 import useAxios from '~/hooks/useAxios';
 import { InfinitySpin } from 'react-loader-spinner';
+import AlertConfimDelete from '~/components/AlertConfirmDelete';
 
 const cx = classNames.bind(styles);
 
@@ -21,6 +22,9 @@ function ProductCategory() {
     const [errorMessageEdit, setErrorMessageEdit] = useState(null);
     const [successMessageEdit, setSuccessMessageEdit] = useState(null);
     const [categoryIdEdit, setCategoryIdEdit] = useState(null);
+    const [openModal, setOpenModal] = useState(false);
+
+    const [idCategoryDelete, setIdCategoryDelete] = useState(null);
 
     const [infoApi, setInfoApi] = useState(null);
 
@@ -79,7 +83,7 @@ function ProductCategory() {
 
     useEffect(() => {
         fetchCategories(); // eslint-disable-next-line
-    }, [successMessage]);
+    }, []);
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -140,11 +144,33 @@ function ProductCategory() {
 
             setSuccessMessageEdit('Edit complete.');
             setErrorMessageEdit(null);
+            fetchCategories();
             setLoading(false);
         } catch (error) {
             console.log(error);
             setErrorMessageEdit('The name has already been taken.');
             setSuccessMessageEdit(null);
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteCategory = async () => {
+        setLoading(true);
+
+        try {
+            if (idCategoryDelete !== null) {
+                const response = await axios.post(`/api/category-product/destroy/${idCategoryDelete}`, {
+                    withCredentials: true,
+                });
+
+                console.log(response.data);
+
+                fetchCategories();
+
+                setLoading(false);
+            }
+        } catch (error) {
+            console.log(error);
             setLoading(false);
         }
     };
@@ -433,7 +459,14 @@ function ProductCategory() {
                                             Edit
                                         </button>
                                         <span className={cx('separate')}></span>
-                                        <button>Delete</button>
+                                        <button
+                                            onClick={() => {
+                                                setIdCategoryDelete(row.id);
+                                                setOpenModal(true);
+                                            }}
+                                        >
+                                            Delete
+                                        </button>
                                     </div>
                                 </div>
                             ))}
@@ -556,6 +589,15 @@ function ProductCategory() {
                         <InfinitySpin width="160" color="#fff" />
                     </div>
                 </div>
+            )}
+
+            {openModal && (
+                <AlertConfimDelete
+                    message={`Do you wanna delete this Category? categoryId: ${idCategoryDelete}`}
+                    confirm={handleDeleteCategory}
+                    show={openModal}
+                    setShow={setOpenModal}
+                />
             )}
         </>
     );
