@@ -23,10 +23,96 @@ function ProductCategory() {
     const [successMessageEdit, setSuccessMessageEdit] = useState(null);
     const [categoryIdEdit, setCategoryIdEdit] = useState(null);
     const [openModal, setOpenModal] = useState(false);
-
     const [idCategoryDelete, setIdCategoryDelete] = useState(null);
-
     const [infoApi, setInfoApi] = useState(null);
+
+    // FILTER RECOMMEND ITEM
+    const [orderCreatedRecommend, setOrderCreatedRecommend] = useState(false);
+    const [typeOrderCreatedRecommend, setTypeOrderCreatedRecommend] = useState(null);
+
+    const [statusRecommend, setStatusRecommend] = useState(false);
+    const [typeSatusRecommend, setTypeStatusRecommend] = useState(null);
+
+    const handleSetRecomendItemLastest = () => {
+        if (orderCreatedRecommend === false) {
+            setOrderCreatedRecommend(true);
+        }
+
+        setTypeOrderCreatedRecommend('desc');
+    };
+
+    const handleSetRecomendItemOldest = () => {
+        if (orderCreatedRecommend === false) {
+            setOrderCreatedRecommend(true);
+        }
+
+        setTypeOrderCreatedRecommend('asc');
+    };
+
+    const handleSetRecommendInactive = () => {
+        if (statusRecommend === false) {
+            setStatusRecommend(true);
+        }
+
+        setTypeStatusRecommend(0);
+    };
+
+    const handleSetRecommendActive = () => {
+        if (statusRecommend === false) {
+            setStatusRecommend(true);
+        }
+
+        setTypeStatusRecommend(1);
+    };
+
+    const clearRecomendStaus = () => {
+        setTypeStatusRecommend(null);
+        setStatusRecommend(false);
+    };
+
+    const clearRecommendCreatedAt = () => {
+        setTypeOrderCreatedRecommend(null);
+        setOrderCreatedRecommend(false);
+    };
+
+    const handleFilterCategory = async () => {
+        if (orderCreatedRecommend === false && statusRecommend === false) {
+            return;
+        }
+
+        setInfoApi(null);
+
+        let url = `/api/category-product/filter?status=${typeSatusRecommend}&createdAt=${typeOrderCreatedRecommend}`;
+
+        if (typeOrderCreatedRecommend == null) {
+            url = `/api/category-product/filter?status=${typeSatusRecommend}`;
+        }
+
+        if (typeSatusRecommend == null) {
+            url = `/api/category-product/filter?createdAt=${typeOrderCreatedRecommend}`;
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await axios.get(url, {
+                withCredentials: true,
+            });
+
+            if (response.data) {
+                console.log(response.data);
+                setListCategory(response.data.data);
+                // clearRecomendStaus();
+                // clearRecommendCreatedAt();
+                setLoading(false);
+            }
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
+    };
+
+    //END FILTER RECOMMEND ITEM
 
     useEffect(() => {
         const $ = document.querySelector.bind(document);
@@ -290,54 +376,75 @@ function ProductCategory() {
                     </header>
 
                     <div className={cx('suggest-list')}>
-                        <div className={cx('suggest-item')}>
+                        <div className={cx('suggest-item')} onClick={fetchCategories}>
                             <img className={cx('icon')} alt="" src={images.filterIcon} />
-                            <span>All filters</span>
+                            <span>All Categories</span>
                         </div>
                         <div className={cx('suggest-item')}>
                             <img className={cx('icon')} alt="" src={images.filterIcon} />
                             <span>In-store</span>
                         </div>
-                        <div className={cx('suggest-item')}>
+                        <div className={cx('suggest-item')} onClick={handleSetRecomendItemLastest}>
                             <img className={cx('icon')} alt="" src={images.clockIcon} />
                             <span>Lastest</span>
                         </div>
+                        <div className={cx('suggest-item')} onClick={handleSetRecomendItemOldest}>
+                            <img className={cx('icon')} alt="" src={images.clockIcon} />
+                            <span>Oldest</span>
+                        </div>
 
-                        <div className={cx('suggest-item')}>
+                        <div className={cx('suggest-item')} onClick={handleSetRecommendInactive}>
                             <img className={cx('icon')} alt="" src={images.tagIcon} />
                             <span>Inavailable</span>
                         </div>
-                        <div className={cx('suggest-item')}>
+                        <div className={cx('suggest-item')} onClick={handleSetRecommendActive}>
                             <img className={cx('icon')} alt="" src={images.starIcon} />
                             <span>Available</span>
                         </div>
                     </div>
                     <div className={cx('recomend-item')}>
-                        <div className={cx('suggest-item')}>
-                            <span>Bread Handmake</span>
-                            <img className={cx('')} alt="" src={images.xBorderIcon} />
-                        </div>
-                        <div className={cx('suggest-item')}>
-                            <span>$29 - $80</span>
-                            <img className={cx('')} alt="" src={images.xBorderIcon} />
-                        </div>
-                        <div className={cx('suggest-item')}>
-                            <span>Bread Handmake</span>
-                            <img className={cx('')} alt="" src={images.xBorderIcon} />
-                        </div>
-                        <div className={cx('suggest-item')}>
-                            <span>$29 - $80</span>
-                            <img className={cx('')} alt="" src={images.xBorderIcon} />
-                        </div>
-                        <div className={cx('suggest-item')}>
-                            <span>Bread Handmake</span>
-                            <img className={cx('')} alt="" src={images.xBorderIcon} />
-                        </div>
-                        <div className={cx('suggest-item')}>
-                            <span>$29 - $80</span>
-                            <img className={cx('')} alt="" src={images.xBorderIcon} />
-                        </div>
-                        <button className={cx('suggest-item')}>Reset filter</button>
+                        {orderCreatedRecommend === true && typeOrderCreatedRecommend !== null && (
+                            <>
+                                <div className={cx('suggest-item')}>
+                                    <span>{typeOrderCreatedRecommend === 'desc' && 'Lastest'}</span>
+                                    <span>{typeOrderCreatedRecommend === 'asc' && 'Oldest'}</span>
+                                    <img
+                                        onClick={clearRecommendCreatedAt}
+                                        className={cx('')}
+                                        alt=""
+                                        src={images.xBorderIcon}
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        {statusRecommend === true && typeSatusRecommend !== null && (
+                            <>
+                                <div className={cx('suggest-item')}>
+                                    <span>{typeSatusRecommend === 0 && 'Status: Inavailable'}</span>
+                                    <span>{typeSatusRecommend === 1 && 'Status: Available'}</span>
+                                    <img
+                                        onClick={clearRecomendStaus}
+                                        className={cx('')}
+                                        alt=""
+                                        src={images.xBorderIcon}
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        <button
+                            onClick={() => {
+                                clearRecomendStaus();
+                                clearRecommendCreatedAt();
+                            }}
+                            className={cx('suggest-item')}
+                        >
+                            Reset filter
+                        </button>
+                        <button className={cx('suggest-item')} onClick={handleFilterCategory}>
+                            Go
+                        </button>
                     </div>
                 </div>
                 <div className={cx('actions')}>
