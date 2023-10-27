@@ -59,13 +59,13 @@ function ProductCategory() {
     // SEARCHING
     const [searchValue, setSearchValue] = useState('');
 
-    const handleSeachCategory = async () => {
-        // e.preventDefault();
+    const handleSeachCategory = async (e) => {
+        e.preventDefault();
 
         if (searchValue.trim() === '') {
             return;
         }
-        //  setLoading(true);
+        setLoading(true);
 
         try {
             const response = await axios.get(`/api/category-product/search?key=${searchValue}`, {
@@ -79,10 +79,6 @@ function ProductCategory() {
             console.log(error);
         }
     };
-
-    useEffect(() => {
-        handleSeachCategory(); // eslint-disable-next-line
-    }, [searchValue]);
 
     // END
 
@@ -512,12 +508,7 @@ function ProductCategory() {
                     </div>
 
                     <div className={cx('form-search')}>
-                        <form
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                handleSeachCategory();
-                            }}
-                        >
+                        <form onSubmit={handleSeachCategory}>
                             <button type="submit">
                                 <img className={cx('icon')} alt="" src={images.searchIncon} />
                             </button>

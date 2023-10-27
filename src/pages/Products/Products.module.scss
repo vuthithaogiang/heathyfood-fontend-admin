@@ -123,7 +123,7 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            background-color: #1f883d;
+            background-color: var(--primary-color);
             color: #fff;
             cursor: pointer;
             border-radius: 6px;
@@ -145,9 +145,22 @@
     align-items: center;
     border-radius: 8px;
 
-    img {
-        padding-left: 16px;
-        padding-right: 4px;
+    button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+        cursor: pointer;
+        background-color: var(--primary-color);
+        padding-left: 12px;
+        padding-right: 12px;
+        border-top-left-radius: inherit;
+        border-bottom-left-radius: inherit;
+
+        img {
+            filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(7491%) hue-rotate(102deg)
+                brightness(111%) contrast(101%);
+        }
     }
 
     input {
@@ -257,12 +270,17 @@
     gap: 34px;
     margin-bottom: 60px;
 
+    span {
+        cursor: pointer;
+    }
+
     button {
         font-size: 1.6rem;
         cursor: pointer;
     }
     button:nth-child(1) {
         background-color: var(--primary-color);
+        color: #fff;
         padding: 8px 40px;
         border-radius: 10px;
     }

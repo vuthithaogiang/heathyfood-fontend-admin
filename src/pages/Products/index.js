@@ -207,14 +207,17 @@ function Products() {
             <div className={cx('actions')}>
                 <div className={cx('title')}>
                     <h4>Product</h4>
-                    <button className={cx('js-toggle')} toggle-target="#add-product">
+                    <button className={cx('js-toggle')} toggle-target="#add-product-form">
                         <img className={cx('icon')} alt="" src={images.categoryIcon} />
                         <span>New</span>
                     </button>
                 </div>
                 <div className={cx('form-search')}>
                     <form method="post" onSubmit={(e) => e.preventDefault()}>
-                        <img className={cx('icon')} alt="" src={images.searchIncon} />
+                        <button type="submit">
+                            <img className={cx('icon')} alt="" src={images.searchIncon} />
+                        </button>
+
                         <input type="text" placeholder="Search category name" />
                     </form>
                 </div>
@@ -222,11 +225,11 @@ function Products() {
             <div className={cx('list-product')}>Detail Product</div>
 
             {/* Form New Product */}
-            <div id="add-product" className={cx('add-product', 'hide')}>
+            <div id="add-product-form" className={cx('add-product', 'hide')}>
                 <div className={cx('wrap-inner')}>
                     <header>
                         <h3>Add new Product</h3>
-                        <button className={cx('js-toggle')} toggle-target="#add-product">
+                        <button className={cx('js-toggle')} toggle-target="#add-product-form">
                             <img className={cx('icon')} alt="" src={images.xIcon} />
                         </button>
                     </header>
@@ -437,15 +440,15 @@ function Products() {
 
                             <div className={cx('form-buttons')}>
                                 <button type="submit">Submit</button>
-                                <button className={cx('js-toggle')} toggle-target="#add-product">
+                                <span className={cx('js-toggle')} toggle-target="#add-product-form">
                                     Cancel
-                                </button>
+                                </span>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-            <div className={cx('product-overlay', 'js-toggle')} toggle-target="#add-product"></div>
+            <div className={cx('product-overlay', 'js-toggle')} toggle-target="#add-product-form"></div>
         </div>
     );
 }
