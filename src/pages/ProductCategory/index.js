@@ -56,6 +56,36 @@ function ProductCategory() {
         }
     };
 
+    // SEARCHING
+    const [searchValue, setSearchValue] = useState('');
+
+    const handleSeachCategory = async () => {
+        // e.preventDefault();
+
+        if (searchValue.trim() === '') {
+            return;
+        }
+        //  setLoading(true);
+
+        try {
+            const response = await axios.get(`/api/category-product/search?key=${searchValue}`, {
+                withCredentials: true,
+            });
+
+            if (response.data) {
+                setListCategory(response.data.data);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        handleSeachCategory(); // eslint-disable-next-line
+    }, [searchValue]);
+
+    // END
+
     const handleSetRecomendItemLastest = () => {
         if (orderCreatedRecommend === false) {
             setOrderCreatedRecommend(true);
@@ -482,11 +512,21 @@ function ProductCategory() {
                     </div>
 
                     <div className={cx('form-search')}>
-                        <form method="post" onSubmit={(e) => e.preventDefault()}>
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSeachCategory();
+                            }}
+                        >
                             <button type="submit">
                                 <img className={cx('icon')} alt="" src={images.searchIncon} />
                             </button>
-                            <input type="text" placeholder="Search category name" />
+                            <input
+                                type="text"
+                                placeholder="Search category name"
+                                value={searchValue}
+                                onChange={(e) => setSearchValue(e.target.value)}
+                            />
                         </form>
                     </div>
                 </div>
@@ -589,6 +629,8 @@ function ProductCategory() {
                                     <span>Actions</span>
                                 </div>
                             </div>
+
+                            {listCategory.length === 0 && <span className={cx('no-data')}>No data</span>}
 
                             {listCategory.map((row) => (
                                 <div className={cx('inner-table')} key={row.id}>
