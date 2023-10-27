@@ -33,6 +33,29 @@ function ProductCategory() {
     const [statusRecommend, setStatusRecommend] = useState(false);
     const [typeSatusRecommend, setTypeStatusRecommend] = useState(null);
 
+    //SORTING
+    const [type, setType] = useState(null);
+    const [filter, setFilter] = useState('ASC');
+
+    const sorting = (col) => {
+        setType(col);
+        console.log(col);
+        console.log(filter);
+
+        if (filter === 'DESC') {
+            const sorted = listCategory.sort((a, b) => (a[col] < b[col] ? 1 : -1));
+            setListCategory(sorted);
+            setFilter('ASC');
+        }
+
+        if (filter === 'ASC') {
+            const sorted = listCategory.sort((a, b) => (a[col] > b[col] ? 1 : -1));
+
+            setListCategory(sorted);
+            setFilter('DESC');
+        }
+    };
+
     const handleSetRecomendItemLastest = () => {
         if (orderCreatedRecommend === false) {
             setOrderCreatedRecommend(true);
@@ -192,6 +215,8 @@ function ProductCategory() {
             console.log(response.data);
 
             setSuccessMessage('Add new category product successfuly.');
+
+            fetchCategories();
 
             setErrorMessage(null);
 
@@ -458,7 +483,9 @@ function ProductCategory() {
 
                     <div className={cx('form-search')}>
                         <form method="post" onSubmit={(e) => e.preventDefault()}>
-                            <img className={cx('icon')} alt="" src={images.searchIncon} />
+                            <button type="submit">
+                                <img className={cx('icon')} alt="" src={images.searchIncon} />
+                            </button>
                             <input type="text" placeholder="Search category name" />
                         </form>
                     </div>
@@ -484,23 +511,59 @@ function ProductCategory() {
                         <div className={cx('container-table')}>
                             <div className={cx('head-table')}>
                                 <div>
-                                    <span>
-                                        ID <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                    <span onClick={() => sorting('id')}>
+                                        ID{' '}
+                                        <img
+                                            className={
+                                                type === 'id' && filter === 'DESC'
+                                                    ? cx('icon', 'icon-rotate')
+                                                    : cx('icon')
+                                            }
+                                            alt=""
+                                            src={images.arrowDownIcon}
+                                        />
                                     </span>
                                 </div>
                                 <div>
-                                    <span>
-                                        Category Name <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                    <span onClick={() => sorting('name')}>
+                                        Category Name{' '}
+                                        <img
+                                            className={
+                                                type === 'name' && filter === 'DESC'
+                                                    ? cx('icon', 'icon-rotate')
+                                                    : cx('icon')
+                                            }
+                                            alt=""
+                                            src={images.arrowDownIcon}
+                                        />
                                     </span>
                                 </div>
                                 <div>
-                                    <span>
-                                        Slug <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                    <span onClick={() => sorting('slug')}>
+                                        Slug{' '}
+                                        <img
+                                            className={
+                                                type === 'slug' && filter === 'DESC'
+                                                    ? cx('icon', 'icon-rotate')
+                                                    : cx('icon')
+                                            }
+                                            alt=""
+                                            src={images.arrowDownIcon}
+                                        />
                                     </span>
                                 </div>
                                 <div>
-                                    <span>
-                                        Created at <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                    <span onClick={() => sorting('created_at')}>
+                                        Created at{' '}
+                                        <img
+                                            className={
+                                                type === 'created_at' && filter === 'DESC'
+                                                    ? cx('icon', 'icon-rotate')
+                                                    : cx('icon')
+                                            }
+                                            alt=""
+                                            src={images.arrowDownIcon}
+                                        />
                                     </span>
                                 </div>
                                 <div>
@@ -509,8 +572,17 @@ function ProductCategory() {
                                     </span>
                                 </div>
                                 <div>
-                                    <span>
-                                        Status <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                    <span onClick={() => sorting('status')}>
+                                        Status
+                                        <img
+                                            className={
+                                                type === 'status' && filter === 'DESC'
+                                                    ? cx('icon', 'icon-rotate')
+                                                    : cx('icon')
+                                            }
+                                            alt=""
+                                            src={images.arrowDownIcon}
+                                        />
                                     </span>
                                 </div>
                                 <div>
