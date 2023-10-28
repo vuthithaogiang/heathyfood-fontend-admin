@@ -543,7 +543,7 @@ function ProductCategory() {
                             <div className={cx('head-table')}>
                                 <div>
                                     <span onClick={() => sorting('id')}>
-                                        ID{' '}
+                                        ID
                                         <img
                                             className={
                                                 type === 'id' && filter === 'DESC'
