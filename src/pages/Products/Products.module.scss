@@ -1,3 +1,7 @@
+.wrapper {
+    padding-bottom: 60px;
+}
+
 .filter-suggest {
     margin-bottom: 30px;
     padding: 20px;
@@ -172,7 +176,7 @@
 .add-product {
     translate: 0 100%;
     position: fixed;
-    z-index: 91;
+    z-index: 9;
     inset: 10% 180px 0 180px;
     background-color: #fff;
     border-top-right-radius: 10px;
@@ -291,7 +295,7 @@
     align-items: center;
     justify-content: space-between;
 
-    button {
+    span.btn {
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -424,7 +428,7 @@ span.note {
     margin-left: 6px;
     font-size: 1.2rem;
     font-style: italic;
-    color: var(--primary-color);
+    color: red;
 }
 
 // Overlay
@@ -620,4 +624,31 @@ span.note {
             }
         }
     }
+}
+
+.error-message {
+    width: 30%;
+    // margin-left: 30px;
+    margin-bottom: 24px;
+    border-radius: 10px;
+    font-size: 1.3rem;
+    font-weight: 500;
+    text-align: left;
+    color: red;
+    padding: 8px 16px;
+    font-style: italic;
+    //  border: 1.5px solid #da5c5c;
+    background-color: #e1acb233;
+}
+
+.success-message {
+    width: 30%;
+    // margin-left: 30px;
+    margin-bottom: 24px;
+    padding: 8px 16px;
+    font-size: 1.3rem;
+    border-radius: 10px;
+    color: #1f883d;
+    font-style: italic;
+    background: rgb(39 243 117 / 20%);
 }

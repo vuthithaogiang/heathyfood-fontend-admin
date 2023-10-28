@@ -6,6 +6,7 @@
 }
 
 .toast {
+    z-index: 100;
     display: none;
     position: fixed;
     bottom: 20px;

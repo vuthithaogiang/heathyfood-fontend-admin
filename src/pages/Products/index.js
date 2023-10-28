@@ -7,15 +7,39 @@ import useOnClickOutside from '~/hooks/useOnclickOutside';
 import useAxios from '~/hooks/useAxios';
 import { InfinitySpin } from 'react-loader-spinner';
 import AlertConfimDelete from '~/components/AlertConfirmDelete';
+import React from 'react';
 
 const cx = classNames.bind(styles);
 
 const BASE_URL_IMAGE = 'http://127.0.0.1:8000/uploads/';
 
 function Products() {
-    const FAKE_STATUS_PRODUCT = ['New Arrival', 'Upcoming', 'Invaiable', 'Vailable'];
+    const IN_AVAILABLE = 0; // STATEMENT
+    const AVAILABLE = 1; // STATEMENT
+    const UPCOMING = 2; // STATEMENT
+    const NEW_ARRIVAL = 3; // STATEMENT
 
-    const [descProduct, setDescProduct] = useState('');
+    // const SOLD_OUT = 4; // CALCULATE
+    // const BEST_SELLER = 5; // CALCULATE
+    const FAKE_STATUS_PRODUCT = [
+        {
+            id: IN_AVAILABLE,
+            state: 'IN AVAILABLE',
+        },
+        {
+            id: AVAILABLE,
+            state: 'AVAILABLE',
+        },
+        {
+            id: UPCOMING,
+            state: 'UPCOMING',
+        },
+        {
+            id: NEW_ARRIVAL,
+            state: 'NEW ARRIVAL',
+        },
+    ];
+
     const [showOptionStatusProduct, setShowOptionStatusProduct] = useState(false);
     const refOptionStatusProduct = useRef();
     const [statusProduct, setStatusProduct] = useState(null);
@@ -30,6 +54,32 @@ function Products() {
 
     const [openModal, setOpenModal] = useState(false);
     const [idProductDelete, setIdProductDelete] = useState(null);
+
+    //value add new
+
+    const [nameProduct, setNameProduct] = useState('');
+    const [brand, setBrand] = useState('');
+    const [descProduct, setDescProduct] = useState('');
+    const [quantity, setQuantity] = useState(null);
+    const [price, setPrice] = useState(null);
+
+    const [errorMessage, setErrorMessage] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
+
+    const handleDeleteProduct = async () => {
+        try {
+            const response = await axios.post(`/api/product/destroy/${idProductDelete}`, {
+                withCredentials: true,
+            });
+
+            if (response.data.success === 'true') {
+                setIdProductDelete(null);
+                fetchProducts();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -91,6 +141,12 @@ function Products() {
                     requestAnimationFrame(() => {
                         $(target).classList.toggle('hide', !isHidden);
                         $(target).classList.toggle('show', isHidden);
+
+                        $(target).classList.toggle('hide', setSuccessMessage(null));
+                        $(target).classList.toggle('hide', setErrorMessage(null));
+
+                        // $(target).classList.toggle('hide', setErrorMessageEdit(null));
+                        // $(target).classList.toggle('hide', setSuccessMessageEdit(null));
                     });
                 };
             });
@@ -128,60 +184,6 @@ function Products() {
     useOnClickOutside(refOptionStatusProduct, hiddenOptionStatusPorduct);
     useOnClickOutside(refOptionCategoryProduct, hiddenOptionCategoryProduct);
 
-    // thumb 1
-    const [previewThumb, setPreviewThumb] = useState(null);
-    const handlePreviewAvatar = (e) => {
-        const file = e.target.files[0];
-
-        file.preview = URL.createObjectURL(file);
-        setPreviewThumb(file.preview);
-    };
-
-    useEffect(() => {
-        //clean up
-        return () => {
-            URL.revokeObjectURL(previewThumb);
-        };
-    }, [previewThumb]);
-
-    //thumb 2
-    const [previewThumbSecond, setPreviewThumbSecond] = useState(null);
-    const handlePreviewThumbSecond = (e) => {
-        const file = e.target.files[0];
-
-        file.preview = URL.createObjectURL(file);
-        setPreviewThumbSecond(file.preview);
-    };
-
-    useEffect(() => {
-        //clean up
-        return () => {
-            URL.revokeObjectURL(previewThumbSecond);
-        };
-    }, [previewThumbSecond]);
-
-    //thumb 3
-    const [previewThumbThird, setPreviewThumbThird] = useState(null);
-    const handlePreviewThumbThird = (e) => {
-        const file = e.target.files[0];
-
-        file.preview = URL.createObjectURL(file);
-        setPreviewThumbThird(file.preview);
-    };
-
-    useEffect(() => {
-        //clean up
-        return () => {
-            URL.revokeObjectURL(previewThumbThird);
-        };
-    }, [previewThumbThird]);
-
-    function clearAllFile() {
-        setPreviewThumb(null);
-        setPreviewThumbSecond(null);
-        setPreviewThumbThird(null);
-    }
-
     const formatDate = (dateString) => {
         const dateObject = new Date(dateString);
         const months = [
@@ -205,6 +207,92 @@ function Products() {
 
         const formattedDate = `${day} ${month} ${year}`; // Combine day, month, and year
         return formattedDate;
+    };
+
+    //Handle photos
+
+    const [selectedFiles, setSelectedFile] = useState([]);
+
+    const handleImageChange = (e) => {
+        setSelectedFile([]);
+        if (e.target.files) {
+            const fileArray = Array.from(e.target.files).map((file) => URL.createObjectURL(file));
+            setSelectedFile((prev) => prev.concat(fileArray));
+            Array.from(e.target.files).map((file) => URL.revokeObjectURL(file));
+        }
+    };
+
+    const renderPhotos = (source) => {
+        return source.map((photo) => (
+            <label className={cx('file-thumb', 'not-border')}>
+                <img className={cx('preview-img')} alt="" src={photo} />
+            </label>
+        ));
+    };
+
+    const uploadToStoreProduct = async (e) => {
+        e.preventDefault();
+
+        console.log(e.target.length);
+        //  console.log(e.target[20].files);
+        console.log(e.target[19].files);
+
+        const formData = new FormData();
+
+        if (
+            nameProduct !== '' &&
+            brand !== '' &&
+            descProduct !== '' &&
+            categoryProduct !== null &&
+            statusProduct !== null &&
+            quantity !== null &&
+            price !== null
+        ) {
+            setLoading(true);
+
+            var files = e.target[19].files;
+
+            for (let i = 0; i < files.length; i++) {
+                formData.append('thumbs[]', files[i]);
+            }
+
+            formData.append('name', nameProduct);
+            formData.append('brand', brand);
+            formData.append('description', descProduct);
+            formData.append('categoryId', categoryProduct.id);
+            formData.append('status', statusProduct.id);
+            formData.append('quantity', quantity);
+            formData.append('price', price);
+
+            try {
+                const response = await axios.post('/api/product/store', formData, {
+                    withCredentials: true,
+                });
+
+                console.log(response.data);
+
+                if (response.data.success === 'true') {
+                    setNameProduct('');
+                    setDescProduct('');
+                    setBrand('');
+                    setPrice(0);
+                    setQuantity(0);
+                    setSelectedFile([]);
+                    setCategoryProduct(null);
+                    setStatusProduct(null);
+                    setErrorMessage(null);
+                    setSuccessMessage('Add new product done');
+                    fetchProducts();
+                }
+
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+                setSuccessMessage(null);
+                setErrorMessage('The request fail. Please try again.');
+                setLoading(false);
+            }
+        }
     };
 
     return (
@@ -415,13 +503,23 @@ function Products() {
                                     </button>
                                 </header>
                                 <div className={cx('content')}>
-                                    <form method="post" onSubmit={(e) => e.preventDefault()}>
+                                    {errorMessage !== null && <p className={cx('error-message')}>{errorMessage}</p>}
+                                    {successMessage !== null && (
+                                        <p className={cx('success-message')}>{successMessage}</p>
+                                    )}
+                                    <form
+                                        method="post"
+                                        onSubmit={(e) => uploadToStoreProduct(e)}
+                                        encType="multipart/form-data"
+                                    >
                                         <div className={cx('form-group')}>
                                             <label className={cx('form-label')}>Name</label>
                                             <input
                                                 type="text"
                                                 className={cx('form-input')}
                                                 placeholder="Name product"
+                                                value={nameProduct}
+                                                onChange={(e) => setNameProduct(e.target.value)}
                                             />
                                         </div>
                                         <div className={cx('form-group')}>
@@ -430,13 +528,15 @@ function Products() {
                                                 type="text"
                                                 className={cx('form-input')}
                                                 placeholder="Belong to Brand"
+                                                value={brand}
+                                                onChange={(e) => setBrand(e.target.value)}
                                             />
                                         </div>
                                         <div className={cx('form-group')}>
                                             <label className={cx('form-label')}>Description</label>
                                             <Editor
                                                 value={descProduct}
-                                                onTextChange={(e) => setDescProduct(e.htmlValue)}
+                                                onTextChange={(e) => setDescProduct(e.textValue)}
                                                 style={{ height: '220px' }}
                                             />
                                         </div>
@@ -444,11 +544,25 @@ function Products() {
                                         <div className={cx('form-row')}>
                                             <div className={cx('form-group')}>
                                                 <label className={cx('form-label')}>Quantity</label>
-                                                <input type="text" className={cx('form-input')} placeholder="10" />
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    className={cx('form-input')}
+                                                    placeholder="10"
+                                                    value={quantity}
+                                                    onChange={(e) => setQuantity(e.target.value)}
+                                                />
                                             </div>
                                             <div className={cx('form-group')}>
                                                 <label className={cx('form-label')}>Price</label>
-                                                <input type="text" className={cx('form-input')} placeholder="$12" />
+                                                <input
+                                                    type="number"
+                                                    min={1}
+                                                    className={cx('form-input')}
+                                                    placeholder="$12"
+                                                    value={price}
+                                                    onChange={(e) => setPrice(e.target.value)}
+                                                />
                                             </div>
                                         </div>
 
@@ -462,7 +576,9 @@ function Products() {
                                                     <label className={cx('form-label')}>Status</label>
                                                     <div className={cx('wrap-select')}>
                                                         <span>
-                                                            {statusProduct === null ? 'Select Status' : statusProduct}
+                                                            {statusProduct === null
+                                                                ? 'Select Status'
+                                                                : statusProduct.state}
                                                         </span>
                                                         <img
                                                             className={
@@ -485,9 +601,9 @@ function Products() {
                                                             <div
                                                                 onClick={() => setStatusProduct(item)}
                                                                 className={cx('option')}
-                                                                key={item}
+                                                                key={item.id}
                                                             >
-                                                                <span>{item}</span>
+                                                                <span>{item.state}</span>
                                                             </div>
                                                         ))}
                                                     </div>
@@ -505,7 +621,7 @@ function Products() {
                                                         <span>
                                                             {categoryProduct === null
                                                                 ? 'Select Category'
-                                                                : categoryProduct}
+                                                                : categoryProduct.name}
                                                         </span>
                                                         <img
                                                             className={
@@ -526,7 +642,7 @@ function Products() {
                                                     >
                                                         {categories.map((item) => (
                                                             <div
-                                                                onClick={() => setCategoryProduct(item.name)}
+                                                                onClick={() => setCategoryProduct(item)}
                                                                 className={cx('option')}
                                                                 key={item.id}
                                                             >
@@ -537,106 +653,30 @@ function Products() {
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div className={cx('form-row-upload')}>
                                             <div className={cx('form-label-row')}>
                                                 <label className={cx('form-label')}>
                                                     Upload Thumbnail
-                                                    <span className={cx('note')}>*can upload min 1 & max 3</span>
+                                                    <span className={cx('note')}>*can upload multi thumbnails</span>
                                                 </label>
 
-                                                <button onClick={() => clearAllFile()}>
+                                                <span className={cx('btn')} onClick={() => setSelectedFile([])}>
                                                     <img className={cx('icon')} alt="" src={images.cleanIcon} />
                                                     Clear
-                                                </button>
+                                                </span>
                                             </div>
                                             <div className={cx('container-files')}>
-                                                {/* Thumb 1 */}
+                                                {renderPhotos(selectedFiles)}
                                                 <input
                                                     type="file"
-                                                    id="previewOne"
-                                                    onChange={handlePreviewAvatar}
-                                                    name="previewOne"
+                                                    id="thumbs"
+                                                    multiple
+                                                    onChange={handleImageChange}
+                                                    name="thumbs[]"
                                                     hidden
                                                 />
-                                                <label
-                                                    htmlFor="previewOne"
-                                                    className={
-                                                        previewThumb === null
-                                                            ? cx('file-thumb')
-                                                            : cx('file-thumb', 'not-border')
-                                                    }
-                                                >
-                                                    {previewThumb === null ? (
-                                                        <>
-                                                            <img className={cx('icon')} alt="" src={images.plusIcon} />
-                                                            <span>Add Thumbnail</span>
-                                                        </>
-                                                    ) : (
-                                                        <img className={cx('preview-img')} alt="" src={previewThumb} />
-                                                    )}
-                                                </label>
-
-                                                {/* Thumb 2 */}
-
-                                                <input
-                                                    type="file"
-                                                    id="previewSecond"
-                                                    onChange={handlePreviewThumbSecond}
-                                                    name="previewSecond"
-                                                    hidden
-                                                />
-
-                                                <label
-                                                    htmlFor="previewSecond"
-                                                    className={
-                                                        previewThumbSecond === null
-                                                            ? cx('file-thumb')
-                                                            : cx('file-thumb', 'not-border')
-                                                    }
-                                                >
-                                                    {previewThumbSecond === null ? (
-                                                        <>
-                                                            <img className={cx('icon')} alt="" src={images.plusIcon} />
-                                                            <span>Add Thumbnail</span>
-                                                        </>
-                                                    ) : (
-                                                        <img
-                                                            className={cx('preview-img')}
-                                                            alt=""
-                                                            src={previewThumbSecond}
-                                                        />
-                                                    )}
-                                                </label>
-
-                                                {/* Thumb 3 */}
-                                                <input
-                                                    type="file"
-                                                    id="previewThird"
-                                                    onChange={handlePreviewThumbThird}
-                                                    name="previewThird"
-                                                    hidden
-                                                />
-                                                <label
-                                                    htmlFor="previewThird"
-                                                    className={
-                                                        previewThumbThird === null
-                                                            ? cx('file-thumb')
-                                                            : cx('file-thumb', 'not-border')
-                                                    }
-                                                >
-                                                    {previewThumbThird === null ? (
-                                                        <>
-                                                            <img className={cx('icon')} alt="" src={images.plusIcon} />
-                                                            <span>Add Thumbnail</span>
-                                                        </>
-                                                    ) : (
-                                                        <img
-                                                            className={cx('preview-img')}
-                                                            alt=""
-                                                            src={previewThumbThird}
-                                                        />
-                                                    )}
+                                                <label htmlFor="thumbs" className={cx('file-thumb')}>
+                                                    <img className={cx('icon')} alt="" src={images.plusIcon} />
                                                 </label>
                                             </div>
                                         </div>
@@ -668,7 +708,7 @@ function Products() {
             {openModal && (
                 <AlertConfimDelete
                     message={`Do you wanna delete this Product? productId: ${idProductDelete}`}
-                    confirm={() => {}}
+                    confirm={handleDeleteProduct}
                     show={openModal}
                     setShow={setOpenModal}
                 />
