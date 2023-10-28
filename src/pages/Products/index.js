@@ -54,6 +54,7 @@ function Products() {
 
     const [openModal, setOpenModal] = useState(false);
     const [idProductDelete, setIdProductDelete] = useState(null);
+    const [selectedFiles, setSelectedFile] = useState([]);
 
     //value add new
 
@@ -65,6 +66,9 @@ function Products() {
 
     const [errorMessage, setErrorMessage] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
+
+    //value edit
+    const [productSatementEdit, setProductStatementEdit] = useState(null);
 
     const handleDeleteProduct = async () => {
         try {
@@ -210,8 +214,6 @@ function Products() {
     };
 
     //Handle photos
-
-    const [selectedFiles, setSelectedFile] = useState([]);
 
     const handleImageChange = (e) => {
         setSelectedFile([]);
@@ -386,6 +388,9 @@ function Products() {
                                             <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
                                         </span>
                                     </div>
+                                    <div>
+                                        <span>Thumbnail</span>
+                                    </div>
 
                                     <div>
                                         <span>
@@ -394,20 +399,16 @@ function Products() {
                                     </div>
 
                                     <div>
-                                        <span>Thumbnail</span>
-                                    </div>
-
-                                    <div>
                                         <span>
                                             Created at <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
                                         </span>
                                     </div>
 
-                                    <div>
+                                    {/* <div>
                                         <span>
                                             Desctiption <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
                                         </span>
-                                    </div>
+                                    </div> */}
 
                                     <div>
                                         <span>
@@ -451,7 +452,6 @@ function Products() {
                                 {listProduct.map((row) => (
                                     <div className={cx('inner-table')}>
                                         <span className={cx('table-data')}>{row.id}</span>
-                                        <p className={cx('table-data', 'name')}>{row.name}</p>
                                         <figure className={cx('table-data')}>
                                             <img
                                                 className={cx('thumb')}
@@ -459,11 +459,13 @@ function Products() {
                                                 src={`${BASE_URL_IMAGE}${row.thumbnails[0].path}`}
                                             />
                                         </figure>
+                                        <p className={cx('table-data', 'name', 'desc')}>{row.name}</p>
+
                                         <p className={cx('table-data', 'date')}>{formatDate(row.created_at)}</p>
-                                        <p className={cx('table-data', 'desc')}>{row.description}</p>
+                                        {/* <p className={cx('table-data', 'desc')}>{row.description}</p> */}
                                         <p className={cx('table-data')}>{row.brand}</p>
                                         <p className={cx('table-data')}>${row.price}</p>
-                                        <p className={cx('table-data')}>{row.quantity}</p>
+                                        <p className={cx('table-data', 'quantity')}>{row.quantity}</p>
                                         <p className={cx('table-data')}>{row.category.name}</p>
                                         <p className={cx('table-data')}>
                                             {row.status === 0 && 'InAvailable'}
@@ -474,7 +476,15 @@ function Products() {
                                             {row.status === 5 && 'Best Seller'}
                                         </p>
                                         <div className={cx('action-btns')}>
-                                            <button>Edit</button>
+                                            <button
+                                                className={cx('js-toggle')}
+                                                toggle-target="#edit-product-form"
+                                                onClick={() => {
+                                                    setProductStatementEdit(row);
+                                                }}
+                                            >
+                                                Edit
+                                            </button>
                                             <span className={cx('separate')}></span>
                                             <button
                                                 onClick={() => {
@@ -694,6 +704,160 @@ function Products() {
                         <div className={cx('product-overlay', 'js-toggle')} toggle-target="#add-product-form"></div>
                     </>
                 )}
+
+                {/* Form Edit Product */}
+
+                <div id="edit-product-form" className={cx('add-product', 'hide')}>
+                    <div className={cx('wrap-inner')}>
+                        <header>
+                            <h3>Edit Product</h3>
+                            <button className={cx('js-toggle')} toggle-target="#edit-product-form">
+                                <img className={cx('icon')} alt="" src={images.xIcon} />
+                            </button>
+                        </header>
+                    </div>
+
+                    <div className={cx('content')}>
+                        <form onSubmit={(e) => e.preventDefault()} encType="multipart/form-data">
+                            <div className={cx('form-group')}>
+                                <label className={cx('form-label')}>Name</label>
+                                <input type="text" className={cx('form-input')} placeholder="Name product" />
+                            </div>
+
+                            <div className={cx('form-group')}>
+                                <label className={cx('form-label')}>Brand</label>
+                                <input type="text" className={cx('form-input')} placeholder="Belong to Brand" />
+                            </div>
+                            <div className={cx('form-group')}>
+                                <label className={cx('form-label')}>Description</label>
+                                <Editor style={{ height: '220px' }} />
+                            </div>
+
+                            <div className={cx('form-row')}>
+                                <div className={cx('form-group')}>
+                                    <label className={cx('form-label')}>Quantity</label>
+                                    <input type="number" min={1} className={cx('form-input')} placeholder="10" />
+                                </div>
+                                <div className={cx('form-group')}>
+                                    <label className={cx('form-label')}>Price</label>
+                                    <input type="number" min={1} className={cx('form-input')} placeholder="$12" />
+                                </div>
+                            </div>
+
+                            {/* <div className={cx('form-row')}>
+                                <div className={cx('form-status-product')}>
+                                    <div
+                                        onClick={toggleShowOptionStatusProduct}
+                                        ref={refOptionStatusProduct}
+                                        className={cx('form-group', 'product')}
+                                    >
+                                        <label className={cx('form-label')}>Status</label>
+                                        <div className={cx('wrap-select')}>
+                                            <span>
+                                                {statusProduct === null ? 'Select Status' : statusProduct.state}
+                                            </span>
+                                            <img
+                                                className={
+                                                    showOptionStatusProduct === true
+                                                        ? cx('icon', 'icon-rotate')
+                                                        : cx('icon')
+                                                }
+                                                alt=""
+                                                src={images.arrowIcon}
+                                            />
+                                        </div>
+                                        <div
+                                            className={
+                                                showOptionStatusProduct === true
+                                                    ? cx('wrap-options')
+                                                    : cx('wrap-options', 'none')
+                                            }
+                                        >
+                                            {FAKE_STATUS_PRODUCT.map((item) => (
+                                                <div
+                                                    onClick={() => setStatusProduct(item)}
+                                                    className={cx('option')}
+                                                    key={item.id}
+                                                >
+                                                    <span>{item.state}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className={cx('form-category-product')}>
+                                    <div
+                                        ref={refOptionCategoryProduct}
+                                        onClick={toggleShowOptionCategoryProduct}
+                                        className={cx('form-group', 'product')}
+                                    >
+                                        <label className={cx('form-label')}>Belong To Category</label>
+                                        <div className={cx('wrap-select')}>
+                                            <span>
+                                                {categoryProduct === null ? 'Select Category' : categoryProduct.name}
+                                            </span>
+                                            <img
+                                                className={
+                                                    showOptionCategoryProduct === true
+                                                        ? cx('icon', 'icon-rotate')
+                                                        : cx('icon')
+                                                }
+                                                alt=""
+                                                src={images.arrowIcon}
+                                            />
+                                        </div>
+                                        <div
+                                            className={
+                                                showOptionCategoryProduct === true
+                                                    ? cx('wrap-options')
+                                                    : cx('wrap-options', 'none')
+                                            }
+                                        >
+                                            {categories.map((item) => (
+                                                <div
+                                                    onClick={() => setCategoryProduct(item)}
+                                                    className={cx('option')}
+                                                    key={item.id}
+                                                >
+                                                    <span>{item.name}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> */}
+                            <div className={cx('form-row-upload')}>
+                                <div className={cx('form-label-row')}>
+                                    <label className={cx('form-label')}>
+                                        Upload Thumbnail
+                                        <span className={cx('note')}>*can upload multi thumbnails</span>
+                                    </label>
+
+                                    <span className={cx('btn')}>
+                                        <img className={cx('icon')} alt="" src={images.cleanIcon} />
+                                        Clear
+                                    </span>
+                                </div>
+                                <div className={cx('container-files')}>
+                                    <input type="file" id="uploadThumbs" multiple name="uploadThumbs[]" hidden />
+                                    <label htmlFor="uploadThumbs" className={cx('file-thumb')}>
+                                        <img className={cx('icon')} alt="" src={images.plusIcon} />
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className={cx('form-buttons')}>
+                                <button type="submit">Submit</button>
+                                <span className={cx('js-toggle')} toggle-target="#edit-product-form">
+                                    Cancel
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div className={cx('product-overlay', 'js-toggle')} toggle-target="#edit-product-form"></div>
             </div>
 
             {loading && (
