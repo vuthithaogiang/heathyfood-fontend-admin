@@ -142,6 +142,8 @@ function Products() {
     const [errorMessage, setErrorMessage] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
 
+    const [searchValue, setSearchValue] = useState('');
+
     //value edit
     const [productSatementEdit, setProductStatementEdit] = useState(null);
     const [editName, setEditName] = useState('');
@@ -549,6 +551,42 @@ function Products() {
         }
     };
 
+    const resetFilter = () => {
+        setSearchValue('');
+        setFilterBrand('');
+        setFilterCategiry(null);
+        setFilterStatus(null);
+        setValues([0, 120]);
+
+        fetchProducts();
+    };
+
+    const handleSearchProducts = async (e) => {
+        e.preventDefault();
+
+        if (searchValue.trim() === '') {
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await axios.get(`/api/product/search?key=${searchValue}`, {
+                withCredentials: true,
+            });
+
+            console.log(response.data);
+
+            if (response.data.success === 'true') {
+                setListProduct(response.data.data);
+            }
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
+    };
+
     return (
         <>
             <div className={cx('wrapper')}>
@@ -845,7 +883,9 @@ function Products() {
                             <span>$29 - $80</span>
                             <img className={cx('')} alt="" src={images.xBorderIcon} />
                         </div>
-                        <button className={cx('suggest-item')}>Reset filter</button>
+                        <button onClick={resetFilter} className={cx('suggest-item')}>
+                            Reset filter
+                        </button>
                     </div>
                 </div>
                 <div className={cx('actions')}>
@@ -857,12 +897,17 @@ function Products() {
                         </button>
                     </div>
                     <div className={cx('form-search')}>
-                        <form method="post" onSubmit={(e) => e.preventDefault()}>
+                        <form method="post" onSubmit={handleSearchProducts}>
                             <button type="submit">
                                 <img className={cx('icon')} alt="" src={images.searchIncon} />
                             </button>
 
-                            <input type="text" placeholder="Search product name" />
+                            <input
+                                type="text"
+                                value={searchValue}
+                                onChange={(e) => setSearchValue(e.target.value)}
+                                placeholder="Search product name"
+                            />
                         </form>
                     </div>
                 </div>
