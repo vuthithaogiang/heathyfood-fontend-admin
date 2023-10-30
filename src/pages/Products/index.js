@@ -69,7 +69,7 @@ function Products() {
     ];
 
     const MIN = 0;
-    const MAX = 300;
+    const MAX = 120;
     const [showFlter, setShowFilter] = useState(false);
     const [values, setValues] = useState([MIN, MAX]);
     const [filterCategory, setFilterCategiry] = useState(null);
@@ -513,12 +513,40 @@ function Products() {
 
     const handleFilterProduct = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        console.log('Brand: ', filterBrand);
-        console.log('MIN : ', values[0]);
-        console.log('MAX', values[1]);
-        console.log('CateId: ', filterCategory.id);
-        console.log('Status: ', filterStatus);
+        let urlBrand;
+        let urlMinPrice = `minPrice=${values[0]}`;
+        let urlMaxPrice = `maxPrice=${values[1]}`;
+        let urlCategoryId;
+        let urlStatus;
+
+        filterBrand.trim() !== '' ? (urlBrand = `brand=${filterBrand}`) : (urlBrand = '');
+
+        filterCategory !== null ? (urlCategoryId = `categoryId=${filterCategory.id}`) : (urlCategoryId = '');
+
+        filterStatus !== null ? (urlStatus = `status=${filterStatus}`) : (urlStatus = '');
+
+        try {
+            const response = await axios.get(
+                `/api/product/filter?${urlMinPrice}&${urlMaxPrice}&${urlCategoryId}&${urlBrand}&${urlStatus}`,
+                {
+                    withCredentials: true,
+                },
+            );
+
+            console.log(response.data);
+
+            if (response.data.success === 'true') {
+                setListProduct(response.data.data);
+            }
+            setShowFilter(false);
+
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
     };
 
     return (
@@ -643,9 +671,12 @@ function Products() {
                                             </div>
                                             <div className={cx('filter-form-group')}>
                                                 <div className={cx('filter-form-tags')}>
-                                                    <button className={cx('filter-form-tag')}>Small</button>
-                                                    <button className={cx('filter-form-tag')}>Medium</button>
-                                                    <button className={cx('filter-form-tag')}>Large</button>
+                                                    <span
+                                                        onClick={() => setFilterCategiry(null)}
+                                                        className={cx('filter-form-tag')}
+                                                    >
+                                                        All
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -720,18 +751,18 @@ function Products() {
                                             </div>
                                             <div className={cx('filter-form-group')}>
                                                 <div className={cx('filter-form-tags')}>
-                                                    <button
+                                                    <span
                                                         className={cx('filter-form-tag')}
                                                         onClick={() => setFilterStatus(5)}
                                                     >
                                                         Best Seller
-                                                    </button>
-                                                    <button
+                                                    </span>
+                                                    <span
                                                         className={cx('filter-form-tag')}
                                                         onClick={() => setFilterStatus(0)}
                                                     >
                                                         Inavailable
-                                                    </button>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>

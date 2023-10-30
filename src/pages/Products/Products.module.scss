@@ -224,7 +224,7 @@
             height: 45px;
             justify-content: space-between;
         }
-
+        .wrap-select,
         .wrap-select.set-width {
             min-width: 240px;
         }
@@ -1013,4 +1013,10 @@ span.note {
 .thumb-edit:hover img.icon {
     visibility: visible;
     opacity: 1;
+}
+
+.no-data {
+    padding: 20px;
+    display: block;
+    height: 200px;
 }
