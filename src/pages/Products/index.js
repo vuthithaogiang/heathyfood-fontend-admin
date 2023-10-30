@@ -8,6 +8,7 @@ import useAxios from '~/hooks/useAxios';
 import { InfinitySpin } from 'react-loader-spinner';
 import AlertConfimDelete from '~/components/AlertConfirmDelete';
 import React from 'react';
+import Notification from '~/components/Notification';
 
 const cx = classNames.bind(styles);
 
@@ -19,8 +20,8 @@ function Products() {
     const UPCOMING = 2; // STATEMENT
     const NEW_ARRIVAL = 3; // STATEMENT
 
-    // const SOLD_OUT = 4; // CALCULATE
-    // const BEST_SELLER = 5; // CALCULATE
+    const SOLD_OUT = 4; // CALCULATE
+    const BEST_SELLER = 5; // CALCULATE
     const FAKE_STATUS_PRODUCT = [
         {
             id: IN_AVAILABLE,
@@ -40,16 +41,53 @@ function Products() {
         },
     ];
 
+    const FAKE_STATUS_PRODUCT_EDIT = [
+        {
+            id: IN_AVAILABLE,
+            state: 'IN AVAILABLE',
+        },
+        {
+            id: AVAILABLE,
+            state: 'AVAILABLE',
+        },
+        {
+            id: UPCOMING,
+            state: 'UPCOMING',
+        },
+        {
+            id: NEW_ARRIVAL,
+            state: 'NEW ARRIVAL',
+        },
+        {
+            id: SOLD_OUT,
+            state: 'SOLD OUT',
+        },
+        {
+            id: BEST_SELLER,
+            state: 'BEST SELLER',
+        },
+    ];
+
+    //select in form new
     const [showOptionStatusProduct, setShowOptionStatusProduct] = useState(false);
     const refOptionStatusProduct = useRef();
     const [statusProduct, setStatusProduct] = useState(null);
     const [showOptionCategoryProduct, setShowOptionCategoryProduct] = useState(false);
     const refOptionCategoryProduct = useRef();
     const [categoryProduct, setCategoryProduct] = useState(null);
+    //end
+
+    //select in form edit
+    const [showEditOptionStattus, setShowEditOptionStatus] = useState(false);
+    const refEditOptionStatus = useRef();
+    const [showEditOptionCategory, setShowEditOptionCategory] = useState(false);
+    const refEditOptionCategory = useRef();
+
+    //end
 
     const axios = useAxios();
-    const [listProduct, setListProduct] = useState(null);
-    const [categories, setCategories] = useState(null);
+    const [listProduct, setListProduct] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const [openModal, setOpenModal] = useState(false);
@@ -69,6 +107,37 @@ function Products() {
 
     //value edit
     const [productSatementEdit, setProductStatementEdit] = useState(null);
+    const [editName, setEditName] = useState('');
+    const [editBrand, setEditBrand] = useState('');
+    const [editPrice, setEditPrice] = useState(null);
+    const [editQuantity, setEditQuantity] = useState(null);
+    const [editDesc, setEditDesc] = useState('');
+    const [editStatus, setEditStatus] = useState(null);
+    const [editCategory, setEditCategory] = useState(null);
+    const [editThumbs, setEditThums] = useState(null);
+    const [uploadThumbsSelected, setUploadThumbsSelected] = useState([]);
+    const [deleteThumbs, setDeleteThumbs] = useState([]);
+    //end
+
+    const [notificationEdit, setNoiticationEdit] = useState(false);
+    const [editSuccess, setEditSuccess] = useState(false);
+
+    const handleUploadThumbsSelected = (e) => {
+        setUploadThumbsSelected([]);
+        if (e.target.files) {
+            const fileArray = Array.from(e.target.files).map((file) => URL.createObjectURL(file));
+            setUploadThumbsSelected((prev) => prev.concat(fileArray));
+            Array.from(e.target.files).map((file) => URL.revokeObjectURL(file));
+        }
+    };
+
+    const renderThumbuoload = (source) => {
+        return source.map((photo) => (
+            <label className={cx('file-thumb', 'not-border')}>
+                <img className={cx('preview-img')} alt="" src={photo} />
+            </label>
+        ));
+    };
 
     const handleDeleteProduct = async () => {
         try {
@@ -152,6 +221,14 @@ function Products() {
                         // $(target).classList.toggle('hide', setErrorMessageEdit(null));
                         // $(target).classList.toggle('hide', setSuccessMessageEdit(null));
                     });
+
+                    if (isHidden) {
+                        setDeleteThumbs([]);
+                        setUploadThumbsSelected([]);
+
+                        const files = document.getElementById('uploadThumbs');
+                        files.value = '';
+                    }
                 };
             });
 
@@ -185,8 +262,27 @@ function Products() {
         setShowOptionCategoryProduct(false);
     };
 
+    const toggleShowEditOptionStatus = () => {
+        setShowEditOptionStatus(!showEditOptionStattus);
+    };
+
+    const toggleSowEditCategory = () => {
+        setShowEditOptionCategory(!showEditOptionCategory);
+    };
+
+    const hiddenEditOptionStatus = () => {
+        setShowEditOptionStatus(false);
+    };
+
+    const hiddenEditOptionCategory = () => {
+        setShowEditOptionCategory(false);
+    };
+
     useOnClickOutside(refOptionStatusProduct, hiddenOptionStatusPorduct);
     useOnClickOutside(refOptionCategoryProduct, hiddenOptionCategoryProduct);
+
+    useOnClickOutside(refEditOptionCategory, hiddenEditOptionCategory);
+    useOnClickOutside(refEditOptionStatus, hiddenEditOptionStatus);
 
     const formatDate = (dateString) => {
         const dateObject = new Date(dateString);
@@ -294,6 +390,64 @@ function Products() {
                 setErrorMessage('The request fail. Please try again.');
                 setLoading(false);
             }
+        }
+    };
+
+    const handleEditProduct = async (e) => {
+        e.preventDefault();
+
+        if (!productSatementEdit.id) {
+            return;
+        }
+        setLoading(true);
+        console.log(e.target.length);
+        console.log(e.target[19].files);
+        console.log(editCategory.id);
+
+        console.log(deleteThumbs);
+
+        const formData = new FormData();
+        var files = e.target[19].files;
+
+        for (let i = 0; i < files.length; i++) {
+            formData.append('uploadThumbs[]', files[i]);
+        }
+
+        if (deleteThumbs.length > 0) {
+            for (let i = 0; i < deleteThumbs.length; i++) {
+                formData.append('deleteThumbs[]', deleteThumbs[i]);
+            }
+        }
+
+        formData.append('name', editName);
+        formData.append('brand', editBrand);
+        formData.append('description', editDesc);
+        formData.append('status', editStatus);
+        formData.append('categoryId', editCategory.id);
+
+        formData.append('price', editPrice);
+        formData.append('quantity', editQuantity);
+
+        try {
+            const response = await axios.post(`/api/product/edit/${productSatementEdit.id}`, formData, {
+                withCredentials: true,
+            });
+
+            console.log(response.data);
+
+            if (response.data.success === 'true') {
+                setEditSuccess(true);
+                fetchProducts();
+                setNoiticationEdit(true);
+            }
+
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setEditSuccess(false);
+            setNoiticationEdit(true);
+
+            setLoading(false);
         }
     };
 
@@ -441,62 +595,72 @@ function Products() {
                                     </div>
 
                                     <div>
-                                        <span>
-                                            Actions <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
-                                        </span>
+                                        <span>Actions</span>
                                     </div>
                                 </div>
 
                                 {listProduct.length === 0 && <span className={cx('no-data')}>No data</span>}
 
-                                {listProduct.map((row) => (
-                                    <div className={cx('inner-table')}>
-                                        <span className={cx('table-data')}>{row.id}</span>
-                                        <figure className={cx('table-data')}>
-                                            <img
-                                                className={cx('thumb')}
-                                                alt=""
-                                                src={`${BASE_URL_IMAGE}${row.thumbnails[0].path}`}
-                                            />
-                                        </figure>
-                                        <p className={cx('table-data', 'name', 'desc')}>{row.name}</p>
+                                {listProduct.length > 0 &&
+                                    listProduct.map((row) => (
+                                        <div className={cx('inner-table')}>
+                                            <span className={cx('table-data')}>{row.id}</span>
+                                            <figure className={cx('table-data')}>
+                                                <img
+                                                    className={cx('thumb')}
+                                                    alt=""
+                                                    src={`${BASE_URL_IMAGE}${row.thumbnails[0].path}`}
+                                                />
+                                            </figure>
+                                            <p className={cx('table-data', 'name', 'desc')}>{row.name}</p>
 
-                                        <p className={cx('table-data', 'date')}>{formatDate(row.created_at)}</p>
-                                        {/* <p className={cx('table-data', 'desc')}>{row.description}</p> */}
-                                        <p className={cx('table-data')}>{row.brand}</p>
-                                        <p className={cx('table-data')}>${row.price}</p>
-                                        <p className={cx('table-data', 'quantity')}>{row.quantity}</p>
-                                        <p className={cx('table-data')}>{row.category.name}</p>
-                                        <p className={cx('table-data')}>
-                                            {row.status === 0 && 'InAvailable'}
-                                            {row.status === 1 && 'Avaiable'}
-                                            {row.status === 2 && 'Upcoming'}
-                                            {row.status === 3 && 'New Arrival'}
-                                            {row.status === 4 && 'Sold Out'}
-                                            {row.status === 5 && 'Best Seller'}
-                                        </p>
-                                        <div className={cx('action-btns')}>
-                                            <button
-                                                className={cx('js-toggle')}
-                                                toggle-target="#edit-product-form"
-                                                onClick={() => {
-                                                    setProductStatementEdit(row);
-                                                }}
-                                            >
-                                                Edit
-                                            </button>
-                                            <span className={cx('separate')}></span>
-                                            <button
-                                                onClick={() => {
-                                                    setIdProductDelete(row.id);
-                                                    setOpenModal(true);
-                                                }}
-                                            >
-                                                Delete
-                                            </button>
+                                            <p className={cx('table-data', 'date')}>{formatDate(row.created_at)}</p>
+                                            {/* <p className={cx('table-data', 'desc')}>{row.description}</p> */}
+                                            <p className={cx('table-data')}>{row.brand}</p>
+                                            <p className={cx('table-data')}>${row.price}</p>
+                                            <p className={cx('table-data', 'quantity')}>{row.quantity}</p>
+                                            <p className={cx('table-data')}>{row.category.name}</p>
+                                            <p className={cx('table-data')}>
+                                                {row.status === 0 && 'InAvailable'}
+                                                {row.status === 1 && 'Avaiable'}
+                                                {row.status === 2 && 'Upcoming'}
+                                                {row.status === 3 && 'New Arrival'}
+                                                {row.status === 4 && 'Sold Out'}
+                                                {row.status === 5 && 'Best Seller'}
+                                            </p>
+                                            <div className={cx('action-btns')}>
+                                                <button
+                                                    className={cx('js-toggle')}
+                                                    toggle-target="#edit-product-form"
+                                                    onClick={() => {
+                                                        setLoading(true);
+                                                        setProductStatementEdit(row);
+                                                        setEditName(row.name);
+                                                        setEditBrand(row.brand);
+                                                        setEditPrice(row.price);
+                                                        setEditQuantity(row.quantity);
+                                                        setEditDesc(row.description);
+                                                        setEditCategory(row.category);
+                                                        setEditStatus(row.status);
+                                                        setEditThums(row.thumbnails);
+
+                                                        setLoading(false);
+                                                    }}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <span className={cx('separate')}></span>
+                                                <button
+                                                    onClick={() => {
+                                                        setIdProductDelete(row.id);
+                                                        setOpenModal(true);
+                                                    }}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
                             </div>
                         </div>
                     </>
@@ -567,7 +731,6 @@ function Products() {
                                                 <label className={cx('form-label')}>Price</label>
                                                 <input
                                                     type="number"
-                                                    min={1}
                                                     className={cx('form-input')}
                                                     placeholder="$12"
                                                     value={price}
@@ -707,157 +870,212 @@ function Products() {
 
                 {/* Form Edit Product */}
 
-                <div id="edit-product-form" className={cx('add-product', 'hide')}>
-                    <div className={cx('wrap-inner')}>
-                        <header>
-                            <h3>Edit Product</h3>
-                            <button className={cx('js-toggle')} toggle-target="#edit-product-form">
-                                <img className={cx('icon')} alt="" src={images.xIcon} />
-                            </button>
-                        </header>
-                    </div>
+                <>
+                    <div id="edit-product-form" className={cx('edit-product', 'hide')}>
+                        <div className={cx('wrap-inner')}>
+                            <header>
+                                <h3>Edit Product - Product ID: {productSatementEdit ? productSatementEdit.id : ''}</h3>
+                                <button className={cx('js-toggle')} toggle-target="#edit-product-form">
+                                    <img className={cx('icon')} alt="" src={images.xIcon} />
+                                </button>
+                            </header>
+                        </div>
 
-                    <div className={cx('content')}>
-                        <form onSubmit={(e) => e.preventDefault()} encType="multipart/form-data">
-                            <div className={cx('form-group')}>
-                                <label className={cx('form-label')}>Name</label>
-                                <input type="text" className={cx('form-input')} placeholder="Name product" />
-                            </div>
-
-                            <div className={cx('form-group')}>
-                                <label className={cx('form-label')}>Brand</label>
-                                <input type="text" className={cx('form-input')} placeholder="Belong to Brand" />
-                            </div>
-                            <div className={cx('form-group')}>
-                                <label className={cx('form-label')}>Description</label>
-                                <Editor style={{ height: '220px' }} />
-                            </div>
-
-                            <div className={cx('form-row')}>
+                        <div className={cx('content')}>
+                            <form onSubmit={handleEditProduct} encType="multipart/form-data">
                                 <div className={cx('form-group')}>
-                                    <label className={cx('form-label')}>Quantity</label>
-                                    <input type="number" min={1} className={cx('form-input')} placeholder="10" />
+                                    <label className={cx('form-label')}>Name</label>
+                                    <input
+                                        type="text"
+                                        className={cx('form-input')}
+                                        value={editName}
+                                        onChange={(e) => setEditName(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className={cx('form-group')}>
+                                    <label className={cx('form-label')}>Brand</label>
+                                    <input
+                                        type="text"
+                                        className={cx('form-input')}
+                                        value={editBrand}
+                                        onChange={(e) => setEditBrand(e.target.value)}
+                                    />
                                 </div>
                                 <div className={cx('form-group')}>
-                                    <label className={cx('form-label')}>Price</label>
-                                    <input type="number" min={1} className={cx('form-input')} placeholder="$12" />
+                                    <label className={cx('form-label')}>Description</label>
+                                    <Editor
+                                        style={{ height: '220px' }}
+                                        value={editDesc}
+                                        onTextChange={(e) => setEditDesc(e.textValue)}
+                                    />
                                 </div>
-                            </div>
 
-                            {/* <div className={cx('form-row')}>
-                                <div className={cx('form-status-product')}>
-                                    <div
-                                        onClick={toggleShowOptionStatusProduct}
-                                        ref={refOptionStatusProduct}
-                                        className={cx('form-group', 'product')}
-                                    >
-                                        <label className={cx('form-label')}>Status</label>
-                                        <div className={cx('wrap-select')}>
-                                            <span>
-                                                {statusProduct === null ? 'Select Status' : statusProduct.state}
-                                            </span>
-                                            <img
-                                                className={
-                                                    showOptionStatusProduct === true
-                                                        ? cx('icon', 'icon-rotate')
-                                                        : cx('icon')
-                                                }
-                                                alt=""
-                                                src={images.arrowIcon}
-                                            />
-                                        </div>
-                                        <div
-                                            className={
-                                                showOptionStatusProduct === true
-                                                    ? cx('wrap-options')
-                                                    : cx('wrap-options', 'none')
-                                            }
-                                        >
-                                            {FAKE_STATUS_PRODUCT.map((item) => (
-                                                <div
-                                                    onClick={() => setStatusProduct(item)}
-                                                    className={cx('option')}
-                                                    key={item.id}
-                                                >
-                                                    <span>{item.state}</span>
-                                                </div>
-                                            ))}
-                                        </div>
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-group')}>
+                                        <label className={cx('form-label')}>Quantity</label>
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            className={cx('form-input')}
+                                            value={editQuantity}
+                                            onChange={(e) => setEditQuantity(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className={cx('form-group')}>
+                                        <label className={cx('form-label')}>Price</label>
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            className={cx('form-input')}
+                                            value={editPrice}
+                                            onChange={(e) => setEditPrice(e.target.value)}
+                                        />
                                     </div>
                                 </div>
 
-                                <div className={cx('form-category-product')}>
-                                    <div
-                                        ref={refOptionCategoryProduct}
-                                        onClick={toggleShowOptionCategoryProduct}
-                                        className={cx('form-group', 'product')}
-                                    >
-                                        <label className={cx('form-label')}>Belong To Category</label>
-                                        <div className={cx('wrap-select')}>
-                                            <span>
-                                                {categoryProduct === null ? 'Select Category' : categoryProduct.name}
-                                            </span>
-                                            <img
-                                                className={
-                                                    showOptionCategoryProduct === true
-                                                        ? cx('icon', 'icon-rotate')
-                                                        : cx('icon')
-                                                }
-                                                alt=""
-                                                src={images.arrowIcon}
-                                            />
-                                        </div>
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-status-product')}>
                                         <div
-                                            className={
-                                                showOptionCategoryProduct === true
-                                                    ? cx('wrap-options')
-                                                    : cx('wrap-options', 'none')
-                                            }
+                                            ref={refEditOptionStatus}
+                                            onClick={toggleShowEditOptionStatus}
+                                            className={cx('form-group', 'product')}
                                         >
-                                            {categories.map((item) => (
-                                                <div
-                                                    onClick={() => setCategoryProduct(item)}
-                                                    className={cx('option')}
-                                                    key={item.id}
-                                                >
-                                                    <span>{item.name}</span>
-                                                </div>
-                                            ))}
+                                            <label className={cx('form-label')}>Status</label>
+                                            <div className={cx('wrap-select')}>
+                                                <span>
+                                                    {FAKE_STATUS_PRODUCT_EDIT.filter(
+                                                        (item) => item.id === editStatus,
+                                                    ).map((i) => i.state)}
+                                                </span>
+                                                <img
+                                                    className={
+                                                        showEditOptionStattus === true
+                                                            ? cx('icon', 'icon-rotate')
+                                                            : cx('icon')
+                                                    }
+                                                    alt=""
+                                                    src={images.arrowIcon}
+                                                />
+                                            </div>
+                                            <div
+                                                className={
+                                                    showEditOptionStattus === true
+                                                        ? cx('wrap-options')
+                                                        : cx('wrap-options', 'none')
+                                                }
+                                            >
+                                                {FAKE_STATUS_PRODUCT_EDIT.map((item) => (
+                                                    <div
+                                                        onClick={() => setEditStatus(item.id)}
+                                                        className={cx('option')}
+                                                        key={item.id}
+                                                    >
+                                                        <span>{item.state}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className={cx('form-category-product')}>
+                                        <div
+                                            ref={refEditOptionCategory}
+                                            onClick={toggleSowEditCategory}
+                                            className={cx('form-group', 'product')}
+                                        >
+                                            <label className={cx('form-label')}>Belong To Category</label>
+                                            <div className={cx('wrap-select')}>
+                                                <span>{editCategory ? editCategory.name : 'Select Category'}</span>
+                                                <img
+                                                    className={
+                                                        showEditOptionCategory === true
+                                                            ? cx('icon', 'icon-rotate')
+                                                            : cx('icon')
+                                                    }
+                                                    alt=""
+                                                    src={images.arrowIcon}
+                                                />
+                                            </div>
+                                            <div
+                                                className={
+                                                    showEditOptionCategory === true
+                                                        ? cx('wrap-options')
+                                                        : cx('wrap-options', 'none')
+                                                }
+                                            >
+                                                {categories.map((item) => (
+                                                    <div
+                                                        onClick={() => setEditCategory(item)}
+                                                        className={cx('option')}
+                                                        key={item.id}
+                                                    >
+                                                        <span>{item.name}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div> */}
-                            <div className={cx('form-row-upload')}>
-                                <div className={cx('form-label-row')}>
-                                    <label className={cx('form-label')}>
-                                        Upload Thumbnail
-                                        <span className={cx('note')}>*can upload multi thumbnails</span>
-                                    </label>
+                                <div className={cx('form-row-upload')}>
+                                    <div className={cx('form-label-row')}>
+                                        <label className={cx('form-label')}>
+                                            Upload Thumbnail
+                                            <span className={cx('note')}>*can upload multi thumbnails</span>
+                                        </label>
+                                    </div>
+                                    <div className={cx('container-files')}>
+                                        {editThumbs
+                                            ? editThumbs.map((thum) => (
+                                                  <label
+                                                      className={
+                                                          deleteThumbs.includes(thum.id)
+                                                              ? cx('file-thumb', 'none')
+                                                              : cx('file-thumb', 'not-border', 'thumb-edit')
+                                                      }
+                                                  >
+                                                      <img
+                                                          className={cx('preview-img')}
+                                                          alt=""
+                                                          src={`${BASE_URL_IMAGE}${thum.path}`}
+                                                      />
 
-                                    <span className={cx('btn')}>
-                                        <img className={cx('icon')} alt="" src={images.cleanIcon} />
-                                        Clear
+                                                      <img
+                                                          onClick={() => setDeleteThumbs((pre) => [...pre, thum.id])}
+                                                          className={cx('icon')}
+                                                          src={images.xIcon}
+                                                          alt=""
+                                                      />
+                                                  </label>
+                                              ))
+                                            : ''}
+                                        {renderThumbuoload(uploadThumbsSelected)}
+                                        <input
+                                            type="file"
+                                            onChange={handleUploadThumbsSelected}
+                                            id="uploadThumbs"
+                                            multiple
+                                            name="uploadThumbs[]"
+                                            hidden
+                                        />
+                                        <label htmlFor="uploadThumbs" className={cx('file-thumb')}>
+                                            <img className={cx('icon')} alt="" src={images.plusIcon} />
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className={cx('form-buttons')}>
+                                    <button type="submit">Submit</button>
+                                    <span className={cx('js-toggle')} toggle-target="#edit-product-form">
+                                        Cancel
                                     </span>
                                 </div>
-                                <div className={cx('container-files')}>
-                                    <input type="file" id="uploadThumbs" multiple name="uploadThumbs[]" hidden />
-                                    <label htmlFor="uploadThumbs" className={cx('file-thumb')}>
-                                        <img className={cx('icon')} alt="" src={images.plusIcon} />
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div className={cx('form-buttons')}>
-                                <button type="submit">Submit</button>
-                                <span className={cx('js-toggle')} toggle-target="#edit-product-form">
-                                    Cancel
-                                </span>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
-                </div>
 
-                <div className={cx('product-overlay', 'js-toggle')} toggle-target="#edit-product-form"></div>
+                    <div className={cx('product-overlay-edit', 'js-toggle')} toggle-target="#edit-product-form"></div>
+                </>
             </div>
 
             {loading && (
@@ -875,6 +1093,16 @@ function Products() {
                     confirm={handleDeleteProduct}
                     show={openModal}
                     setShow={setOpenModal}
+                />
+            )}
+
+            {notificationEdit && (
+                <Notification
+                    message={editSuccess === true ? 'Edit Product successfuly.' : 'Edit Product Failed.'}
+                    show={editSuccess}
+                    setShow={setEditSuccess}
+                    className={'js-toggle'}
+                    toggleTarget={'#edit-product-form'}
                 />
             )}
         </>
