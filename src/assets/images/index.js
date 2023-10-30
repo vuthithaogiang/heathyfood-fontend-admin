@@ -33,6 +33,7 @@ const images = {
     lockIcon: require('~/assets/images/lock-icon.svg').default,
     upgradeIcon: require('~/assets/images/upgrade-icon.svg').default,
     arrowLeftIcon: require('~/assets/images/arrow-left-icon.svg').default,
+    pushIcon: require('~/assets/images/push-icon.svg').default,
 };
 
 export default images;

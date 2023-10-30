@@ -9,6 +9,7 @@ import { InfinitySpin } from 'react-loader-spinner';
 import AlertConfimDelete from '~/components/AlertConfirmDelete';
 import React from 'react';
 import Notification from '~/components/Notification';
+import ReactSlider from 'react-slider';
 
 const cx = classNames.bind(styles);
 
@@ -19,7 +20,6 @@ function Products() {
     const AVAILABLE = 1; // STATEMENT
     const UPCOMING = 2; // STATEMENT
     const NEW_ARRIVAL = 3; // STATEMENT
-
     const SOLD_OUT = 4; // CALCULATE
     const BEST_SELLER = 5; // CALCULATE
     const FAKE_STATUS_PRODUCT = [
@@ -68,6 +68,18 @@ function Products() {
         },
     ];
 
+    const MIN = 0;
+    const MAX = 300;
+    const [showFlter, setShowFilter] = useState(false);
+    const [values, setValues] = useState([MIN, MAX]);
+    const [filterCategory, setFilterCategiry] = useState(null);
+    const [filterStatus, setFilterStatus] = useState(null);
+    const [filterBrand, setFilterBrand] = useState('');
+
+    const toggleShowFilter = () => {
+        setShowFilter(!showFlter);
+    };
+
     //select in form new
     const [showOptionStatusProduct, setShowOptionStatusProduct] = useState(false);
     const refOptionStatusProduct = useRef();
@@ -76,6 +88,31 @@ function Products() {
     const refOptionCategoryProduct = useRef();
     const [categoryProduct, setCategoryProduct] = useState(null);
     //end
+
+    const refSelectCategory = useRef();
+    const [showSelectCategpry, setShowSelectCategory] = useState(false);
+
+    const toggleShowSelectCategoty = () => {
+        setShowSelectCategory(!showSelectCategpry);
+    };
+
+    const hiddenSelectCategory = () => {
+        setShowSelectCategory(false);
+    };
+
+    const refSelectedStatus = useRef();
+    const [showSelectedStatus, setShowSelectedStatus] = useState();
+
+    const toggleShowSelectedStatus = () => {
+        setShowSelectedStatus(!showSelectedStatus);
+    };
+
+    const hiddenSelectedStatus = () => {
+        setShowSelectedStatus(false);
+    };
+
+    useOnClickOutside(refSelectCategory, hiddenSelectCategory);
+    useOnClickOutside(refSelectedStatus, hiddenSelectedStatus);
 
     //select in form edit
     const [showEditOptionStattus, setShowEditOptionStatus] = useState(false);
@@ -121,6 +158,29 @@ function Products() {
 
     const [notificationEdit, setNoiticationEdit] = useState(false);
     const [editSuccess, setEditSuccess] = useState(false);
+
+    //SORTING
+    const [type, setType] = useState(null);
+    const [filter, setFilter] = useState('ASC');
+
+    const sorting = (col) => {
+        setType(col);
+        console.log(col);
+        console.log(filter);
+
+        if (filter === 'DESC') {
+            const sorted = listProduct.sort((a, b) => (a[col] < b[col] ? 1 : -1));
+            setListProduct(sorted);
+            setFilter('ASC');
+        }
+
+        if (filter === 'ASC') {
+            const sorted = listProduct.sort((a, b) => (a[col] > b[col] ? 1 : -1));
+
+            setListProduct(sorted);
+            setFilter('DESC');
+        }
+    };
 
     const handleUploadThumbsSelected = (e) => {
         setUploadThumbsSelected([]);
@@ -451,6 +511,16 @@ function Products() {
         }
     };
 
+    const handleFilterProduct = async (e) => {
+        e.preventDefault();
+
+        console.log('Brand: ', filterBrand);
+        console.log('MIN : ', values[0]);
+        console.log('MAX', values[1]);
+        console.log('CateId: ', filterCategory.id);
+        console.log('Status: ', filterStatus);
+    };
+
     return (
         <>
             <div className={cx('wrapper')}>
@@ -462,9 +532,244 @@ function Products() {
                     </header>
 
                     <div className={cx('suggest-list')}>
-                        <div className={cx('suggest-item')}>
-                            <img className={cx('icon')} alt="" src={images.filterIcon} />
-                            <span>All filters</span>
+                        <div className={cx('suggest-item', 'wrap-button')}>
+                            <img onClick={toggleShowFilter} className={cx('icon')} alt="" src={images.filterIcon} />
+                            <span onClick={toggleShowFilter}>All filters</span>
+
+                            <div className={showFlter === true ? cx('popper-filter') : cx('popper-filter', 'none')}>
+                                <h3 className={cx('filter-heading')}>Filter</h3>
+                                <form method="post" onSubmit={handleFilterProduct} className={cx('filter-form')}>
+                                    <div className={cx('filter-row')}>
+                                        {/* Column 1 */}
+                                        <div className={cx('filter-col')}>
+                                            <label className={cx('filter-form-label')}>Price</label>
+                                            <div className={cx('filter-form-group')}>
+                                                <ReactSlider
+                                                    min={MIN}
+                                                    max={MAX}
+                                                    value={values}
+                                                    onChange={setValues}
+                                                    className={'slider-filter-price'}
+                                                ></ReactSlider>
+                                            </div>
+                                            <div className={cx('filter-form-group', 'hornizonal')}>
+                                                <div>
+                                                    <label className={cx('filter-form-label', 'small')}>Minimun</label>
+                                                    <input
+                                                        type="text"
+                                                        readOnly
+                                                        className={cx('filter-form-input')}
+                                                        value={values[0]}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className={cx('filter-form-label', 'small')}>Maximum</label>
+                                                    <input
+                                                        type="text"
+                                                        readOnly
+                                                        className={cx('filter-form-input')}
+                                                        value={values[1]}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className={cx('filter-separate')}></div>
+
+                                        {/* Column 2 */}
+                                        <div className={cx('filter-col')}>
+                                            <label className={cx('filter-form-label')}>Category</label>
+                                            <div className={cx('filter-form-group')}>
+                                                <div ref={refSelectCategory} className={cx('filter-select-wrap')}>
+                                                    <div
+                                                        onClick={toggleShowSelectCategoty}
+                                                        className={cx('wrap-select')}
+                                                    >
+                                                        <span>
+                                                            {filterCategory === null
+                                                                ? 'Choose Category'
+                                                                : filterCategory.name}
+                                                        </span>
+
+                                                        <span className={cx('group-btn')}>
+                                                            <span>
+                                                                <img
+                                                                    className={cx('icon')}
+                                                                    alt=""
+                                                                    src={images.addIcon}
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                {' '}
+                                                                <img
+                                                                    className={cx('icon')}
+                                                                    alt=""
+                                                                    src={images.arrowDownIcon}
+                                                                />
+                                                            </span>
+                                                        </span>
+                                                    </div>
+
+                                                    <div
+                                                        className={
+                                                            showSelectCategpry === true
+                                                                ? cx('category-list')
+                                                                : cx('category-list', 'none')
+                                                        }
+                                                    >
+                                                        <img className={cx('arrow-up')} alt="" src={images.arrowUp} />
+                                                        <div className={cx('popper-list')}>
+                                                            {categories.map((cate) => (
+                                                                <div
+                                                                    onClick={() => setFilterCategiry(cate)}
+                                                                    key={cate.id}
+                                                                    className={
+                                                                        filterCategory === cate
+                                                                            ? cx('popper-item', 'active')
+                                                                            : cx('popper-item')
+                                                                    }
+                                                                >
+                                                                    <img
+                                                                        className={cx('icon')}
+                                                                        alt=""
+                                                                        src={images.pushIcon}
+                                                                    />
+                                                                    <span>{cate.name}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className={cx('filter-form-group')}>
+                                                <div className={cx('filter-form-tags')}>
+                                                    <button className={cx('filter-form-tag')}>Small</button>
+                                                    <button className={cx('filter-form-tag')}>Medium</button>
+                                                    <button className={cx('filter-form-tag')}>Large</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className={cx('filter-separate')}></div>
+                                        {/* Column 3 */}
+                                        <div className={cx('filter-col')}>
+                                            <label className={cx('filter-form-label')}>Status</label>
+                                            <div className={cx('filter-form-group')}>
+                                                <div ref={refSelectedStatus} className={cx('filter-select-wrap')}>
+                                                    <div
+                                                        onClick={toggleShowSelectedStatus}
+                                                        className={cx('wrap-select', 'set-width')}
+                                                    >
+                                                        <span>
+                                                            {filterStatus === null
+                                                                ? 'Choose status'
+                                                                : FAKE_STATUS_PRODUCT_EDIT.filter(
+                                                                      (item) => item.id === filterStatus,
+                                                                  ).map((i) => i.state)}
+                                                        </span>
+
+                                                        <span className={cx('group-btn')}>
+                                                            <span>
+                                                                <img
+                                                                    className={cx('icon')}
+                                                                    alt=""
+                                                                    src={images.addIcon}
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                {' '}
+                                                                <img
+                                                                    className={cx('icon')}
+                                                                    alt=""
+                                                                    src={images.arrowDownIcon}
+                                                                />
+                                                            </span>
+                                                        </span>
+                                                    </div>
+
+                                                    <div
+                                                        className={
+                                                            showSelectedStatus === true
+                                                                ? cx('category-list')
+                                                                : cx('category-list', 'none')
+                                                        }
+                                                    >
+                                                        <img className={cx('arrow-up')} alt="" src={images.arrowUp} />
+                                                        <div className={cx('popper-list')}>
+                                                            {FAKE_STATUS_PRODUCT_EDIT.map((item) => (
+                                                                <div
+                                                                    onClick={() => setFilterStatus(item.id)}
+                                                                    key={item.id}
+                                                                    className={
+                                                                        filterStatus === item.id
+                                                                            ? cx('popper-item', 'active')
+                                                                            : cx('popper-item')
+                                                                    }
+                                                                >
+                                                                    <img
+                                                                        className={cx('icon')}
+                                                                        alt=""
+                                                                        src={images.pushIcon}
+                                                                    />
+                                                                    <span>{item.state}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className={cx('filter-form-group')}>
+                                                <div className={cx('filter-form-tags')}>
+                                                    <button
+                                                        className={cx('filter-form-tag')}
+                                                        onClick={() => setFilterStatus(5)}
+                                                    >
+                                                        Best Seller
+                                                    </button>
+                                                    <button
+                                                        className={cx('filter-form-tag')}
+                                                        onClick={() => setFilterStatus(0)}
+                                                    >
+                                                        Inavailable
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className={cx('filter-separate')}></div>
+
+                                        {/* Column 4 */}
+                                        <div className={cx('filter-col')}>
+                                            <label className={cx('filter-form-label')}>Brand</label>
+                                            <div className={cx('filter-form-group')}>
+                                                <div className={cx('filter-form-text')}>
+                                                    <input
+                                                        value={filterBrand}
+                                                        onChange={(e) => setFilterBrand(e.target.value)}
+                                                        type="text"
+                                                        placeholder="Search brand name"
+                                                    />
+                                                    <img className={cx('icon')} alt="" src={images.searchIncon} />
+                                                </div>
+                                            </div>
+                                            <div className={cx('filter-form-group')}>
+                                                <div className={cx('filter-form-tags')}>
+                                                    <button className={cx('filter-form-tag')}>Lavazza</button>
+                                                    <button className={cx('filter-form-tag')}>Nescafe</button>
+                                                    <button className={cx('filter-form-tag')}>Starbcks</button>
+                                                </div>
+                                            </div>
+
+                                            <div className={cx('filter-form-group')}>
+                                                <div className={cx('btn-group')}>
+                                                    <span onClick={() => setShowFilter(false)}>Cancel</span>
+                                                    <button type="submit">Show Result</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                         <div className={cx('suggest-item')}>
                             <img className={cx('icon')} alt="" src={images.filterIcon} />
@@ -526,7 +831,7 @@ function Products() {
                                 <img className={cx('icon')} alt="" src={images.searchIncon} />
                             </button>
 
-                            <input type="text" placeholder="Search category name" />
+                            <input type="text" placeholder="Search product name" />
                         </form>
                     </div>
                 </div>
@@ -537,9 +842,17 @@ function Products() {
                             <div className={cx('container-table')}>
                                 <div className={cx('head-table')}>
                                     <div>
-                                        <span>
+                                        <span onClick={() => sorting('id')}>
                                             ID
-                                            <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                            <img
+                                                className={
+                                                    type === 'id' && filter === 'DESC'
+                                                        ? cx('icon', 'icon-rotate')
+                                                        : cx('icon')
+                                                }
+                                                alt=""
+                                                src={images.arrowDownIcon}
+                                            />
                                         </span>
                                     </div>
                                     <div>
@@ -547,14 +860,32 @@ function Products() {
                                     </div>
 
                                     <div>
-                                        <span>
-                                            Name <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                        <span onClick={() => sorting('name')}>
+                                            Name{' '}
+                                            <img
+                                                className={
+                                                    type === 'name' && filter === 'DESC'
+                                                        ? cx('icon', 'icon-rotate')
+                                                        : cx('icon')
+                                                }
+                                                alt=""
+                                                src={images.arrowDownIcon}
+                                            />
                                         </span>
                                     </div>
 
                                     <div>
-                                        <span>
-                                            Created at <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                        <span onClick={() => sorting('created_at')}>
+                                            Created at{' '}
+                                            <img
+                                                className={
+                                                    type === 'created_at' && filter === 'DESC'
+                                                        ? cx('icon', 'icon-rotate')
+                                                        : cx('icon')
+                                                }
+                                                alt=""
+                                                src={images.arrowDownIcon}
+                                            />
                                         </span>
                                     </div>
 
@@ -565,20 +896,47 @@ function Products() {
                                     </div> */}
 
                                     <div>
-                                        <span>
-                                            Brand <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                        <span onClick={() => sorting('brand')}>
+                                            Brand{' '}
+                                            <img
+                                                className={
+                                                    type === 'brand' && filter === 'DESC'
+                                                        ? cx('icon', 'icon-rotate')
+                                                        : cx('icon')
+                                                }
+                                                alt=""
+                                                src={images.arrowDownIcon}
+                                            />
                                         </span>
                                     </div>
 
                                     <div>
-                                        <span>
-                                            Price <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                        <span onClick={() => sorting('price')}>
+                                            Price{' '}
+                                            <img
+                                                className={
+                                                    type === 'price' && filter === 'DESC'
+                                                        ? cx('icon', 'icon-rotate')
+                                                        : cx('icon')
+                                                }
+                                                alt=""
+                                                src={images.arrowDownIcon}
+                                            />
                                         </span>
                                     </div>
 
                                     <div>
-                                        <span>
-                                            Quantity <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                        <span onClick={() => sorting('quantity')}>
+                                            Quantity{' '}
+                                            <img
+                                                className={
+                                                    type === 'quantity' && filter === 'DESC'
+                                                        ? cx('icon', 'icon-rotate')
+                                                        : cx('icon')
+                                                }
+                                                alt=""
+                                                src={images.arrowDownIcon}
+                                            />
                                         </span>
                                     </div>
 
@@ -589,8 +947,17 @@ function Products() {
                                     </div>
 
                                     <div>
-                                        <span>
-                                            Status <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                        <span onClick={() => sorting('status')}>
+                                            Status{' '}
+                                            <img
+                                                className={
+                                                    type === 'status' && filter === 'DESC'
+                                                        ? cx('icon', 'icon-rotate')
+                                                        : cx('icon')
+                                                }
+                                                alt=""
+                                                src={images.arrowDownIcon}
+                                            />
                                         </span>
                                     </div>
 
