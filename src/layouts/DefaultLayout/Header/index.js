@@ -103,7 +103,7 @@ function Header() {
             id: 9,
             title: 'Campaign',
             icon: images.giftIcon,
-            to: '/',
+            to: '/admin/campaigns',
         },
         {
             id: 10,

@@ -54,22 +54,6 @@ function TypesOfCampaign() {
         }
     };
 
-    const fetListTypeOfCampaign = async () => {
-        setLoading(true);
-        try {
-            const response = await authAxios.get('/api/types-of-campaign/getAll', {
-                withCredentials: true,
-            });
-
-            if (response.data) {
-                setListTypesOfampaign(response.data);
-            }
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
         const $ = document.querySelector.bind(document);
         const $$ = document.querySelectorAll.bind(document);
@@ -90,8 +74,10 @@ function TypesOfCampaign() {
                         $(target).classList.toggle('hide', !isHidden);
                         $(target).classList.toggle('show', isHidden);
 
-                        // $(target).classList.toggle('hide', setSuccessMessage(null));
-                        // $(target).classList.toggle('hide', setErrorMessage(null));
+                        $(target).classList.toggle('hide', setSuccessMessage(null));
+                        $(target).classList.toggle('hide', setErrorMessage(null));
+                        $(target).classList.toggle('hide', setErrorEditMessage(null));
+                        $(target).classList.toggle('hide', setSuccessEditMessage(null));
                     });
                 };
             });
@@ -99,6 +85,22 @@ function TypesOfCampaign() {
 
         initJsToggle();
     }, [listTypesOfCampaign]);
+
+    const fetListTypeOfCampaign = async () => {
+        setLoading(true);
+        try {
+            const response = await authAxios.get('/api/types-of-campaign/getAll', {
+                withCredentials: true,
+            });
+
+            if (response.data) {
+                setListTypesOfampaign(response.data);
+            }
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         fetListTypeOfCampaign(); // eslint-disable-next-line

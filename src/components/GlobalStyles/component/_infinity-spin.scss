@@ -1,0 +1,23 @@
+.modal-infinity,
+.overlay-infinity {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+    z-index: 11;
+}
+
+.overlay-infinity {
+    background: rgba(49, 49, 49, 0.8);
+}
+
+.wrap-loading-infinity {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+}
