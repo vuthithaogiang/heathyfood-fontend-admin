@@ -3,6 +3,7 @@ import Login from '~/pages/Login';
 import ProductCategory from '~/pages/ProductCategory';
 import Products from '~/pages/Products';
 import Customers from '~/pages/Customers';
+import TypesOfCampaign from '~/pages/TypesOfCampaign';
 
 const privateRoutes = [
     { path: '/', component: Home },
@@ -14,6 +15,10 @@ const privateRoutes = [
     {
         path: '/admin/customers',
         component: Customers,
+    },
+    {
+        path: '/admin/types-of-campaign',
+        component: TypesOfCampaign,
     },
 ];
 

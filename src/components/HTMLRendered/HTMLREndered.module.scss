@@ -1,0 +1,95 @@
+.text-value {
+    font-size: 1.6rem;
+    line-height: 1.6;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-weight: 600;
+    }
+
+    h1 {
+        font-size: 2.6rem;
+    }
+    h2 {
+        font-size: 2.2rem;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+    }
+
+    h4 {
+        font-size: 1.6rem;
+    }
+    h5 {
+        font-size: 1.4rem;
+    }
+    h6 {
+        font-size: 1.2rem;
+    }
+
+    h1,
+    h2,
+    h3,
+    h5,
+    h5,
+    h6,
+    p,
+    blockquote,
+    img,
+    figure,
+    ul,
+    ol {
+        margin: 6px 0;
+    }
+
+    p {
+        color: #656d76;
+        font-size: 1.4rem;
+        line-height: 1.6;
+        font-family: 'Inter';
+        font-weight: 400;
+    }
+
+    p br {
+        height: 6px !important;
+    }
+
+    img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 80%;
+        object-fit: cover;
+    }
+
+    img + em {
+        display: block;
+        font-style: italic;
+        text-align: center;
+    }
+    a {
+        color: #0071dc !important;
+        text-decoration: underline !important;
+    }
+
+    blockquote {
+        background-color: rgba($color: #77dae6, $alpha: 0.1);
+        padding: 20px;
+        border-left: 3px solid var(--logo-color);
+        p {
+            margin: 0;
+        }
+    }
+
+    hr {
+        border: none;
+        height: 1.5px;
+        background-color: #333;
+        margin: 40px 0;
+    }
+}

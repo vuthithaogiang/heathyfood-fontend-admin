@@ -75,8 +75,10 @@ function ProductCategory() {
             if (response.data) {
                 setListCategory(response.data.data);
             }
+            setLoading(false);
         } catch (error) {
             console.log(error);
+            setLoading(false);
         }
     };
 
@@ -423,7 +425,9 @@ function ProductCategory() {
                     <header>
                         <h3>Home</h3>
                         <img src={images.arrowRightIcon} alt="" />
-                        <h3 className={cx('active')}>Product Category</h3>
+                        <h3 className={cx('active')}>
+                            Product Category ( {listCategory !== null ? listCategory.length : 0} ){' '}
+                        </h3>
                     </header>
 
                     <div className={cx('suggest-list')}>
@@ -740,7 +744,7 @@ function ProductCategory() {
                 ></div>
 
                 {/* Form edit Category Product */}
-                <div id="edit-category-product-form" className={cx('add-category-product', 'hide')}>
+                <div id="edit-category-product-form" className={cx('edit-category-product', 'hide')}>
                     <div className={cx('wrap-form')}>
                         <header>
                             <h3>Edit Category Product</h3>
@@ -789,7 +793,7 @@ function ProductCategory() {
                 </div>
 
                 <div
-                    className={cx('category-product-overlay', 'js-toggle')}
+                    className={cx('category-product-edit-overlay', 'js-toggle')}
                     toggle-target="#edit-category-product-form"
                 ></div>
             </div>

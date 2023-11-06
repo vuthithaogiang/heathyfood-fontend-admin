@@ -95,13 +95,13 @@ function Header() {
         },
         {
             id: 8,
-            title: 'Category Event',
+            title: 'Types of Campaign',
             icon: images.heartIcon,
-            to: '/',
+            to: '/admin/types-of-campaign',
         },
         {
             id: 9,
-            title: 'Event',
+            title: 'Campaign',
             icon: images.giftIcon,
             to: '/',
         },

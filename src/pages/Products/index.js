@@ -156,6 +156,7 @@ function Products() {
     const [editThumbs, setEditThums] = useState(null);
     const [uploadThumbsSelected, setUploadThumbsSelected] = useState([]);
     const [deleteThumbs, setDeleteThumbs] = useState([]);
+
     //end
 
     const [notificationEdit, setNoiticationEdit] = useState(false);
@@ -164,6 +165,65 @@ function Products() {
     //SORTING
     const [type, setType] = useState(null);
     const [filter, setFilter] = useState('ASC');
+
+    useEffect(() => {
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document);
+
+        function initJsToggle() {
+            $$('.js-toggle').forEach((button) => {
+                const target = button.getAttribute('toggle-target');
+                if (!target) {
+                    document.body.innerText = `Cần thêm toggle-target cho: ${button.outerHTML}`;
+                }
+                button.onclick = () => {
+                    if (!$(target)) {
+                        return (document.body.innerText = `Không tìm thấy phần tử "${target}"`);
+                    }
+                    const isHidden = $(target).classList.contains('hide');
+
+                    requestAnimationFrame(() => {
+                        $(target).classList.toggle('hide', !isHidden);
+                        $(target).classList.toggle('show', isHidden);
+
+                        $(target).classList.toggle('hide', setSuccessMessage(null));
+                        $(target).classList.toggle('hide', setErrorMessage(null));
+
+                        // $(target).classList.toggle('hide', setErrorMessageEdit(null));
+                        // $(target).classList.toggle('hide', setSuccessMessageEdit(null));
+                    });
+
+                    if (isHidden) {
+                        setDeleteThumbs([]);
+                        setUploadThumbsSelected([]);
+
+                        const files = document.getElementById('uploadThumbs');
+
+                        if (files !== null && files.value !== null) {
+                            files.value = '';
+                        }
+                    }
+                };
+            });
+
+            const links = $$('.js-dropdown-list > li > a');
+
+            links.forEach((link) => {
+                link.onclick = () => {
+                    if (window.innerWidth > 991) return;
+                    const item = link.closest('li');
+                    item.classList.toggle('navbar-item--active');
+                };
+            });
+        }
+
+        initJsToggle();
+    }, [listProduct]);
+
+    useEffect(() => {
+        fetchProducts(); // eslint-disable-next-line
+        fetchCategories(); // eslint-disable-next-line
+    }, []);
 
     const sorting = (col) => {
         setType(col);
@@ -251,62 +311,6 @@ function Products() {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        fetchProducts(); // eslint-disable-next-line
-        fetchCategories(); // eslint-disable-next-line
-    }, []);
-
-    useEffect(() => {
-        const $ = document.querySelector.bind(document);
-        const $$ = document.querySelectorAll.bind(document);
-
-        function initJsToggle() {
-            $$('.js-toggle').forEach((button) => {
-                const target = button.getAttribute('toggle-target');
-                if (!target) {
-                    document.body.innerText = `Cần thêm toggle-target cho: ${button.outerHTML}`;
-                }
-                button.onclick = () => {
-                    if (!$(target)) {
-                        return (document.body.innerText = `Không tìm thấy phần tử "${target}"`);
-                    }
-                    const isHidden = $(target).classList.contains('hide');
-
-                    requestAnimationFrame(() => {
-                        $(target).classList.toggle('hide', !isHidden);
-                        $(target).classList.toggle('show', isHidden);
-
-                        $(target).classList.toggle('hide', setSuccessMessage(null));
-                        $(target).classList.toggle('hide', setErrorMessage(null));
-
-                        // $(target).classList.toggle('hide', setErrorMessageEdit(null));
-                        // $(target).classList.toggle('hide', setSuccessMessageEdit(null));
-                    });
-
-                    if (isHidden) {
-                        setDeleteThumbs([]);
-                        setUploadThumbsSelected([]);
-
-                        const files = document.getElementById('uploadThumbs');
-                        files.value = '';
-                    }
-                };
-            });
-
-            const links = $$('.js-dropdown-list > li > a');
-
-            links.forEach((link) => {
-                link.onclick = () => {
-                    if (window.innerWidth > 991) return;
-                    const item = link.closest('li');
-                    item.classList.toggle('navbar-item--active');
-                };
-            });
-        }
-
-        initJsToggle();
-    }, [listProduct]);
 
     const toggleShowOptionCategoryProduct = () => {
         setShowOptionCategoryProduct(!showOptionCategoryProduct);
@@ -594,7 +598,7 @@ function Products() {
                     <header>
                         <h3>Home</h3>
                         <img src={images.arrowRightIcon} alt="" />
-                        <h3 className={cx('active')}>Product Category</h3>
+                        <h3 className={cx('active')}>Product ( {listProduct !== null ? listProduct.length : 0} ) </h3>
                     </header>
 
                     <div className={cx('suggest-list')}>

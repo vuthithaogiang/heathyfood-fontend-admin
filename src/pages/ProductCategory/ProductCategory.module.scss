@@ -179,7 +179,8 @@
 }
 
 // ADD NEW CATEGORY PRODUCT
-.add-category-product {
+.add-category-product,
+.edit-category-product {
     translate: 0 100%;
     position: fixed;
     z-index: 10;
@@ -342,7 +343,8 @@
 }
 
 // Overlay
-.category-product-overlay {
+.category-product-overlay,
+.category-product-edit-overlay {
     visibility: hidden;
     opacity: 0;
     position: fixed;
@@ -359,6 +361,15 @@
 }
 
 .add-category-product[class$='show'] {
+    translate: 0 0;
+}
+
+.edit-category-product[class$='show'] ~ .category-product-edit-overlay {
+    visibility: visible;
+    opacity: 1;
+}
+
+.edit-category-product[class$='show'] {
     translate: 0 0;
 }
 

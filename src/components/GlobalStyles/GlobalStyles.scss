@@ -2,6 +2,8 @@
 @use './base';
 @use './abstract';
 
+@use './component';
+
 @import 'normalize.css';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
@@ -86,6 +88,17 @@ input,
 textarea select {
     font-family: inherit;
     color: inherit;
+}
+
+input[type='number'] {
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+/* Style the input as needed */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+    display: none;
 }
 
 ul,
