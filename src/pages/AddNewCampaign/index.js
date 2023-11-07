@@ -721,12 +721,20 @@ function AddNewCampaign() {
                                             >
                                                 Cancel
                                             </div>
+
                                             <button
                                                 className={cx('btn', 'btn-next', 'js-toggle')}
                                                 toggle-target="#popper-review-content"
                                             >
-                                                Show Review
+                                                Next step
                                                 <img className={cx('icon')} alt="" src={images.arrowRightIcon} />
+                                            </button>
+
+                                            <button
+                                                className={cx('btn', 'btn-preview', 'js-toggle')}
+                                                toggle-target="#popper-review-content"
+                                            >
+                                                Show Preview
                                             </button>
                                         </div>
                                     </>

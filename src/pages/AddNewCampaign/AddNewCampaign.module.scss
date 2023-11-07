@@ -430,6 +430,19 @@
                 brightness(119%) contrast(100%);
         }
     }
+    .btn.btn-preview {
+        margin-left: auto;
+        background-color: #f3f3f3;
+        border-radius: 99px;
+        width: 150px;
+        transition: background-color, color;
+        transition-duration: 0.3s;
+
+        &:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+    }
 }
 
 .form-actions.larger-margin {
