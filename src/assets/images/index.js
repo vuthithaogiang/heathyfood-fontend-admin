@@ -35,6 +35,11 @@ const images = {
     arrowLeftIcon: require('~/assets/images/arrow-left-icon.svg').default,
     pushIcon: require('~/assets/images/push-icon.svg').default,
     moreIcon: require('~/assets/images/more-icon.svg').default,
+    introIcon: require('~/assets/images/intro-icon.svg').default,
+    typeIcon: require('~/assets/images/type-icon.svg').default,
+    socialContentIcon: require('~/assets/images/social-content-icon.svg').default,
+    planIcon: require('~/assets/images/plan-icon.svg').default,
+    doneIcon: require('~/assets/images/done-icon.svg').default,
 };
 
 export default images;

@@ -5,11 +5,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import useAxios from '~/hooks/useAxios';
 import { InfinitySpin } from 'react-loader-spinner';
 import useOnClickOutside from '~/hooks/useOnclickOutside';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 function Campaigns() {
     const axios = useAxios();
+    const navigate = useNavigate();
 
     const [listTypeOfCampaign, setListTypeOfCampaign] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -131,7 +133,10 @@ function Campaigns() {
                                         </div>
                                         <div className={cx('right')}>
                                             <div className={cx('popper-actions')}>
-                                                <button className={cx('popper-item', 'js-toggle')}>
+                                                <button
+                                                    onClick={() => navigate('/admin/add-new-campaign')}
+                                                    className={cx('popper-item', 'js-toggle')}
+                                                >
                                                     <img className={cx('icon')} alt="" src={images.plusIcon} />
                                                     Add Campaign
                                                 </button>

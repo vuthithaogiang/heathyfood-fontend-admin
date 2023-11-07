@@ -1,0 +1,17 @@
+.rdrCalendarWrapper {
+    border-radius: 6px;
+    width: 100%;
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.rdrMonth {
+    width: 100%;
+}
+.rdrMonthAndYearPickers select {
+    color: #fff;
+}
+
+.rdrDayNumber span {
+    color: #fff;
+}
