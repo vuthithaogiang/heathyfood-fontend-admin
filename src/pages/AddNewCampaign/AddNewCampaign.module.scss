@@ -242,6 +242,7 @@
     position: relative;
     .main {
         min-width: 72px;
+        height: 40px;
         display: flex;
         align-items: center;
         gap: 6px;
@@ -249,9 +250,13 @@
         font-family: 'Inter', sans-serif;
         font-size: 1.4rem;
         border: 1px solid #d0d7de;
-        padding: 11px 11px;
+        padding-right: 11px;
         cursor: pointer;
         border-radius: 6px;
+
+        span {
+            margin-left: 11px;
+        }
 
         img {
             width: 13px;
@@ -421,4 +426,11 @@
 .switch [type='checkbox']:checked + label {
     background-color: var(--primary-color);
     outline-color: var(--primary-color);
+}
+
+.date-value {
+    padding: 6px 16px;
+    border-radius: 14px;
+    background-color: #ececf5;
+    color: blueviolet;
 }
