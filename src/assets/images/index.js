@@ -40,6 +40,9 @@ const images = {
     socialContentIcon: require('~/assets/images/social-content-icon.svg').default,
     planIcon: require('~/assets/images/plan-icon.svg').default,
     doneIcon: require('~/assets/images/done-icon.svg').default,
+    calendarIcon: require('~/assets/images/calendar-icon.svg').default,
+    tasksIcon: require('~/assets/images/tasks-icon.svg').default,
+    pinIcon: require('~/assets/images/pin-icon.svg').default,
 };
 
 export default images;

@@ -889,3 +889,61 @@
 }
 
 //END PREVIEW CONTENT
+
+.timetable {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    .timetable-title {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+
+        img {
+            width: 13px;
+            height: 13px;
+            object-fit: contain;
+            filter: brightness(0) saturate(100%) invert(48%) sepia(0%) saturate(7098%) hue-rotate(168deg)
+                brightness(82%) contrast(98%);
+        }
+
+        span {
+            font-family: 'Inter', sans-serif;
+            color: #646464;
+            line-height: 1.4;
+            font-size: 1.6rem;
+            font-weight: 400;
+        }
+
+        span.value {
+        }
+    }
+}
+
+.form-timetable {
+}
+.form-notice {
+    width: fit-content;
+    padding: 8px 20px;
+    margin-top: 24px;
+    background-color: #e5f0ff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 10px;
+    p {
+        font-family: 'Inter', sans-serif;
+        color: #18191b;
+        font-weight: 400;
+        line-height: 1.5;
+    }
+    p:nth-child(1) {
+        color: #0969da;
+        font-size: 1.3rem;
+    }
+
+    p:nth-child(2) {
+        font-size: 1.3rem;
+    }
+}

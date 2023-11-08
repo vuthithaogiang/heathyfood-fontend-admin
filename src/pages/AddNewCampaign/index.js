@@ -88,7 +88,8 @@ function AddNewCampaign() {
 
     //INFORMATION ABOUNT NEW CAMPAIGN
     const [channels, setChannels] = useState(null);
-    const [budgetIsChecked, setBudgetIsCheced] = useState(true);
+    const [budgetIsChecked, setBudgetIsCheced] = useState(false);
+    const [activityIsChecked, setActivityIsChecked] = useState(false);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [idTypeOfCampaign, setIdTypeOfCampaign] = useState(null);
@@ -100,6 +101,39 @@ function AddNewCampaign() {
     const [totalBudget, setTotalBudget] = useState(null);
     const [dailyBudget, setDailyBudget] = useState(null);
     //END
+
+    const formatDate = (dateString) => {
+        console.log(dateString);
+        const parts = dateString.split('-');
+        let dateObject;
+        if (parts.length === 3) {
+            // Create a new Date object with the parsed day, month, and year
+            dateObject = new Date(parts[2], parts[1] - 1, parts[0]);
+        }
+
+        console.log(dateObject);
+        const months = [
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December',
+        ];
+
+        const day = dateObject.getDate(); // Get the day (1-31)
+        const month = months[dateObject.getMonth()]; // Get the month as a string
+        //   const year = dateObject.getFullYear(); // Get the year (e.g., 2023)
+
+        const formattedDate = ` ${month} ${day}`; // Combine day, month, and year
+        return formattedDate;
+    };
 
     useEffect(() => {
         return () => {
@@ -197,6 +231,11 @@ function AddNewCampaign() {
     const handleCheckBoxBudgetChange = (event) => {
         const isChecked = event.target.checked;
         setBudgetIsCheced(isChecked);
+    };
+
+    const handleCheckboxShowFormActivity = (event) => {
+        const isChecked = event.target.checked;
+        setActivityIsChecked(isChecked);
     };
 
     const toggleShowPopperChannels = () => {
@@ -526,7 +565,13 @@ function AddNewCampaign() {
                         <div className={cx('details-campaign')}>
                             <div className={cx('head')}>
                                 <h4>Details Campaign:</h4> <p>Type of Campaign</p>
-                                <button className={cx('back-btn')} onClick={() => setInProcess(1)}>
+                                <button
+                                    className={cx('back-btn')}
+                                    onClick={() => {
+                                        setInProcess(1);
+                                        setTaskDone([]);
+                                    }}
+                                >
                                     <img className={cx('icon')} alt="" src={images.arrowLeftIcon} />
                                     Back
                                 </button>
@@ -660,9 +705,15 @@ function AddNewCampaign() {
                     <>
                         <div className={cx('details-campaign')}>
                             <div className={cx('head')}>
-                                <h4>Details Campign: </h4>
+                                <h4>Details Campaign: </h4>
                                 <p>Create Social Content</p>
-                                <button className={cx('back-btn')} onClick={() => setInProcess(2)}>
+                                <button
+                                    className={cx('back-btn')}
+                                    onClick={() => {
+                                        setInProcess(2);
+                                        setTaskDone([1]);
+                                    }}
+                                >
                                     <img className={cx('icon')} alt="" src={images.arrowLeftIcon} />
                                     Back
                                 </button>
@@ -723,8 +774,11 @@ function AddNewCampaign() {
                                             </div>
 
                                             <button
-                                                className={cx('btn', 'btn-next', 'js-toggle')}
-                                                toggle-target="#popper-review-content"
+                                                onClick={() => {
+                                                    setInProcess(4);
+                                                    setTaskDone([1, 2, 3]);
+                                                }}
+                                                className={cx('btn', 'btn-next')}
                                             >
                                                 Next step
                                                 <img className={cx('icon')} alt="" src={images.arrowRightIcon} />
@@ -741,6 +795,79 @@ function AddNewCampaign() {
                                 ) : (
                                     <></>
                                 )}
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <></>
+                )}
+
+                {inProcess === 4 ? (
+                    <>
+                        <div className={cx('details-campaign')}>
+                            <div className={cx('head')}>
+                                <h4>Details Campaign: </h4>
+                                <p>Planned Activities in Campaign</p>
+                                <button
+                                    className={cx('back-btn')}
+                                    onClick={() => {
+                                        setInProcess(3);
+                                        setTaskDone([1, 2]);
+                                    }}
+                                >
+                                    <img className={cx('icon')} alt="" src={images.arrowLeftIcon} />
+                                    Back
+                                </button>
+                            </div>
+                            <div className={cx('timetable')}>
+                                <div className={cx('timetable-title')}>
+                                    <img className={cx('icon')} alt="" src={images.calendarIcon} />
+                                    <span>
+                                        Start: <span className={cx('value')}>{formatDate(startDate)}</span>{' '}
+                                    </span>
+                                </div>
+                                <div className={cx('timetable-title')}>
+                                    <img className={cx('icon')} alt="" src={images.pinIcon} />
+                                    <span>
+                                        Target: <span className={cx('value')}>{formatDate(endDate)}</span>
+                                    </span>
+                                </div>
+                                <div className={cx('timetable-title')}>
+                                    <img className={cx('icon')} alt="" src={images.tasksIcon} />
+                                    <span>
+                                        Activities: <span className={cx('value')}>0</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div className={cx('form', 'form-timetable')}>
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>Create Activity's Campaign: </label>
+                                        </div>
+
+                                        <p className={cx('form-desc')}>
+                                            Define how about information you want to provide in this campaign
+                                        </p>
+                                        <div className={cx('form-notice')}>
+                                            <p>Note: </p>
+                                            <p>
+                                                The proposed activities are just an estimate, you can change them later.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className={cx('switch')}>
+                                        <input
+                                            onChange={handleCheckboxShowFormActivity}
+                                            hidden
+                                            id="switch"
+                                            type="checkbox"
+                                            checked={activityIsChecked}
+                                        />
+                                        <label htmlFor="switch"></label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </>

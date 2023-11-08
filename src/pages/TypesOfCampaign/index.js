@@ -336,7 +336,7 @@ function TypesOfCampaign() {
                 <div className={cx('list-type')}>
                     {listTypesOfCampaign !== null &&
                         listTypesOfCampaign.map((item) => (
-                            <div className={cx('item')}>
+                            <div key={item.id} className={cx('item')}>
                                 <div className={cx('wrap-item')}>
                                     <div className={cx('info')}>
                                         <div className={cx('left')}>
