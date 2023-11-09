@@ -43,6 +43,7 @@ const images = {
     calendarIcon: require('~/assets/images/calendar-icon.svg').default,
     tasksIcon: require('~/assets/images/tasks-icon.svg').default,
     pinIcon: require('~/assets/images/pin-icon.svg').default,
+    seperateIcon: require('~/assets/images/seperate-icon.svg').default,
 };
 
 export default images;
