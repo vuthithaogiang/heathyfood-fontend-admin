@@ -9,7 +9,7 @@ const cx = classNames.bind(styles);
 
 function CalendarComponent({ setDateToString }) {
     const handleSelectDate = (e) => {
-        console.log(e);
+        // console.log(e);
         setDateToString(format(e, 'dd-MM-yyyy'));
     };
     return (

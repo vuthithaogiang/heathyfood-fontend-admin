@@ -14,13 +14,13 @@ function AddNewCampaign() {
     const SEQUENCE_PROCESS = [
         {
             step: 1,
-            title: 'Introduce about Campaign',
-            icon: images.introIcon,
+            title: 'Type of Campaign',
+            icon: images.typeIcon,
         },
         {
             step: 2,
-            title: 'Type of Campaign',
-            icon: images.typeIcon,
+            title: 'Introduce about Campaign',
+            icon: images.introIcon,
         },
         {
             step: 3,
@@ -73,8 +73,6 @@ function AddNewCampaign() {
         },
     ];
 
-    const FAKE_ACTIVITIES = [];
-
     const axios = useAxios();
     const [listTypeOfCampaign, setListTypeOfCampaign] = useState(null);
     const [inProcess, setInProcess] = useState(1);
@@ -83,15 +81,20 @@ function AddNewCampaign() {
     const [showPopperChannels, setShowPopperChannels] = useState(false);
     const refCalendarStartDate = useRef();
     const refCalandarEndDate = useRef();
+    const refCalendarStartDateActivity = useRef();
+    const refCalendarEndDateActivity = useRef();
+
     const [showCalendarStartDate, setShowCalendarStartDate] = useState(false);
     const [showCalandarEndDate, setShowCalendaeEndDate] = useState(false);
+    const [showCalendarStartDateActivity, setShowCalendarStartDateActivity] = useState(false);
+    const [showCalendarEndDateActivity, setShowCalendarEndDateActivity] = useState(false);
     const [showDetailsTypeCampaign, setshowDetailsTypeCampaign] = useState([]);
     const [breadActive, setBreadActive] = useState('About');
 
     //INFORMATION ABOUNT NEW CAMPAIGN
     const [channels, setChannels] = useState(null);
     const [budgetIsChecked, setBudgetIsCheced] = useState(false);
-    const [activityIsChecked, setActivityIsChecked] = useState(false);
+    const [activityIsChecked, setActivityIsChecked] = useState(true);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [idTypeOfCampaign, setIdTypeOfCampaign] = useState(null);
@@ -102,50 +105,81 @@ function AddNewCampaign() {
     const [objective, setObjective] = useState('');
     const [totalBudget, setTotalBudget] = useState(null);
     const [dailyBudget, setDailyBudget] = useState(null);
+    const [messageErrorDate, setMessageErrorDate] = useState(null);
+
+    const [messageErrorDateSchedule, setMessageErrorDateSchedule] = useState(null);
+    const [messageNameExistInActivity, setMessageNameExistInActivity] = useState(null);
     //END
 
     //INFORMATION AVTIVITY BELONGS TO CAMPAIGN
     const [nameActivity, setNameActivity] = useState('');
     const [startDateActivity, setStartDateActivity] = useState(null);
     const [endDateActivity, setEndDateActivity] = useState(null);
+    const [dateActivityValid, setDateActivityValid] = useState(false);
+    const [typeActitvity, setTypeActity] = useState(null);
 
+    const [listActivity, setListActivity] = useState([]);
     //END
 
-    const refShowCalendarStartDateActivity = useRef();
-    const refShowCalendarEndDateActivity = useRef();
+    const [schedule, setSchedule] = useState(null);
 
-    const [showCalendarStartDateActivity, setShowCalendarStartDateActivity] = useState(false);
-    const [showCalendarEndDateActivity, setShowCalendarEndDateActivity] = useState(false);
+    const refTypesActivity = useRef();
+    const [showTypesActivity, setshowTypesActivity] = useState(false);
+    const [showSuggestActivities, setShowSugestActivities] = useState(false);
 
-    const toggleShowCalendarStartDateActivity = () => {
-        setShowCalendarStartDateActivity(!showCalendarStartDateActivity);
+    useEffect(() => {
+        if (startDate === null || endDate === null || startDateActivity === null || endDateActivity === null) {
+            setDateActivityValid(false);
+            return;
+        }
+
+        const compareStartDateVsBegin = compareDates(startDateActivity, startDate);
+        const compareStartDateVsEnd = compareDates(startDate, endDate);
+
+        const compareStartDateVsEndDate = compareDates(startDateActivity, endDateActivity);
+
+        const compareEndDateVsEnd = compareDates(endDateActivity, endDate);
+        const compareEndDateVsStart = compareDates(endDateActivity, startDate);
+
+        if (compareStartDateVsEndDate === 1) {
+            setDateActivityValid(false);
+            return;
+        }
+
+        if (
+            (compareStartDateVsBegin === 0 || compareStartDateVsBegin === 1) &&
+            (compareStartDateVsEnd === 0 || compareStartDateVsEnd === -1) &&
+            (compareEndDateVsEnd === 0 || compareEndDateVsEnd === -1) &&
+            (compareEndDateVsStart === 0 || compareEndDateVsStart === 1)
+        ) {
+            setDateActivityValid(true);
+        } else {
+            setDateActivityValid(false);
+        }
+    }, [startDateActivity, endDateActivity]);
+
+    const toggleShowTypesActivity = () => {
+        setshowTypesActivity(!showTypesActivity);
     };
 
-    const hiddenCalendarStartDateActivity = () => {
-        setShowCalendarStartDateActivity(false);
+    const hiddenTypesActivity = () => {
+        setshowTypesActivity(false);
     };
 
-    const toggleShowCalendarEndDateActivity = () => {
-        setShowCalendarEndDateActivity(!showCalendarEndDateActivity);
-    };
+    useOnClickOutside(refTypesActivity, hiddenTypesActivity);
 
-    const hiddenCalendarEndDateActivity = () => {
-        setShowCalendarEndDateActivity(false);
-    };
-
-    useOnClickOutside(refShowCalendarStartDateActivity, hiddenCalendarStartDateActivity);
-    useOnClickOutside(refShowCalendarEndDateActivity, hiddenCalendarEndDateActivity);
-
-    const formatDate = (dateString) => {
-        console.log(dateString);
+    const tranferDate = (dateString) => {
         const parts = dateString.split('-');
         let dateObject;
         if (parts.length === 3) {
             // Create a new Date object with the parsed day, month, and year
             dateObject = new Date(parts[2], parts[1] - 1, parts[0]);
         }
+        return dateObject;
+    };
 
-        console.log(dateObject);
+    const formatDate = (dateString) => {
+        const dateObject = tranferDate(dateString);
         const months = [
             'January',
             'February',
@@ -250,6 +284,26 @@ function AddNewCampaign() {
         setShowCalendaeEndDate(false);
     };
 
+    const toggleShowCalendarStartDateActivity = () => {
+        setShowCalendarStartDateActivity(!showCalendarStartDateActivity);
+    };
+
+    const hiddenCalendarStartDateActivity = () => {
+        setShowCalendarStartDateActivity(false);
+    };
+
+    const toggleShowCalendarEndDateActvity = () => {
+        setShowCalendarEndDateActivity(!showCalendarEndDateActivity);
+    };
+
+    const hiddenCalendarEndDateActivity = () => {
+        setShowCalendarEndDateActivity(false);
+    };
+
+    useOnClickOutside(refCalendarStartDateActivity, hiddenCalendarStartDateActivity);
+
+    useOnClickOutside(refCalendarEndDateActivity, hiddenCalendarEndDateActivity);
+
     useOnClickOutside(refCalandarEndDate, hiddenCalendarEndDate);
 
     const toggleShowCalendarStartDate = () => {
@@ -284,6 +338,25 @@ function AddNewCampaign() {
 
     useOnClickOutside(refChannels, hiddenPopperChannels);
 
+    function compareDates(date1, date2) {
+        const parseDate = (dateString) => {
+            const [day, month, year] = dateString.split('-').map(Number);
+            // Month in JavaScript Date is 0-indexed, so subtract 1
+            return new Date(year, month - 1, day);
+        };
+
+        const d1 = parseDate(date1);
+        const d2 = parseDate(date2);
+
+        if (d1 < d2) {
+            return -1;
+        } else if (d1 > d2) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
     const handleSubmitStep1 = async (e) => {
         e.preventDefault();
 
@@ -291,8 +364,81 @@ function AddNewCampaign() {
             return;
         }
 
-        setInProcess(2);
-        setTaskDone([1]);
+        const compareDate = compareDates(startDate, endDate);
+        if (compareDate === 0 || compareDate === 1) {
+            setMessageErrorDate('The start date and end date in Campaign is not valid!');
+
+            return;
+        }
+
+        setInProcess(3);
+        setTaskDone([1, 2]);
+    };
+
+    const handleAddSchedule = async (e) => {
+        e.preventDefault();
+
+        console.log(dateActivityValid);
+
+        if (dateActivityValid === true) {
+            setMessageErrorDateSchedule(null);
+            const data = {
+                startDate: startDateActivity,
+                endDate: endDateActivity,
+            };
+
+            console.log(data);
+
+            setSchedule(data);
+            console.log(schedule);
+        } else {
+            setMessageErrorDateSchedule('Date was choosen conflict with date instance in Campaingn!');
+        }
+    };
+
+    const handleAddActivityToSchedule = async (e) => {
+        e.preventDefault();
+
+        if (nameActivity === '' && typeActitvity === null) {
+            return;
+        }
+
+        // check name not sample
+
+        const newActivity = {
+            name: nameActivity,
+            type: typeActitvity,
+        };
+
+        let newArray = [];
+
+        if (listActivity !== null) {
+            newArray = listActivity;
+        }
+
+        // Check if the name already exists in the array
+        let isNameUnique = !newArray.some((obj) => obj.name === newActivity.name);
+
+        // If the name is unique, add the new object
+        if (isNameUnique) {
+            setMessageNameExistInActivity(null);
+            newArray.push(newActivity);
+            setListActivity(newArray);
+
+            setTypeActity(null);
+            setNameActivity('');
+        } else {
+            setMessageNameExistInActivity('This name is esited. Please try again!');
+        }
+    };
+
+    const handleRemoteActivity = (item) => {
+        if (listActivity.indexOf(item) === -1) {
+            return;
+        } else {
+            const newArray = listActivity.filter((element) => element !== item);
+            setListActivity(newArray);
+        }
     };
 
     return (
@@ -333,284 +479,11 @@ function AddNewCampaign() {
                 </div>
             </div>
             <div className={cx('content')}>
-                {(inProcess === null) | (inProcess === 1) ? (
-                    <>
-                        <div className={cx('details-campaign')}>
-                            <h4 className={cx('head')}>
-                                Details Campaign: <p>Introduce about Campaign</p>
-                            </h4>
-                            <form className={cx('form')} onSubmit={handleSubmitStep1}>
-                                {/* Name + Channel*/}
-                                <div className={cx('form-row')}>
-                                    <div className={cx('form-group')}>
-                                        <div className={cx('form-label')}>
-                                            <label htmlFor="campaignName">Campaign Name*</label>
-                                        </div>
-                                        <div className={cx('form-control')}>
-                                            <input
-                                                className={cx('form-input')}
-                                                type="text"
-                                                id="campaignName"
-                                                placeholder="Enter campaign name"
-                                                value={nameCampaign}
-                                                onChange={(e) => setNameCampaign(e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className={cx('form-group')}>
-                                        <div className={cx('form-label')}>
-                                            <label>Channel</label>
-                                        </div>
-                                        <div ref={refChannels} className={cx('form-wrap-select')}>
-                                            <div onClick={toggleShowPopperChannels} className={cx('main')}>
-                                                {channels === null ? (
-                                                    <span>Choose Channel </span>
-                                                ) : (
-                                                    <span className={cx('channel-value')}>{channels.title}</span>
-                                                )}
-                                                <img className={cx('icon')} alt="" src={images.addIcon} />
-                                            </div>
-
-                                            <div
-                                                className={
-                                                    showPopperChannels === true
-                                                        ? cx('wrap-list')
-                                                        : cx('wrap-list', 'none')
-                                                }
-                                            >
-                                                <div className={cx('popper-list')}>
-                                                    {FAKE_CHANNELS.map((item) => (
-                                                        <div
-                                                            onClick={() => setChannels(item)}
-                                                            key={item.id}
-                                                            className={
-                                                                channels === item
-                                                                    ? cx('popper-item', 'active')
-                                                                    : cx('popper-item')
-                                                            }
-                                                        >
-                                                            <img
-                                                                className={cx('icon')}
-                                                                alt=""
-                                                                src={images.socialContentIcon}
-                                                            />
-                                                            <span>{item.title}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* Objective */}
-                                <div className={cx('form-row')}>
-                                    <div className={cx('form-group')}>
-                                        <div className={cx('form-label')}>
-                                            <label htmlFor="objective">Objective*</label>
-                                        </div>
-                                        <div className={cx('form-control')}>
-                                            <input
-                                                type="text"
-                                                className={cx('form-input')}
-                                                id="objective"
-                                                placeholder="Enter campaign objective"
-                                                value={objective}
-                                                onChange={(e) => setObjective(e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Budget */}
-                                <div className={cx('form-row')}>
-                                    <div className={cx('form-group')}>
-                                        <div className={cx('form-label')}>
-                                            <label>Budget</label>
-                                        </div>
-                                        <div className={cx('form-control', 'no-border', 'inline')}>
-                                            <p className={cx('form-desc')}>Define how much you want to spend?</p>
-                                            <div className={cx('switch')}>
-                                                <input
-                                                    onChange={handleCheckBoxBudgetChange}
-                                                    hidden
-                                                    id="switch"
-                                                    type="checkbox"
-                                                    checked={budgetIsChecked}
-                                                />
-                                                <label htmlFor="switch"></label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {budgetIsChecked ? (
-                                    <>
-                                        <div className={cx('form-row', 'margin-inital')}>
-                                            <div className={cx('form-group')}>
-                                                <div className={cx('form-label', 'small')}>
-                                                    <label>Overall Budget</label>
-                                                </div>
-                                                <div className={cx('form-control')}>
-                                                    <input
-                                                        className={cx('form-input')}
-                                                        type="number"
-                                                        placeholder="Enter amount for campaign total"
-                                                        value={totalBudget}
-                                                        onChange={(e) => setTotalBudget(e.target.value)}
-                                                    />
-                                                </div>
-                                                <div className={cx('form-desc', 'small')}>(In US dollars)</div>
-                                            </div>
-                                            <div className={cx('form-group')}>
-                                                <div className={cx('form-label', 'small')}>
-                                                    <label>Daily Budget</label>
-                                                </div>
-                                                <div className={cx('form-control')}>
-                                                    <input
-                                                        className={cx('form-input')}
-                                                        type="number"
-                                                        placeholder="Enter the overage you want to spend each day"
-                                                        value={dailyBudget}
-                                                        onChange={(e) => setDailyBudget(e.target.value)}
-                                                    />
-                                                </div>
-                                                <div className={cx('form-desc', 'small')}>(In US dollars)</div>
-                                            </div>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <></>
-                                )}
-
-                                {/* Calendar */}
-                                <div className={cx('form-row')}>
-                                    <div className={cx('form-group')}>
-                                        <div className={cx('form-label')}>
-                                            <label>Calendar</label>
-                                        </div>
-                                        <div className={cx('form-control', 'no-border', 'inline')}>
-                                            <p className={cx('form-desc')}>Define how long you want to going?</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className={cx('form-row', 'margin-inital')}>
-                                    <div className={cx('form-group')}>
-                                        <div className={cx('form-label', 'small')}>
-                                            <label>Start Date</label>
-                                        </div>
-                                        <div ref={refCalendarStartDate} className={cx('form-wrap-select')}>
-                                            <div onClick={toggleShowCalendarStartDate} className={cx('main')}>
-                                                {startDate === null ? (
-                                                    <>
-                                                        <span>Choose Campaign Start Date </span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <span className={cx('date-value')}>{startDate}</span>
-                                                    </>
-                                                )}
-
-                                                <img
-                                                    className={
-                                                        showCalendarStartDate === true
-                                                            ? cx('icon', 'icon-rotate')
-                                                            : cx('icon')
-                                                    }
-                                                    alt=""
-                                                    src={images.arrowIcon}
-                                                />
-                                            </div>
-                                            <div
-                                                className={
-                                                    showCalendarStartDate === true
-                                                        ? cx('wrap-list', 'calendar')
-                                                        : cx('wrap-list', 'calendar', 'none')
-                                                }
-                                            >
-                                                <div className={cx('popper-list', 'calendar')}>
-                                                    <CalendarComponent setDateToString={setStartDate} />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className={cx('form-group')}>
-                                        <div className={cx('form-label', 'small')}>
-                                            <label>End Date</label>
-                                        </div>
-                                        <div ref={refCalandarEndDate} className={cx('form-wrap-select')}>
-                                            <div onClick={toggleShowCalendarEndDate} className={cx('main')}>
-                                                {endDate === null ? (
-                                                    <>
-                                                        <span>Choose Campaign End Date </span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <span className={cx('date-value')}> {endDate} </span>
-                                                    </>
-                                                )}
-
-                                                <img
-                                                    className={
-                                                        showCalandarEndDate === true
-                                                            ? cx('icon', 'icon-rotate')
-                                                            : cx('icon')
-                                                    }
-                                                    alt=""
-                                                    src={images.arrowIcon}
-                                                />
-                                            </div>
-
-                                            <div
-                                                className={
-                                                    showCalandarEndDate === true
-                                                        ? cx('wrap-list', 'calendar')
-                                                        : cx('wrap-list', 'calendar', 'none')
-                                                }
-                                            >
-                                                <div className={cx('popper-list', 'calendar')}>
-                                                    <CalendarComponent setDateToString={setEndDate} />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className={cx('form-actions')}>
-                                    <div className={cx('btn')}>Cancel</div>
-                                    <button
-                                        type="submit"
-                                        // onClick={() => {
-                                        //     setInProcess(2);
-                                        //     setTaskDone([1]);
-                                        // }}
-                                        className={cx('btn', 'btn-next')}
-                                    >
-                                        Next step
-                                        <img className={cx('icon')} alt="" src={images.arrowRightIcon} />
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </>
-                ) : (
-                    <></>
-                )}
-
-                {inProcess === 2 ? (
+                {inProcess === 1 || inProcess === null ? (
                     <>
                         <div className={cx('details-campaign')}>
                             <div className={cx('head')}>
                                 <h4>Details Campaign:</h4> <p>Type of Campaign</p>
-                                <button
-                                    className={cx('back-btn')}
-                                    onClick={() => {
-                                        setInProcess(1);
-                                        setTaskDone([]);
-                                    }}
-                                >
-                                    <img className={cx('icon')} alt="" src={images.arrowLeftIcon} />
-                                    Back
-                                </button>
                             </div>
 
                             <div className={cx('form', 'not-background-color')}>
@@ -708,8 +581,8 @@ function AddNewCampaign() {
                                                         </div>
                                                         <div
                                                             onClick={() => {
-                                                                setInProcess(3);
-                                                                setTaskDone([1, 2]);
+                                                                setInProcess(2);
+                                                                setTaskDone([1]);
                                                             }}
                                                             className={cx('btn', 'btn-next')}
                                                         >
@@ -731,6 +604,302 @@ function AddNewCampaign() {
                                     )}
                                 </div>
                             </div>
+                        </div>
+                    </>
+                ) : (
+                    <></>
+                )}
+                {inProcess === 2 ? (
+                    <>
+                        <div className={cx('details-campaign')}>
+                            <h4 className={cx('head')}>
+                                Details Campaign: <p>Introduce about Campaign</p>
+                                <button
+                                    className={cx('back-btn')}
+                                    onClick={() => {
+                                        setInProcess(1);
+                                        setTaskDone([]);
+                                    }}
+                                >
+                                    <img className={cx('icon')} alt="" src={images.arrowLeftIcon} />
+                                    Back
+                                </button>
+                            </h4>
+                            <form className={cx('form')} onSubmit={handleSubmitStep1}>
+                                {/* Calendar */}
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>Calendar</label>
+                                        </div>
+                                        <div className={cx('form-control', 'no-border', 'inline')}>
+                                            <p className={cx('form-desc')}>Define how long you want to going?</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className={cx('form-row', 'margin-inital')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label', 'small')}>
+                                            <label>Start Date</label>
+                                        </div>
+                                        <div ref={refCalendarStartDate} className={cx('form-wrap-select')}>
+                                            <div onClick={toggleShowCalendarStartDate} className={cx('main')}>
+                                                {startDate === null ? (
+                                                    <>
+                                                        <span>Choose Campaign Start Date </span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span className={cx('date-value')}>{startDate}</span>
+                                                    </>
+                                                )}
+
+                                                <img
+                                                    className={
+                                                        showCalendarStartDate === true
+                                                            ? cx('icon', 'icon-rotate')
+                                                            : cx('icon')
+                                                    }
+                                                    alt=""
+                                                    src={images.arrowIcon}
+                                                />
+                                            </div>
+                                            <div
+                                                className={
+                                                    showCalendarStartDate === true
+                                                        ? cx('wrap-list', 'calendar')
+                                                        : cx('wrap-list', 'calendar', 'none')
+                                                }
+                                            >
+                                                <div className={cx('popper-list', 'calendar')}>
+                                                    <CalendarComponent setDateToString={setStartDate} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label', 'small')}>
+                                            <label>End Date</label>
+                                        </div>
+                                        <div ref={refCalandarEndDate} className={cx('form-wrap-select')}>
+                                            <div onClick={toggleShowCalendarEndDate} className={cx('main')}>
+                                                {endDate === null ? (
+                                                    <>
+                                                        <span>Choose Campaign End Date </span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span className={cx('date-value')}> {endDate} </span>
+                                                    </>
+                                                )}
+
+                                                <img
+                                                    className={
+                                                        showCalandarEndDate === true
+                                                            ? cx('icon', 'icon-rotate')
+                                                            : cx('icon')
+                                                    }
+                                                    alt=""
+                                                    src={images.arrowIcon}
+                                                />
+                                            </div>
+
+                                            <div
+                                                className={
+                                                    showCalandarEndDate === true
+                                                        ? cx('wrap-list', 'calendar')
+                                                        : cx('wrap-list', 'calendar', 'none')
+                                                }
+                                            >
+                                                <div className={cx('popper-list', 'calendar')}>
+                                                    <CalendarComponent setDateToString={setEndDate} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {messageErrorDate === null ? (
+                                    <></>
+                                ) : (
+                                    <>
+                                        <div className={cx('form-error')}>{messageErrorDate}</div>
+                                    </>
+                                )}
+                                {/* Name + Channel*/}
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label htmlFor="campaignName">Campaign Name*</label>
+                                        </div>
+                                        <div className={cx('form-control')}>
+                                            <input
+                                                className={cx('form-input')}
+                                                type="text"
+                                                id="campaignName"
+                                                placeholder="Enter campaign name"
+                                                value={nameCampaign}
+                                                onChange={(e) => setNameCampaign(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>Channel</label>
+                                        </div>
+                                        <div ref={refChannels} className={cx('form-wrap-select')}>
+                                            <div onClick={toggleShowPopperChannels} className={cx('main')}>
+                                                {channels === null ? (
+                                                    <span>Choose Channel </span>
+                                                ) : (
+                                                    <span className={cx('channel-value')}>{channels.title}</span>
+                                                )}
+                                                <img className={cx('icon')} alt="" src={images.addIcon} />
+                                            </div>
+
+                                            <div
+                                                className={
+                                                    showPopperChannels === true
+                                                        ? cx('wrap-list')
+                                                        : cx('wrap-list', 'none')
+                                                }
+                                            >
+                                                <div className={cx('popper-list')}>
+                                                    {FAKE_CHANNELS.map((item) => (
+                                                        <div
+                                                            onClick={() => setChannels(item)}
+                                                            key={item.id}
+                                                            className={
+                                                                channels === item
+                                                                    ? cx('popper-item', 'active')
+                                                                    : cx('popper-item')
+                                                            }
+                                                        >
+                                                            <img
+                                                                className={cx('icon')}
+                                                                alt=""
+                                                                src={images.socialContentIcon}
+                                                            />
+                                                            <span>{item.title}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* Objective */}
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label htmlFor="objective">Objective*</label>
+                                        </div>
+                                        <div className={cx('form-control')}>
+                                            <input
+                                                type="text"
+                                                className={cx('form-input')}
+                                                id="objective"
+                                                placeholder="Enter campaign objective"
+                                                value={objective}
+                                                onChange={(e) => setObjective(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    {idTypeOfCampaign === 8 && (
+                                        <>
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label')}>
+                                                    <label htmlFor="objective">Target Domation*</label>
+                                                </div>
+                                                <div className={cx('form-control')}>
+                                                    <input
+                                                        type="number"
+                                                        className={cx('form-input')}
+                                                        id="objective"
+                                                        placeholder="Enter target amount in this campaign"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Budget */}
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>Budget</label>
+                                        </div>
+                                        <div className={cx('form-control', 'no-border', 'inline')}>
+                                            <p className={cx('form-desc')}>Define how much you want to spend?</p>
+                                            <div className={cx('switch')}>
+                                                <input
+                                                    onChange={handleCheckBoxBudgetChange}
+                                                    hidden
+                                                    id="switch"
+                                                    type="checkbox"
+                                                    checked={budgetIsChecked}
+                                                />
+                                                <label htmlFor="switch"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {budgetIsChecked ? (
+                                    <>
+                                        <div className={cx('form-row', 'margin-inital')}>
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label', 'small')}>
+                                                    <label>Overall Budget</label>
+                                                </div>
+                                                <div className={cx('form-control')}>
+                                                    <input
+                                                        className={cx('form-input')}
+                                                        type="number"
+                                                        placeholder="Enter amount for campaign total"
+                                                        value={totalBudget}
+                                                        onChange={(e) => setTotalBudget(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className={cx('form-desc', 'small')}>(In US dollars)</div>
+                                            </div>
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label', 'small')}>
+                                                    <label>Daily Budget</label>
+                                                </div>
+                                                <div className={cx('form-control')}>
+                                                    <input
+                                                        className={cx('form-input')}
+                                                        type="number"
+                                                        placeholder="Enter the overage you want to spend each day"
+                                                        value={dailyBudget}
+                                                        onChange={(e) => setDailyBudget(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className={cx('form-desc', 'small')}>(In US dollars)</div>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <></>
+                                )}
+
+                                <div className={cx('form-actions')}>
+                                    <div className={cx('btn')}>Cancel</div>
+                                    <button
+                                        type="submit"
+                                        // onClick={() => {
+                                        //     setInProcess(2);
+                                        //     setTaskDone([1]);
+                                        // }}
+                                        className={cx('btn', 'btn-next')}
+                                    >
+                                        Next step
+                                        <img className={cx('icon')} alt="" src={images.arrowRightIcon} />
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </>
                 ) : (
@@ -876,212 +1045,535 @@ function AddNewCampaign() {
                                 </div>
                             </div>
 
-                            <div className={cx('content-row')}>
-                                <div className={cx('form', 'form-timetable')}>
-                                    <div className={cx('form-row')}>
-                                        <div className={cx('form-group')}>
-                                            <div className={cx('form-label')}>
-                                                <label>Create Activity's Campaign: </label>
+                            {schedule !== null ? (
+                                <>
+                                    <form
+                                        onSubmit={handleAddActivityToSchedule}
+                                        className={cx('form', 'form-timetable')}
+                                    >
+                                        <div className={cx('form-row')}>
+                                            <div className={cx('form-label', 'label-schedule')}>
+                                                <div className={cx('label')}>
+                                                    Schedule:
+                                                    <span className={cx('')}>
+                                                        {schedule.startDate} - {schedule.endDate}
+                                                    </span>
+                                                </div>
+                                                <span onClick={() => setSchedule(null)} className={cx('add-timetable')}>
+                                                    Continue Schedule
+                                                    <img
+                                                        className={cx('icon', 'deco-icon')}
+                                                        alt=""
+                                                        src={images.addIcon}
+                                                    />
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className={cx('separate')}>
+                                            <span className={cx('first')}></span>
+                                            <span className={cx('second')}></span>
+                                            <span className={cx('third')}></span>
+                                        </div>
+                                        <div className={cx('form-row')}>
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label')}>
+                                                    <label>Type of Activity*</label>
+                                                </div>
+                                                <div ref={refTypesActivity} className={cx('filter-form-group')}>
+                                                    <div
+                                                        onClick={toggleShowTypesActivity}
+                                                        className={cx('filter-select-wrap')}
+                                                    >
+                                                        <div className={cx('wrap-select')}>
+                                                            <span className={cx('value')}>
+                                                                {typeActitvity === null
+                                                                    ? 'Choose tyoe of activity'
+                                                                    : typeActitvity}
+                                                            </span>
+
+                                                            <span className={cx('group-btn')}>
+                                                                <span>
+                                                                    <img
+                                                                        className={cx('icon')}
+                                                                        alt=""
+                                                                        src={images.addIcon}
+                                                                    />
+                                                                </span>
+                                                                <span>
+                                                                    {' '}
+                                                                    <img
+                                                                        className={cx('icon')}
+                                                                        alt=""
+                                                                        src={images.arrowDownIcon}
+                                                                    />
+                                                                </span>
+                                                            </span>
+                                                        </div>
+
+                                                        <div
+                                                            className={
+                                                                showTypesActivity === true
+                                                                    ? cx('category-list')
+                                                                    : cx('category-list', 'none')
+                                                            }
+                                                        >
+                                                            <img
+                                                                className={cx('arrow-up')}
+                                                                alt=""
+                                                                src={images.arrowUp}
+                                                            />
+                                                            <div className={cx('popper-list')}>
+                                                                <div
+                                                                    onClick={() =>
+                                                                        setTypeActity('User-generated Content')
+                                                                    }
+                                                                    className={
+                                                                        typeActitvity === 'User-generated Content'
+                                                                            ? cx('popper-item', 'active')
+                                                                            : cx('popper-item')
+                                                                    }
+                                                                >
+                                                                    <img
+                                                                        className={cx('icon')}
+                                                                        alt=""
+                                                                        src={images.pushIcon}
+                                                                    />
+                                                                    <span>User-generated Content</span>
+                                                                </div>
+                                                                <div
+                                                                    onClick={() =>
+                                                                        setTypeActity('System-generated Content')
+                                                                    }
+                                                                    className={
+                                                                        typeActitvity === 'System-generated Content'
+                                                                            ? cx('popper-item', 'active')
+                                                                            : cx('popper-item')
+                                                                    }
+                                                                >
+                                                                    <img
+                                                                        className={cx('icon')}
+                                                                        alt=""
+                                                                        src={images.pushIcon}
+                                                                    />
+                                                                    <span>System-generated Content</span>
+                                                                </div>
+                                                                <div
+                                                                    onClick={() => setTypeActity(null)}
+                                                                    className={cx('popper-item')}
+                                                                >
+                                                                    <img
+                                                                        className={cx('icon')}
+                                                                        alt=""
+                                                                        src={images.pushIcon}
+                                                                    />
+                                                                    <span>Other</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {typeActitvity !== null && (
+                                            <>
+                                                {/* Name */}
+                                                <div className={cx('form-row')}>
+                                                    <div className={cx('form-group')}>
+                                                        <div className={cx('form-label')}>
+                                                            <label htmlFor="activityName">Title Actitvity*</label>
+                                                        </div>
+                                                        <div
+                                                            className={cx(
+                                                                'form-control',
+                                                                'no-border',
+                                                                'form-activity-name',
+                                                            )}
+                                                        >
+                                                            <input
+                                                                className={
+                                                                    showSuggestActivities === true
+                                                                        ? cx('form-input', 'special', 'active')
+                                                                        : cx('form-input', 'special')
+                                                                }
+                                                                type="text"
+                                                                id="activityName"
+                                                                placeholder="Untitled"
+                                                                value={nameActivity}
+                                                                onChange={(e) => setNameActivity(e.target.value)}
+                                                                onFocus={() => setShowSugestActivities(true)}
+                                                                onDoubleClick={() => setShowSugestActivities(false)}
+                                                                onBlur={() => setShowSugestActivities(false)}
+                                                            />
+                                                            <div
+                                                                className={
+                                                                    showSuggestActivities === true
+                                                                        ? cx('suggest-open')
+                                                                        : cx('suggest-open', 'none')
+                                                                }
+                                                            >
+                                                                <div
+                                                                    onClick={() =>
+                                                                        setNameActivity(
+                                                                            'Click me if you wanna recommend activities saved',
+                                                                        )
+                                                                    }
+                                                                    className={cx('item')}
+                                                                >
+                                                                    <span>
+                                                                        Click me if you wanna recommend activities saved
+                                                                    </span>
+                                                                    <img
+                                                                        className={cx('icon', 'suggest-icon')}
+                                                                        alt=""
+                                                                        src={images.suggestIcon}
+                                                                    />
+                                                                </div>
+                                                                <div
+                                                                    onClick={() =>
+                                                                        setNameActivity(
+                                                                            'Click me if you wanna recommend activities saved',
+                                                                        )
+                                                                    }
+                                                                    className={cx('item')}
+                                                                >
+                                                                    <span>
+                                                                        Click me if you wanna recommend activities saved
+                                                                    </span>
+                                                                    <img
+                                                                        className={cx('icon', 'suggest-icon')}
+                                                                        alt=""
+                                                                        src={images.suggestIcon}
+                                                                    />
+                                                                </div>
+                                                                <div
+                                                                    onClick={() =>
+                                                                        setNameActivity(
+                                                                            'Click me if you wanna recommend activities saved',
+                                                                        )
+                                                                    }
+                                                                    className={cx('item')}
+                                                                >
+                                                                    <span>
+                                                                        Click me if you wanna recommend activities saved
+                                                                    </span>
+                                                                    <img
+                                                                        className={cx('icon', 'suggest-icon')}
+                                                                        alt=""
+                                                                        src={images.suggestIcon}
+                                                                    />
+                                                                </div>
+                                                                <div
+                                                                    onClick={() =>
+                                                                        setNameActivity(
+                                                                            'Click me if you wanna recommend activities saved',
+                                                                        )
+                                                                    }
+                                                                    className={cx('item')}
+                                                                >
+                                                                    <span>
+                                                                        Click me if you wanna recommend activities saved
+                                                                    </span>
+                                                                    <img
+                                                                        className={cx('icon', 'suggest-icon')}
+                                                                        alt=""
+                                                                        src={images.suggestIcon}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {messageNameExistInActivity !== null && (
+                                                    <>
+                                                        <div className={cx('form-error')}>
+                                                            {messageNameExistInActivity}
+                                                        </div>
+                                                    </>
+                                                )}
+
+                                                <div className={cx('form-actions', 'larger-margin')}>
+                                                    <button
+                                                        type="submit"
+                                                        // onClick={() => {
+                                                        //     setInProcess(2);
+                                                        //     setTaskDone([1]);
+                                                        // }}
+                                                        className={cx('btn', 'btn-add')}
+                                                    >
+                                                        Add
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </form>
+                                </>
+                            ) : (
+                                <>
+                                    <form onSubmit={handleAddSchedule} className={cx('form', 'form-timetable')}>
+                                        <div className={cx('form-row')}>
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label')}>
+                                                    <label>Create Activity's Campaign: </label>
+                                                </div>
+
+                                                <p className={cx('form-desc')}>
+                                                    Define how about information you want to provide in this campaign
+                                                </p>
                                             </div>
 
-                                            <p className={cx('form-desc')}>
-                                                Define how about information you want to provide in this campaign
+                                            <div className={cx('switch', 'activity')}>
+                                                <input
+                                                    onChange={handleCheckboxShowFormActivity}
+                                                    hidden
+                                                    id="switchActivity"
+                                                    type="checkbox"
+                                                    checked={activityIsChecked}
+                                                />
+                                                <label htmlFor="switchActivity"></label>
+                                            </div>
+                                        </div>
+
+                                        <div className={activityIsChecked ? cx('form-row') : cx('form-row', 'none')}>
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label')}>
+                                                    <label>Schedule:</label>
+                                                </div>
+                                                <div className={cx('form-control', 'no-border', 'inline')}>
+                                                    <p className={cx('form-desc')}>
+                                                        Define how long you want to going?
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            className={
+                                                activityIsChecked
+                                                    ? cx('form-row', 'margin-inital')
+                                                    : cx('form-row', 'none', 'margin-inital')
+                                            }
+                                        >
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label', 'small')}>
+                                                    <label>From: </label>
+                                                </div>
+                                                <div
+                                                    ref={refCalendarStartDateActivity}
+                                                    className={cx('form-wrap-select')}
+                                                >
+                                                    <div
+                                                        onClick={toggleShowCalendarStartDateActivity}
+                                                        className={cx('main')}
+                                                    >
+                                                        {startDateActivity === null ? (
+                                                            <>
+                                                                <span>Choose Activity Start Date </span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <span className={cx('date-value')}>
+                                                                    {startDateActivity}
+                                                                </span>
+                                                            </>
+                                                        )}
+
+                                                        <img
+                                                            className={
+                                                                showCalendarStartDateActivity === true
+                                                                    ? cx('icon', 'icon-rotate')
+                                                                    : cx('icon')
+                                                            }
+                                                            alt=""
+                                                            src={images.arrowIcon}
+                                                        />
+                                                    </div>
+                                                    <div
+                                                        className={
+                                                            showCalendarStartDateActivity === true
+                                                                ? cx('wrap-list', 'calendar')
+                                                                : cx('wrap-list', 'calendar', 'none')
+                                                        }
+                                                    >
+                                                        <div className={cx('popper-list', 'calendar')}>
+                                                            <CalendarComponent setDateToString={setStartDateActivity} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label', 'small')}>
+                                                    <label>To: </label>
+                                                </div>
+                                                <div
+                                                    ref={refCalendarEndDateActivity}
+                                                    className={cx('form-wrap-select')}
+                                                >
+                                                    <div
+                                                        onClick={toggleShowCalendarEndDateActvity}
+                                                        className={cx('main')}
+                                                    >
+                                                        {endDateActivity === null ? (
+                                                            <>
+                                                                <span>Choose Activity End Date </span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <span className={cx('date-value')}>
+                                                                    {' '}
+                                                                    {endDateActivity}{' '}
+                                                                </span>
+                                                            </>
+                                                        )}
+
+                                                        <img
+                                                            className={
+                                                                showCalendarEndDateActivity === true
+                                                                    ? cx('icon', 'icon-rotate')
+                                                                    : cx('icon')
+                                                            }
+                                                            alt=""
+                                                            src={images.arrowIcon}
+                                                        />
+                                                    </div>
+
+                                                    <div
+                                                        className={
+                                                            showCalendarEndDateActivity === true
+                                                                ? cx('wrap-list', 'calendar')
+                                                                : cx('wrap-list', 'calendar', 'none')
+                                                        }
+                                                    >
+                                                        <div className={cx('popper-list', 'calendar')}>
+                                                            <CalendarComponent setDateToString={setEndDateActivity} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {messageErrorDateSchedule !== null ? (
+                                            <>
+                                                <div className={cx('form-error')}>{messageErrorDateSchedule}</div>
+                                            </>
+                                        ) : (
+                                            <></>
+                                        )}
+
+                                        {/* Form Notice */}
+                                        <div className={cx('form-notice')}>
+                                            <p>Note: </p>
+                                            <p>
+                                                The proposed activities are just an estimate, you can change them later.
                                             </p>
                                         </div>
 
-                                        <div className={cx('switch', 'activity')}>
-                                            <input
-                                                onChange={handleCheckboxShowFormActivity}
-                                                hidden
-                                                id="switchActivity"
-                                                type="checkbox"
-                                                checked={activityIsChecked}
-                                            />
-                                            <label htmlFor="switchActivity"></label>
-                                        </div>
-                                    </div>
-                                    {/* Name */}
-                                    <div className={activityIsChecked ? cx('form-row') : cx('form-row', 'none')}>
-                                        <div className={cx('form-group')}>
-                                            <div className={cx('form-label')}>
-                                                <label htmlFor="activityName">Title Actitvity*</label>
-                                            </div>
-                                            <div className={cx('form-control')}>
-                                                <input
-                                                    className={cx('form-input')}
-                                                    type="text"
-                                                    id="activityName"
-                                                    placeholder="Enter title Activity"
-                                                    value={nameActivity}
-                                                    onChange={(e) => setNameActivity(e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className={activityIsChecked ? cx('form-row') : cx('form-row', 'none')}>
-                                        <div className={cx('form-group')}>
-                                            <div className={cx('form-label')}>
-                                                <label>Calendar</label>
-                                            </div>
-                                            <div className={cx('form-control', 'no-border', 'inline')}>
-                                                <p className={cx('form-desc')}>Define how long you want to going?</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Calendar From */}
-                                    <div
-                                        className={
-                                            activityIsChecked
-                                                ? cx('form-row', 'margin-inital')
-                                                : cx('form-row', 'none', 'margin-inital')
-                                        }
-                                    >
-                                        <div className={cx('form-group')}>
-                                            <div className={cx('form-label', 'small')}>
-                                                <label>From: </label>
-                                            </div>
-                                            <div
-                                                ref={refShowCalendarStartDateActivity}
-                                                className={cx('form-wrap-select')}
-                                            >
-                                                <div
-                                                    onClick={toggleShowCalendarStartDateActivity}
-                                                    className={cx('main')}
-                                                >
-                                                    {startDateActivity === null ? (
-                                                        <>
-                                                            <span>Choose Activity Start Date </span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <span className={cx('date-value')}>
-                                                                {startDateActivity}
-                                                            </span>
-                                                        </>
-                                                    )}
-
-                                                    <img
-                                                        className={
-                                                            showCalendarStartDateActivity === true
-                                                                ? cx('icon', 'icon-rotate')
-                                                                : cx('icon')
-                                                        }
-                                                        alt=""
-                                                        src={images.arrowIcon}
-                                                    />
+                                        {activityIsChecked ? (
+                                            <>
+                                                <div className={cx('form-actions', 'larger-margin')}>
+                                                    <button
+                                                        type="submit"
+                                                        // onClick={() => {
+                                                        //     setInProcess(2);
+                                                        //     setTaskDone([1]);
+                                                        // }}
+                                                        className={cx('btn', 'btn-add')}
+                                                    >
+                                                        Add
+                                                    </button>
                                                 </div>
-                                                <div
-                                                    className={
-                                                        showCalendarStartDateActivity === true
-                                                            ? cx('wrap-list', 'calendar-activity')
-                                                            : cx(
-                                                                  'wrap-list',
-                                                                  'calendar-activity',
-                                                                  'none',
-                                                                  'activity-none',
-                                                              )
-                                                    }
-                                                >
-                                                    <div className={cx('popper-list', 'calendar')}>
-                                                        <CalendarComponent setDateToString={setStartDateActivity} />
+                                            </>
+                                        ) : (
+                                            <></>
+                                        )}
+                                    </form>
+                                </>
+                            )}
+
+                            <div className={cx('list-activity')}>
+                                {schedule !== null && (
+                                    <>
+                                        <div className={cx('group-activity')}>
+                                            <div className={cx('decoration')}>
+                                                <div>
+                                                    <img className={cx('icon')} alt="" src={images.decorationIcon} />
+                                                </div>
+                                                <div className={cx('line-column')}></div>
+                                            </div>
+                                            <div className={cx('activities')}>
+                                                <div className={cx('schedule')}>
+                                                    <span>
+                                                        Going on {formatDate(schedule.startDate)} -{' '}
+                                                        {formatDate(schedule.endDate)}
+                                                    </span>
+                                                    <button className={cx('push-btn')}>
+                                                        Push
+                                                        <img className={cx('icon')} alt="" src={images.saveCloudIcon} />
+                                                    </button>
+                                                </div>
+                                                <div className={cx('multi-activity')}>
+                                                    {listActivity.map((item, index) => (
+                                                        <div key={index} className={cx('activity-item')}>
+                                                            <div>
+                                                                <p>{item.name}</p>
+                                                                <p>
+                                                                    Belong to: <span>{item.type}</span>
+                                                                </p>
+                                                            </div>
+                                                            <div
+                                                                onClick={() => handleRemoteActivity(item)}
+                                                                className={cx('remove')}
+                                                            >
+                                                                <img className={cx('icon')} alt="" src={images.xIcon} />
+                                                            </div>
+                                                        </div>
+                                                    ))}
+
+                                                    <div className={cx('activity-item', 'label')}>
+                                                        <div className={cx('div-1')}></div>
+                                                        <div className={cx('div-2')}></div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                    </>
+                                )}
+                                <div className={cx('group-activity')}>
+                                    <div className={cx('decoration')}>
+                                        <div>
+                                            <img className={cx('icon')} alt="" src={images.decorationIcon} />
+                                        </div>
+                                        <div className={cx('line-column')}></div>
                                     </div>
-
-                                    {/* Calendar To */}
-                                    <div
-                                        style={{ marginTop: '8px' }}
-                                        className={
-                                            activityIsChecked
-                                                ? cx('form-row', 'margin-inital')
-                                                : cx('form-row', 'none', 'margin-inital')
-                                        }
-                                    >
-                                        <div className={cx('form-group')}>
-                                            <div className={cx('form-label', 'small')}>
-                                                <label>To: </label>
+                                    <div className={cx('activities')}>
+                                        <div className={cx('schedule')}>
+                                            <span>Going on ...</span>
+                                        </div>
+                                        <div className={cx('multi-activity')}>
+                                            <div className={cx('activity-item', 'label')}>
+                                                <div className={cx('div-1')}></div>
+                                                <div className={cx('div-2')}></div>
                                             </div>
-                                            <div
-                                                ref={refShowCalendarEndDateActivity}
-                                                className={cx('form-wrap-select')}
-                                            >
-                                                <div onClick={toggleShowCalendarEndDateActivity} className={cx('main')}>
-                                                    {endDateActivity === null ? (
-                                                        <>
-                                                            <span>Choose Activity End Date </span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <span className={cx('date-value')}>
-                                                                {' '}
-                                                                {endDateActivity}{' '}
-                                                            </span>
-                                                        </>
-                                                    )}
-
-                                                    <img
-                                                        className={
-                                                            showCalendarEndDateActivity === true
-                                                                ? cx('icon', 'icon-rotate')
-                                                                : cx('icon')
-                                                        }
-                                                        alt=""
-                                                        src={images.arrowIcon}
-                                                    />
-                                                </div>
-
-                                                <div
-                                                    className={
-                                                        showCalendarEndDateActivity === true
-                                                            ? cx('wrap-list', 'calendar-activity')
-                                                            : cx(
-                                                                  'wrap-list',
-                                                                  'calendar-activity',
-                                                                  'none',
-                                                                  'activity-none',
-                                                              )
-                                                    }
-                                                >
-                                                    <div className={cx('popper-list', 'calendar')}>
-                                                        <CalendarComponent setDateToString={setEndDateActivity} />
-                                                    </div>
-                                                </div>
+                                            <div className={cx('activity-item', 'label')}>
+                                                <div className={cx('div-1')}></div>
+                                                <div className={cx('div-2')}></div>
                                             </div>
-                                            <div className={cx('form-desc', 'small')}>
-                                                (Optional: Default in {formatDate(endDate)})
+                                            <div className={cx('activity-item', 'label')}>
+                                                <div className={cx('div-1')}></div>
+                                                <div className={cx('div-2')}></div>
+                                            </div>
+                                            <div className={cx('activity-item', 'label')}>
+                                                <div className={cx('div-1')}></div>
+                                                <div className={cx('div-2')}></div>
+                                            </div>
+                                            <div className={cx('activity-item', 'label')}>
+                                                <div className={cx('div-1')}></div>
+                                                <div className={cx('div-2')}></div>
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Form Notice */}
-                                    <div className={cx('form-notice')}>
-                                        <p>Note: </p>
-                                        <p>The proposed activities are just an estimate, you can change them later.</p>
-                                    </div>
-                                    {activityIsChecked ? (
-                                        <>
-                                            <div className={cx('form-actions', 'larger-margin')}>
-                                                <button
-                                                    // onClick={() => {
-                                                    //     setInProcess(2);
-                                                    //     setTaskDone([1]);
-                                                    // }}
-                                                    className={cx('btn', 'btn-add')}
-                                                >
-                                                    Add
-                                                </button>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <></>
-                                    )}
                                 </div>
-                                {/* List Activity */}
-                                <div className={cx('list-activity')}>List activity</div>
                             </div>
                         </div>
                     </>

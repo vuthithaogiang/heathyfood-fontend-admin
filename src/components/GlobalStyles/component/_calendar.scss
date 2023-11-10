@@ -1,17 +1,18 @@
 .rdrCalendarWrapper {
-    border-radius: 6px;
+    border-radius: 4px;
     width: 100%;
-    background-color: var(--primary-color);
-    color: #fff;
+    box-shadow: rgba(51, 51, 51, 0.2) 3px 2px 12px;
+    // background-color: var(--primary-color);
+    // color: #fff;
 }
 
 .rdrMonth {
     width: 100%;
 }
 .rdrMonthAndYearPickers select {
-    color: #fff;
+    // color: #fff;
 }
 
 .rdrDayNumber span {
-    color: #fff;
+    // color: #fff;
 }

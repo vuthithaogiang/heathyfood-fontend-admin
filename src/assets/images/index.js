@@ -44,6 +44,10 @@ const images = {
     tasksIcon: require('~/assets/images/tasks-icon.svg').default,
     pinIcon: require('~/assets/images/pin-icon.svg').default,
     seperateIcon: require('~/assets/images/seperate-icon.svg').default,
+    decorationIcon: require('~/assets/images/decoration-icon.svg').default,
+    suggestIcon: require('~/assets/images/suggest-icon.svg').default,
+    decorationIcon1: require('~/assets/images/decoration-icon-1.svg').default,
+    saveCloudIcon: require('~/assets/images/save-cloud-icon.svg').default,
 };
 
 export default images;

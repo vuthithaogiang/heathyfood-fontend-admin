@@ -37,7 +37,7 @@ function Notification({ message, className, show, toggleTarget, setShow, confirm
             className={show === true ? cx('toast', 'show', className) : cx('toast', className)}
         >
             <div className={cx('title')}>
-                <p>1 row selected. {message}</p>
+                <p>{message}</p>
             </div>
             <div className={cx('separate')}></div>
             <div className={cx('action')}>
