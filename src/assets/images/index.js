@@ -48,6 +48,7 @@ const images = {
     suggestIcon: require('~/assets/images/suggest-icon.svg').default,
     decorationIcon1: require('~/assets/images/decoration-icon-1.svg').default,
     saveCloudIcon: require('~/assets/images/save-cloud-icon.svg').default,
+    loadingIcon: require('~/assets/images/loading-icon.svg').default,
 };
 
 export default images;

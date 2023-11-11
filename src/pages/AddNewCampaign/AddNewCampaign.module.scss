@@ -1172,12 +1172,39 @@
                 font-family: 'Inter', sans-serif;
                 font-size: 1.5rem;
                 color: #7e6d76;
+                transition: color 0.6s;
             }
 
             &:hover {
                 .push-btn {
                     opacity: 1;
                     visibility: visible;
+                }
+            }
+
+            .loading {
+                margin-left: -10px;
+                img {
+                    width: 13px;
+                    filter: brightness(0) saturate(100%) invert(71%) sepia(72%) saturate(0%) hue-rotate(271deg)
+                        brightness(98%) contrast(86%);
+                    animation: spinner 1.4s infinite;
+                }
+            }
+            .text-loading {
+                position: relative;
+                color: #e2e3e9;
+
+                &::before {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    color: #c1c1c1;
+                    content: attr(data-text);
+                    white-space: nowrap;
+                    //  width: 100%;
+                    overflow: hidden;
+                    animation: run 2s infinite;
                 }
             }
 
@@ -1190,7 +1217,7 @@
                 align-items: center;
                 justify-content: center;
                 gap: 6px;
-                height: 28px;
+                height: 24px;
                 background-color: var(--primary-color);
                 border-radius: 4px;
                 position: relative;
@@ -1213,9 +1240,15 @@
                 }
 
                 img {
+                    width: 14px;
+                    object-fit: contain;
                     filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(351deg)
                         brightness(103%) contrast(104%);
                 }
+            }
+
+            .push-btn.none {
+                display: none;
             }
         }
 
@@ -1410,18 +1443,32 @@ img.deco-icon {
     gap: 4px;
 
     span {
-        height: 4px;
-        width: 92px;
+        height: 3px;
+        width: 72px;
         opacity: 0.08;
         background-color: #000958;
+        border-radius: 7px;
 
-        border-radius: 3px;
+        transition: opacity, background-color;
+        transition-duration: 0.6s;
+    }
+    span:nth-child(3) {
+        width: 54px;
     }
 
     span.first {
         width: 45px;
         background-color: #6059e7;
         opacity: 1;
+    }
+
+    span.active {
+        background-color: #6059e7;
+        opacity: 1;
+    }
+
+    span.small {
+        width: 34px;
     }
 }
 .label-schedule {
@@ -1456,7 +1503,7 @@ img.deco-icon {
         justify-content: space-between;
         font-family: 'Inter', sans-serif;
         font-size: 1.3rem;
-        color: #a782c2;
+
         background-color: #f2f2f2;
 
         height: 28px;
@@ -1467,10 +1514,46 @@ img.deco-icon {
         visibility: hidden;
         opacity: 0;
 
+        span {
+            position: relative;
+            color: #ddd;
+            transition: color 0.6s;
+
+            &::after {
+                color: #a782c2;
+                position: absolute;
+                top: 0;
+                left: 0;
+                content: 'Continue Schedule';
+                white-space: nowrap;
+                //  width: 100%;
+                overflow: hidden;
+                animation: run 2s infinite;
+            }
+        }
+
         transition: background-color, opacity, visibility;
         transition-duration: 0.3s;
         &:hover {
             background-color: #e5e5e5;
         }
+    }
+}
+
+@keyframes spinner {
+    from {
+        rotate: 0;
+    }
+    to {
+        rotate: 180deg;
+    }
+}
+
+@keyframes run {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
     }
 }
