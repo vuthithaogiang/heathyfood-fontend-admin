@@ -551,7 +551,7 @@ function AddNewCampaign() {
         formData.append('objective', objective);
         formData.append('startDate', startDate);
         formData.append('endDate', endDate);
-        formData.append('descripton', content);
+        formData.append('description', content);
 
         if (totalBudget !== null) {
             formData.append('budget', totalBudget);

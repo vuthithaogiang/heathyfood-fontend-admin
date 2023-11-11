@@ -346,7 +346,7 @@ function TypesOfCampaign() {
                                             </div>
                                             <div className={cx('row-2')}>
                                                 <span className={cx('tag')}></span>
-                                                <span>hasManyCampaign: 0 </span>
+                                                <span>hasManyCampaign: {item.campaigns.length} </span>
                                             </div>
                                         </div>
                                         <div className={cx('right')}>

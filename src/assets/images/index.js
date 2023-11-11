@@ -49,6 +49,17 @@ const images = {
     decorationIcon1: require('~/assets/images/decoration-icon-1.svg').default,
     saveCloudIcon: require('~/assets/images/save-cloud-icon.svg').default,
     loadingIcon: require('~/assets/images/loading-icon.svg').default,
+
+    nameIcon: require('~/assets/images/name-icon.svg').default,
+    statusIcon: require('~/assets/images/status-icon.svg').default,
+    dateIcon: require('~/assets/images/date-icon.svg').default,
+    hastagIcon: require('~/assets/images/hastag-icon.svg').default,
+    channelIcon: require('~/assets/images/channel-icon.svg').default,
+    flowerIcon: require('~/assets/images/flower-icon.svg').default,
+    openIcon: require('~/assets/images/open-icon.svg').default,
+    editIcon: require('~/assets/images/edit-icon.svg').default,
+    deleteIcon: require('~/assets/images/delete-icon.svg').default,
+    renameIcon: require('~/assets/images/re-name-icon.svg').default,
 };
 
 export default images;
