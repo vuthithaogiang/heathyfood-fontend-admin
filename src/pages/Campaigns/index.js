@@ -11,7 +11,6 @@ import { DateRangePicker } from 'react-date-range';
 import CalendarComponent from '~/components/CalendarComponent';
 import { Editor } from 'primereact/editor';
 import { format } from 'date-fns';
-import { da } from 'date-fns/locale';
 
 const cx = classNames.bind(styles);
 
@@ -687,7 +686,10 @@ function Campaigns() {
                                                         src={images.editIcon}
                                                     />
                                                 </button>
-                                                <button>
+                                                <button
+                                                    className={cx('js-toggle')}
+                                                    toggle-target="#popper-campaign-delete"
+                                                >
                                                     <img
                                                         className={cx('icon', 'icon-small')}
                                                         alt=""
@@ -1180,6 +1182,22 @@ function Campaigns() {
                 </div>
 
                 <div className={cx('popper-overlay-edit', 'js-toggle')} toggle-target="#popper-campaign-edit"></div>
+
+                {/* Delete Campagin */}
+                <div id="popper-campaign-delete" className={cx('popper-notification-delete', 'hide')}>
+                    <div className={cx('wrap-content')}>
+                        <p>Would you like to remove this Campaign: </p>
+                        <p className={cx('name')}>Healty Food Choice Campaign 2?</p>
+                        <div className={cx('btn')}>
+                            <button>Remove</button>
+                        </div>
+                        <div className={cx('btn', 'js-toggle')} toggle-target="#popper-campaign-delete">
+                            <button>Don't Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className={cx('popper-overlay-delete', 'js-toggle')} toggle-target="#popper-campaign-delete"></div>
             </div>
 
             {loading && (

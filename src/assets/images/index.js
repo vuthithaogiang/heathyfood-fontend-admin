@@ -63,6 +63,7 @@ const images = {
     gotoIcon: require('~/assets/images/go-to-icon.svg').default,
     sumIcon: require('~/assets/images/sum-icon.svg').default,
     sendIcon: require('~/assets/images/send-icon.svg').default,
+    hiddenIcon: require('~/assets/images/hidden-icon.svg').default,
 };
 
 export default images;
