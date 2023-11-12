@@ -7,14 +7,14 @@ import { format } from 'date-fns';
 
 const cx = classNames.bind(styles);
 
-function CalendarComponent({ setDateToString }) {
+function CalendarComponent({ setDateToString, date }) {
     const handleSelectDate = (e) => {
         // console.log(e);
         setDateToString(format(e, 'dd-MM-yyyy'));
     };
     return (
         <div className={cx('wrapper')}>
-            <Calendar date={new Date()} onChange={handleSelectDate} />
+            <Calendar date={date ? date : new Date()} onChange={handleSelectDate} />
         </div>
     );
 }

@@ -10,6 +10,8 @@ import HTMLREndered from '~/components/HTMLRendered';
 import { DateRangePicker } from 'react-date-range';
 import CalendarComponent from '~/components/CalendarComponent';
 import { Editor } from 'primereact/editor';
+import { format } from 'date-fns';
+import { da } from 'date-fns/locale';
 
 const cx = classNames.bind(styles);
 
@@ -88,12 +90,30 @@ function Campaigns() {
     const [budgetIsChecked, setBudgetIsCheced] = useState(false);
     const [previewThumbnail, setPreviewThumbnail] = useState(null);
 
+    const [campaignEdit, setCampaignEdit] = useState(null);
+
+    // NEW VALUE TO EDIT
+    const [nameEdit, setNameEdit] = useState(null);
+    const [statusEdir, setStatusEdit] = useState(null);
+    const [descriptionEdit, setDescriptionEdit] = useState(null);
+    const [budgetEdit, setBudgetEdit] = useState(null);
+    const [dailyBudgetEdit, setDailyBudgetEdit] = useState(null);
+    const [typeCampaignEdit, setTypeCampaignEdit] = useState(null);
+    const [objectiveEdit, setObjectiveEdit] = useState(null);
+    const [startDateEdit, setStartDateEdit] = useState(null);
+    const [endDateEdit, setEndDateEdit] = useState(null);
+    const [thumnailEdit, setThumbnailEdit] = useState(null);
+    const [channelEdit, setChannelEdit] = useState('Website');
+
+    //END
+
     const handlePreviewThumbnail = (e) => {
         const file = e.target.files[0];
 
         if (file) {
             file.preview = URL.createObjectURL(file);
             setPreviewThumbnail(file.preview);
+            setThumbnailEdit(file);
         }
     };
 
@@ -146,7 +166,7 @@ function Campaigns() {
         }
 
         initJsToggle();
-    }, [content]);
+    }, [content, campaignEdit]);
 
     const formatDateFromBackend = (dateString) => {
         const dateObject = new Date(dateString);
@@ -277,6 +297,23 @@ function Campaigns() {
         fetListTypeOfCampaign(); // eslint-disable-next-line
         fetchListCampaign();
     }, []);
+
+    const handlePrepareStateEdit = (item) => {
+        setCampaignEdit(item);
+        setNameEdit(item.name);
+        setObjectiveEdit(item.objective);
+
+        const dateStart = new Date(item.start_date);
+        const endDate = new Date();
+
+        setStartDateEdit(format(dateStart, 'dd-MM-yyyy'));
+        setEndDateEdit(format(endDate, 'dd-MM-yyyy'));
+
+        setDescriptionEdit(item.description);
+        setBudgetEdit(item.budget);
+        setDailyBudgetEdit(item.daily_budget);
+        setStatusEdit(item.status);
+    };
 
     return (
         <>
@@ -506,10 +543,8 @@ function Campaigns() {
                                             <div className={cx('wrap-name-campaign')}>
                                                 <p className={cx('text-data')}>{item.name}</p>
                                                 <button
-                                                    onClick={async () => {
-                                                        setLoading(true);
-                                                        await setContent(item);
-                                                        setLoading(false);
+                                                    onClick={() => {
+                                                        setContent(item);
                                                     }}
                                                     className={cx('btn', 'btn-preview', 'js-toggle')}
                                                     toggle-target="#popper-review-content"
@@ -642,6 +677,7 @@ function Campaigns() {
                                             <div className={cx('actions')}>
                                                 <button>1 selected</button>
                                                 <button
+                                                    onClick={() => handlePrepareStateEdit(item)}
                                                     className={cx('js-toggle')}
                                                     toggle-target="#popper-campaign-edit"
                                                 >
@@ -763,273 +799,384 @@ function Campaigns() {
                             <img className={cx('icon')} alt="" src={images.xIcon} />
                         </button>
                     </div>
-                    <div className={cx('content')}>
-                        <div className={cx('head-content')}>
-                            <div className={cx('name')}>
-                                <div className={cx('form-edit')}>
-                                    <img className={cx('icon')} alt="" src={images.renameIcon} />
-                                    <input type="text" value="Either include them or remove" />
-                                </div>
-                            </div>
-                            <div className={cx('group-btns')}>
-                                <button>On going</button>
-                                <button>Pause</button>
-                            </div>
-                        </div>
-
-                        {/* Type, Status, Channel */}
-                        <div className={cx('form-row')}>
-                            <div className={cx('form-group')}>
-                                <div className={cx('form-label')}>
-                                    <label>Type's Campaign</label>
-                                </div>
-                                <div ref={refTypeCampaignEdit} className={cx('form-wrap-select')}>
-                                    <div onClick={toggleShowPopperTypeCampaignEdit} className={cx('main')}>
-                                        <span>Type of campaign</span>
-                                        <img className={cx('icon')} alt="" src={images.addIcon} />
-                                    </div>
-                                    <div
-                                        className={
-                                            showPopperTypeCampaginEdit === true
-                                                ? cx('wrap-list')
-                                                : cx('wrap-list', 'none')
-                                        }
-                                    >
-                                        <div className={cx('popper-list')}>
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
-
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
+                    {campaignEdit !== null ? (
+                        <>
+                            <div className={cx('content')}>
+                                <div className={cx('head-content')}>
+                                    <div className={cx('name')}>
+                                        <div className={cx('form-edit')}>
+                                            <img className={cx('icon')} alt="" src={images.renameIcon} />
+                                            <input
+                                                type="text"
+                                                value={nameEdit}
+                                                onChange={(e) => setNameEdit(e.target.value)}
+                                            />
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div className={cx('form-group')}>
-                                <div className={cx('form-label')}>
-                                    <label>Status Campaign</label>
-                                </div>
-                                <div ref={refStatusEdit} className={cx('form-wrap-select')}>
-                                    <div onClick={toggleShowPopperStatusEdit} className={cx('main')}>
-                                        <span>Campaign status</span>
-                                        <img className={cx('icon')} alt="" src={images.addIcon} />
+                                    <div className={cx('group-btns')}>
+                                        {/* New */}
+                                        {campaignEdit.status === 0 && (
+                                            <>
+                                                <button className={cx('status-1')}>On going</button>
+                                            </>
+                                        )}
+                                        {/* On going */}
+                                        {campaignEdit.status === 1 && (
+                                            <>
+                                                <button className={cx('status-2')}>Pause</button>
+                                                <button className={cx('status-3')}>Conplete</button>
+                                            </>
+                                        )}
+                                        {/* Pause */}
+                                        {campaignEdit.status === 2 && (
+                                            <>
+                                                <button className={cx('status-3')}>Complete</button>
+                                                <button className={cx('status-2')}>On going</button>
+                                            </>
+                                        )}
+                                        {/* Complete */}
+                                        {campaignEdit.status === 3 && (
+                                            <>
+                                                <button className={cx('status-0')}>Start again</button>
+                                            </>
+                                        )}
                                     </div>
-                                    <div
-                                        className={
-                                            showPopperStatusEdit === true ? cx('wrap-list') : cx('wrap-list', 'none')
-                                        }
-                                    >
-                                        <div className={cx('popper-list')}>
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
+                                </div>
 
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={cx('form-group')}>
-                                <div className={cx('form-label')}>
-                                    <label>Channel</label>
-                                </div>
-                                <div ref={refchannelEdit} className={cx('form-wrap-select')}>
-                                    <div onClick={toggleShowPopperChannelEdit} className={cx('main')}>
-                                        <span>Channel</span>
-                                        <img className={cx('icon')} alt="" src={images.addIcon} />
-                                    </div>
-                                    <div
-                                        className={
-                                            showPopperChannelEdit === true ? cx('wrap-list') : cx('wrap-list', 'none')
-                                        }
-                                    >
-                                        <div className={cx('popper-list')}>
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
-
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
-                                            <div className={cx('popper-item')}>
-                                                <span>Popper item</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Budget */}
-                        <div className={cx('form-row')}>
-                            <div className={cx('form-group')}>
-                                <div className={cx('form-row', 'margin-inital')}>
+                                {/* Type, Status, Channel */}
+                                <div className={cx('form-row')}>
                                     <div className={cx('form-group')}>
                                         <div className={cx('form-label')}>
-                                            <label>Budget</label>
+                                            <label>Type's Campaign</label>
                                         </div>
-                                        <div className={cx('form-control', 'no-border', 'inline')}>
-                                            <p className={cx('form-desc')}>Define how much you want to spend?</p>
-                                            <div className={cx('switch')}>
-                                                <input
-                                                    onChange={handleCheckBoxBudgetChange}
-                                                    hidden
-                                                    id="switch"
-                                                    type="checkbox"
-                                                    checked={budgetIsChecked}
-                                                />
-                                                <label htmlFor="switch"></label>
+                                        <div ref={refTypeCampaignEdit} className={cx('form-wrap-select')}>
+                                            <div onClick={toggleShowPopperTypeCampaignEdit} className={cx('main')}>
+                                                <span>
+                                                    {typeCampaignEdit === null
+                                                        ? 'Type of campaign'
+                                                        : typeCampaignEdit.name}
+                                                </span>
+                                                <img className={cx('icon')} alt="" src={images.addIcon} />
+                                            </div>
+                                            <div
+                                                className={
+                                                    showPopperTypeCampaginEdit === true
+                                                        ? cx('wrap-list')
+                                                        : cx('wrap-list', 'none')
+                                                }
+                                            >
+                                                <div className={cx('popper-list')}>
+                                                    {listTypeOfCampaign.map((item) => (
+                                                        <div
+                                                            onClick={() => setTypeCampaignEdit(item)}
+                                                            key={item.id}
+                                                            className={cx('popper-item')}
+                                                        >
+                                                            <span>{item.name}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                {budgetIsChecked ? (
-                                    <>
-                                        <div className={cx('form-row', 'margin-inital')}>
-                                            <div className={cx('form-group')}>
-                                                <div className={cx('form-label', 'small')}>
-                                                    <label>Overall Budget</label>
-                                                </div>
-                                                <div className={cx('form-control')}>
-                                                    <input
-                                                        className={cx('form-input')}
-                                                        type="number"
-                                                        placeholder="Enter amount for campaign total"
-                                                    />
-                                                </div>
-                                                <div className={cx('form-desc', 'small')}>(In US dollars)</div>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>Status Campaign</label>
+                                        </div>
+                                        <div ref={refStatusEdit} className={cx('form-wrap-select')}>
+                                            <div onClick={toggleShowPopperStatusEdit} className={cx('main')}>
+                                                <span>
+                                                    {statusEdir === null && 'Status campaign'}
+                                                    {statusEdir === 0 && 'New created'}
+                                                    {statusEdir === 1 && 'On going'}
+                                                    {statusEdir === 2 && 'Pause'}
+                                                    {statusEdir === 3 && 'Complete'}
+                                                </span>
+                                                <img className={cx('icon')} alt="" src={images.addIcon} />
                                             </div>
-                                        </div>
-                                        <div className={cx('form-row', 'margin-inital')}>
-                                            <div className={cx('form-group')}>
-                                                <div className={cx('form-label', 'small')}>
-                                                    <label>Daily Budget</label>
-                                                </div>
-                                                <div className={cx('form-control')}>
-                                                    <input
-                                                        className={cx('form-input')}
-                                                        type="number"
-                                                        placeholder="Enter the overage you want to spend each day"
-                                                    />
-                                                </div>
-                                                <div className={cx('form-desc', 'small')}>(In US dollars)</div>
-                                            </div>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <></>
-                                )}
-                            </div>
-                            <div className={cx('form-group')}></div>
-                        </div>
-                        {/* Schedule */}
-                        <div className={cx('form-row')}>
-                            <div className={cx('form-group')}>
-                                <div className={cx('form-label')}>
-                                    <label>From:</label>
-                                </div>
-                                <div ref={refStartDateEdit} className={cx('form-wrap-select')}>
-                                    <div onClick={togglePopperStartDateEdit} className={cx('main')}>
-                                        <span>Start date</span>
-                                        <img className={cx('icon')} alt="" src={images.dateIcon} />
-                                    </div>
-                                    <div
-                                        className={
-                                            showPopperStartDateEdit === true ? cx('wrap-list') : cx('wrap-list', 'none')
-                                        }
-                                    >
-                                        <div className={cx('popper-list', 'calendar')}>
-                                            <CalendarComponent dateString={() => {}} />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={cx('form-group')}>
-                                <div className={cx('form-label')}>
-                                    <label>To:</label>
-                                </div>
-                                <div ref={refEndDateEdit} className={cx('form-wrap-select')}>
-                                    <div onClick={togglePopperEndDateEdit} className={cx('main')}>
-                                        <span>End date</span>
-                                        <img className={cx('icon')} alt="" src={images.dateIcon} />
-                                    </div>
-                                    <div
-                                        className={
-                                            showPopperEndDateEdit === true ? cx('wrap-list') : cx('wrap-list', 'none')
-                                        }
-                                    >
-                                        <div className={cx('popper-list', 'calendar')}>
-                                            <CalendarComponent dateString={() => {}} />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={cx('form-group')}>
-                                <div className={cx('form-group')}></div>
-                            </div>
-                        </div>
-                        {/* Thumbnail */}
-                        <div className={cx('form-row')}>
-                            <div className={cx('form-group')}>
-                                <div className={cx('form-label')}>
-                                    <label>Thumbnail</label>
-                                </div>
-                                <div className={cx('container-file')}>
-                                    <input type="file" onChange={handlePreviewThumbnail} id="uploadThumb" hidden />
+                                            <div
+                                                className={
+                                                    showPopperStatusEdit === true
+                                                        ? cx('wrap-list')
+                                                        : cx('wrap-list', 'none')
+                                                }
+                                            >
+                                                <div className={cx('popper-list')}>
+                                                    <div onClick={() => setStatusEdit(0)} className={cx('popper-item')}>
+                                                        <span>New created</span>
+                                                    </div>
+                                                    <div onClick={() => setStatusEdit(1)} className={cx('popper-item')}>
+                                                        <span>On going</span>
+                                                    </div>
 
-                                    {previewThumbnail !== null ? (
-                                        <label htmlFor="uploadThumb" className={cx('file-thumb', 'not-border')}>
-                                            <img className={cx('preview-img')} alt="" src={previewThumbnail} />
-                                        </label>
-                                    ) : (
-                                        <label htmlFor="uploadThumb" className={cx('file-thumb', 'not-border')}>
-                                            <img
-                                                className={cx('preview-img')}
-                                                alt=""
-                                                src="https://cdn.evbstatic.com/s3-build/fe/build/images/870dbf22443fa23480745089a0ac8de7-food.webp"
+                                                    <div onClick={() => setStatusEdit(2)} className={cx('popper-item')}>
+                                                        <span>Pause</span>
+                                                    </div>
+                                                    <div onClick={() => setStatusEdit(3)} className={cx('popper-item')}>
+                                                        <span>Complete</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>Channel</label>
+                                        </div>
+                                        <div ref={refchannelEdit} className={cx('form-wrap-select')}>
+                                            <div onClick={toggleShowPopperChannelEdit} className={cx('main')}>
+                                                <span>{channelEdit}</span>
+                                                <img className={cx('icon')} alt="" src={images.addIcon} />
+                                            </div>
+                                            <div
+                                                className={
+                                                    showPopperChannelEdit === true
+                                                        ? cx('wrap-list')
+                                                        : cx('wrap-list', 'none')
+                                                }
+                                            >
+                                                <div className={cx('popper-list')}>
+                                                    <div
+                                                        onClick={() => setChannelEdit('Website')}
+                                                        className={cx('popper-item')}
+                                                    >
+                                                        <span>Website</span>
+                                                    </div>
+                                                    <div
+                                                        onClick={() => setChannelEdit('Facebook')}
+                                                        className={cx('popper-item')}
+                                                    >
+                                                        <span>Facebook</span>
+                                                    </div>
+
+                                                    <div
+                                                        onClick={() => setChannelEdit('Linkedin')}
+                                                        className={cx('popper-item')}
+                                                    >
+                                                        <span>Linkedin</span>
+                                                    </div>
+                                                    <div
+                                                        onClick={() => setChannelEdit('Twitter')}
+                                                        className={cx('popper-item')}
+                                                    >
+                                                        <span>Twitter</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Budget */}
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-row', 'margin-inital')}>
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label')}>
+                                                    <label>Budget</label>
+                                                </div>
+                                                <div className={cx('form-control', 'no-border', 'inline')}>
+                                                    <p className={cx('form-desc')}>
+                                                        Define how much you want to spend?
+                                                    </p>
+                                                    <div className={cx('switch')}>
+                                                        <input
+                                                            onChange={handleCheckBoxBudgetChange}
+                                                            hidden
+                                                            id="switch"
+                                                            type="checkbox"
+                                                            checked={budgetIsChecked}
+                                                        />
+                                                        <label htmlFor="switch"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {budgetIsChecked ? (
+                                            <>
+                                                <div className={cx('form-row', 'margin-inital')}>
+                                                    <div className={cx('form-group')}>
+                                                        <div className={cx('form-label', 'small')}>
+                                                            <label>Overall Budget</label>
+                                                        </div>
+                                                        <div className={cx('form-control')}>
+                                                            <input
+                                                                className={cx('form-input')}
+                                                                type="number"
+                                                                placeholder="Enter amount for campaign total"
+                                                                value={budgetEdit !== null ? budgetEdit : ''}
+                                                                onChange={(e) => setBudgetEdit(e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className={cx('form-desc', 'small')}>(In US dollars)</div>
+                                                    </div>
+                                                </div>
+                                                <div className={cx('form-row', 'margin-inital')}>
+                                                    <div className={cx('form-group')}>
+                                                        <div className={cx('form-label', 'small')}>
+                                                            <label>Daily Budget</label>
+                                                        </div>
+                                                        <div className={cx('form-control')}>
+                                                            <input
+                                                                className={cx('form-input')}
+                                                                type="number"
+                                                                placeholder="Enter the overage you want to spend each day"
+                                                                value={dailyBudgetEdit !== null ? dailyBudgetEdit : ''}
+                                                                onChange={(e) => setDailyBudgetEdit(e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className={cx('form-desc', 'small')}>(In US dollars)</div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <></>
+                                        )}
+                                    </div>
+                                    <div className={cx('form-group')}></div>
+                                </div>
+                                {/* Schedule */}
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>From:</label>
+                                        </div>
+                                        <div ref={refStartDateEdit} className={cx('form-wrap-select')}>
+                                            <div onClick={togglePopperStartDateEdit} className={cx('main')}>
+                                                <span>{startDateEdit !== null ? startDateEdit : 'Start date'}</span>
+                                                <img className={cx('icon')} alt="" src={images.dateIcon} />
+                                            </div>
+                                            <div
+                                                className={
+                                                    showPopperStartDateEdit === true
+                                                        ? cx('wrap-list')
+                                                        : cx('wrap-list', 'none')
+                                                }
+                                            >
+                                                <div className={cx('popper-list', 'calendar')}>
+                                                    <CalendarComponent
+                                                        date={new Date(campaignEdit.start_date)}
+                                                        setDateToString={setStartDateEdit}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>To:</label>
+                                        </div>
+                                        <div ref={refEndDateEdit} className={cx('form-wrap-select')}>
+                                            <div onClick={togglePopperEndDateEdit} className={cx('main')}>
+                                                <span className={cx('date-value')}>
+                                                    {endDateEdit === null ? 'End date' : endDateEdit}
+                                                </span>
+                                                <img className={cx('icon')} alt="" src={images.dateIcon} />
+                                            </div>
+                                            <div
+                                                className={
+                                                    showPopperEndDateEdit === true
+                                                        ? cx('wrap-list')
+                                                        : cx('wrap-list', 'none')
+                                                }
+                                            >
+                                                <div className={cx('popper-list', 'calendar')}>
+                                                    <CalendarComponent
+                                                        date={new Date(campaignEdit.end_date)}
+                                                        setDateToString={setEndDateEdit}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-group')}></div>
+                                    </div>
+                                </div>
+
+                                {/* Objective  */}
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>Objective</label>
+                                        </div>
+                                        <div className={cx('form-control')}>
+                                            <input
+                                                type="text"
+                                                className={cx('form-input')}
+                                                placeholder="Enter Objective"
+                                                value={objectiveEdit}
+                                                onChange={(e) => setObjectiveEdit(e.target.value)}
                                             />
-                                        </label>
-                                    )}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className={cx('form-group')}></div>
-                            <div className={cx('form-group')}></div>
-                        </div>
+                                {/* Thumbnail */}
+                                <div className={cx('form-row')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>Thumbnail</label>
+                                        </div>
+                                        <div className={cx('container-file')}>
+                                            <input
+                                                type="file"
+                                                onChange={handlePreviewThumbnail}
+                                                id="uploadThumb"
+                                                hidden
+                                            />
 
-                        {/* Description */}
-                        <div className={cx('form-row')}>
-                            <div className={cx('forn-group')}>
-                                <div className={cx('form-label')}>
-                                    <label>Description</label>
+                                            {previewThumbnail !== null ? (
+                                                <label
+                                                    onClick={() => {
+                                                        setPreviewThumbnail(null);
+                                                        setThumbnailEdit(null);
+                                                    }}
+                                                    className={cx('file-thumb', 'not-border', 'new')}
+                                                >
+                                                    <img className={cx('preview-img')} alt="" src={previewThumbnail} />
+                                                    <img
+                                                        className={cx('icon', 'x-icon')}
+                                                        alt=""
+                                                        src={images.xBorderIcon}
+                                                    />
+                                                </label>
+                                            ) : (
+                                                <label
+                                                    htmlFor="uploadThumb"
+                                                    className={cx('file-thumb', 'not-border', 'old')}
+                                                >
+                                                    <img
+                                                        className={cx('preview-img')}
+                                                        alt=""
+                                                        src={`${BASE_URL_IMAGE}${campaignEdit.thumbnails[0].path}`}
+                                                    />
+                                                </label>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className={cx('form-group')}></div>
+                                    <div className={cx('form-group')}></div>
                                 </div>
-                                <Editor
-                                    style={{ height: '420px' }}
-                                    // value={content}
-                                    // onTextChange={(e) => setContent(e.htmlValue)}
-                                />
+
+                                {/* Description */}
+                                <div className={cx('form-row')}>
+                                    <div className={cx('forn-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>Description</label>
+                                        </div>
+                                        <Editor
+                                            style={{ height: '420px' }}
+                                            value={descriptionEdit !== null ? descriptionEdit : ''}
+                                            onTextChange={(e) => setDescriptionEdit(e.htmlValue)}
+                                        />
+                                    </div>
+                                    <div className={cx('form-group')}></div>
+                                </div>
                             </div>
-                            <div className={cx('form-group')}></div>
-                        </div>
-                    </div>
+                        </>
+                    ) : (
+                        <></>
+                    )}
                 </div>
 
                 <div className={cx('popper-overlay-edit', 'js-toggle')} toggle-target="#popper-campaign-edit"></div>

@@ -908,11 +908,19 @@ span.large {
                 font-weight: 500;
             }
 
-            button:nth-child(1) {
-                background-color: #fdecc8;
+            button.status-0 {
+                background-color: #f1f0ef;
             }
-            button:nth-child(2) {
+
+            button.status-1 {
+                background-color: #fdecc8 !important;
+            }
+            button.status-2 {
                 background-color: #ffe2dd;
+            }
+
+            button.status-3 {
+                background-color: #dbeddb;
             }
         }
     }
@@ -1056,12 +1064,18 @@ span.large {
             }
 
             span {
-                display: block;
-                padding: 6px 6px;
+                //   display: block;
+                padding: 0 6px;
                 min-width: 96px;
                 font-size: 1.4rem;
                 font-weight: 500;
                 color: #7d7c85;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                word-break: break-all;
+                line-height: 28px;
             }
 
             + .popper-item {
@@ -1105,6 +1119,19 @@ span.large {
 
         img.icon-rotate {
             rotate: 180deg;
+        }
+
+        span {
+            color: #0969da;
+            background-color: #eeeef4;
+            font-size: 1.3rem;
+            padding: 3px 6px;
+            border-radius: 2px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-all;
         }
     }
 }
@@ -1151,8 +1178,21 @@ span.large {
         border-radius: 4px;
         border: 1px dashed #c8ccd0;
         cursor: pointer;
-        position: relative;
 
+        &.not-border {
+            border: none;
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+    }
+
+    .file-thumb.old {
+        position: relative;
         &:hover {
             &::after {
                 opacity: 1;
@@ -1167,6 +1207,7 @@ span.large {
             content: '+';
             top: 50%;
             left: 50%;
+            transform: translate(-50%, -50%);
             width: 24px;
             height: 24px;
             border: 1px dotted #fadede;
@@ -1178,27 +1219,20 @@ span.large {
 
             transition: opacity 0.4s;
         }
-
-        &.not-border {
-            border: none;
-        }
-
-        .preview-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 4px;
-            opacity: 1;
-            transition: opacity;
-            transition-duration: 0.4s;
-
-            &:hover {
-                opacity: 0.8;
-            }
-        }
     }
 
-    .file-thumb.none {
-        display: none;
+    .file-thumb.new {
+        position: relative;
+
+        .x-icon {
+            background-color: transparent;
+            position: absolute;
+            top: 0;
+            right: -18px;
+            width: 22px;
+            transform: translate(-50%, -50%);
+            filter: brightness(0) saturate(100%) invert(56%) sepia(0%) saturate(155%) hue-rotate(242deg)
+                brightness(100%) contrast(87%);
+        }
     }
 }
