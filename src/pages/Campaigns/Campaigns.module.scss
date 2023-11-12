@@ -152,7 +152,7 @@
             z-index: 1;
             background-color: #fff;
             border-radius: 6px;
-            box-shadow: 0px 40px 90px #9b9ba833;
+            box-shadow: 0 3px 5px #9d929280;
 
             opacity: 1;
             visibility: visible;
@@ -163,8 +163,11 @@
             .popper-list {
                 width: 100%;
                 padding: 6px;
-
                 font-family: 'Inter', sans-serif;
+            }
+
+            .popper-list.calendar {
+                padding: 0;
             }
 
             .popper-item {
@@ -200,6 +203,11 @@
                     color: #17171a;
                 }
             }
+        }
+        .wrap-list.calendar {
+            left: initial;
+            right: 0;
+            transform: translateX(50%);
         }
 
         .wrap-list.none {
@@ -285,7 +293,7 @@ span.large {
 .table {
     .head-table {
         display: grid;
-        grid-template-columns: 280px repeat(6, 1fr);
+        grid-template-columns: 280px repeat(4, 1fr) 200px repeat(2, 1fr);
         column-gap: 12px;
         border-bottom: 1px solid #e7e7e9;
 
@@ -321,7 +329,7 @@ span.large {
     .row-data {
         position: relative;
         display: grid;
-        grid-template-columns: 280px repeat(6, 1fr);
+        grid-template-columns: 280px repeat(4, 1fr) 200px repeat(2, 1fr);
         column-gap: 12px;
         border-bottom: 1px solid #e7e7e9;
         font-family: 'Inter', sans-serif;
@@ -464,6 +472,38 @@ span.large {
         }
     }
 
+    .budget,
+    .daily-budget {
+        position: relative;
+    }
+    .form-input {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+
+        background-color: #fff;
+        box-shadow: 0 3px 5px #9d929280;
+        height: 28px;
+        border-radius: 4px;
+        width: 60%;
+        opacity: 1;
+        visibility: visible;
+
+        transition: opacity, visibility;
+        transition-duration: 0.4s;
+
+        input {
+            width: 100%;
+            height: 100%;
+            padding: 0 8px;
+        }
+    }
+    .form-input.none {
+        opacity: 0;
+        visibility: hidden;
+    }
+
     .daily-budget:hover {
         .add-daily-budget {
             opacity: 1;
@@ -531,6 +571,41 @@ span.large {
 
             span {
                 width: 100%;
+            }
+        }
+    }
+
+    .timetable-campaign {
+        position: relative;
+
+        &:hover {
+            .go-schedule {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+
+        .go-schedule {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            //  width: 72%;
+            position: absolute;
+            left: 0;
+            top: 4px;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 0 3px 5px #9d929280;
+            opacity: 0;
+            visibility: hidden;
+
+            transition: opacity, visibility;
+            transition-duration: 0.4s;
+
+            img {
+                filter: brightness(0) saturate(100%) invert(29%) sepia(96%) saturate(3270%) hue-rotate(203deg)
+                    brightness(90%) contrast(93%);
             }
         }
     }
@@ -728,3 +803,36 @@ span.large {
 }
 
 //END PREVIEW CONTENT
+.popper-notofication-edit {
+    translate: 100%;
+    position: fixed;
+    z-index: 91;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 950px;
+    // inset: 0 calc(100% - 350px) 0 0;
+    background-color: #fff;
+    border-top-left-radius: 20px;
+    transition: translate 0.5s;
+    height: 100vh;
+    overflow-y: scroll;
+}
+
+.popper-overlay-edit {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    background-color: #00000042;
+    transition: opacity, visibility;
+    transition-duration: 0.5s;
+}
+.popper-notofication-edit[class$='show'] {
+    translate: 0;
+}
+.popper-notofication-edit[class$='show'] ~ .popper-overlay-edit {
+    visibility: visible;
+    opacity: 1;
+}

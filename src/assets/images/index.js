@@ -60,6 +60,8 @@ const images = {
     editIcon: require('~/assets/images/edit-icon.svg').default,
     deleteIcon: require('~/assets/images/delete-icon.svg').default,
     renameIcon: require('~/assets/images/re-name-icon.svg').default,
+    gotoIcon: require('~/assets/images/go-to-icon.svg').default,
+    sumIcon: require('~/assets/images/sum-icon.svg').default,
 };
 
 export default images;

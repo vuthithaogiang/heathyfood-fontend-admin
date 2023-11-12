@@ -7,6 +7,8 @@ import { InfinitySpin } from 'react-loader-spinner';
 import useOnClickOutside from '~/hooks/useOnclickOutside';
 import { useNavigate } from 'react-router-dom';
 import HTMLREndered from '~/components/HTMLRendered';
+import CalendarComponent from '~/components/CalendarComponent';
+import { DateRangePicker } from 'react-date-range';
 
 const cx = classNames.bind(styles);
 
@@ -14,26 +16,6 @@ const BASE_URL_IMAGE = 'http://127.0.0.1:8000/uploads/';
 function Campaigns() {
     const axios = useAxios();
     const navigate = useNavigate();
-
-    const [listTypeOfCampaign, setListTypeOfCampaign] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [typeOfNavbar, setTypeOfNavbar] = useState('Overview');
-
-    const [showPopperNavbar, setShowPopperNavbar] = useState(false);
-    const [showPopperStatus, setShowPopperStatus] = useState(false);
-    const [statusFilter, setStatusFilter] = useState(null);
-
-    const [showPopperTypeCampaign, setShowPoppertypeCampaign] = useState(false);
-    const [typeCampaingFilter, setTypeCampaignFilter] = useState(null);
-
-    const [searchValue, setSearchValue] = useState('');
-
-    const [listCampaign, setListCampaign] = useState(null);
-
-    const refSelectNavbar = useRef();
-    const refSelectStatus = useRef();
-    const refSelectTypeCamppaign = useRef();
-
     const NAVBAR = [
         {
             id: 1,
@@ -47,24 +29,58 @@ function Campaigns() {
 
     const FAKE_STATUS = [
         {
-            id: 1,
+            id: 0,
             title: 'New',
         },
         {
-            id: 2,
+            id: 1,
             title: 'On Going',
         },
         {
-            id: 3,
+            id: 2,
             title: 'Complete',
         },
         {
-            id: 4,
+            id: 3,
             title: 'Paused',
         },
     ];
 
-    const [content, setContent] = useState(null);
+    const [listTypeOfCampaign, setListTypeOfCampaign] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [typeOfNavbar, setTypeOfNavbar] = useState('Overview');
+
+    const [showPopperNavbar, setShowPopperNavbar] = useState(false);
+    const [showPopperStatus, setShowPopperStatus] = useState(false);
+    const [showPopperCalendar, setShowPopperCalendar] = useState(false);
+
+    const [statusFilter, setStatusFilter] = useState(null);
+
+    const [showPopperTypeCampaign, setShowPoppertypeCampaign] = useState(false);
+    const [typeCampaingFilter, setTypeCampaignFilter] = useState(null);
+
+    const [searchValue, setSearchValue] = useState('');
+
+    const [listCampaign, setListCampaign] = useState(null);
+    const [content, setContent] = useState(null); // CONTENT PREVIEW WHEN CLICKED OPREN
+
+    const [budgetClicked, setBudgetClicked] = useState(null);
+    const [dailyBudgetClicked, setDailyBudgetclicked] = useState(null);
+
+    const refSelectNavbar = useRef();
+    const refSelectStatus = useRef();
+    const refSelectTypeCamppaign = useRef();
+    const refSelectCalendar = useRef();
+
+    const selectionRange = {
+        startDate: new Date(),
+        endDate: new Date(),
+        key: 'selection',
+    };
+
+    const handleSelectDatePicker = (e) => {
+        console.log(e);
+    };
 
     useEffect(() => {
         const $ = document.querySelector.bind(document);
@@ -132,6 +148,15 @@ function Campaigns() {
         setShowPoppertypeCampaign(false);
     };
 
+    const toggleShowPopperCalendar = () => {
+        setShowPopperCalendar(!showPopperCalendar);
+    };
+
+    const hiddenPopperCalendar = () => {
+        setShowPopperCalendar(false);
+    };
+
+    useOnClickOutside(refSelectCalendar, hiddenPopperCalendar);
     useOnClickOutside(refSelectNavbar, hiddenPopperNavBar);
     useOnClickOutside(refSelectStatus, hiddenPopperStatus);
     useOnClickOutside(refSelectTypeCamppaign, hiddenPopperTypeCampaign);
@@ -246,7 +271,7 @@ function Campaigns() {
                             <>
                                 <div ref={refSelectStatus} className={cx('filter-select-wrap')}>
                                     <div onClick={toggleShowPopperStatus} className={cx('main')}>
-                                        {statusFilter === null ? 'Status' : statusFilter}
+                                        {statusFilter === null ? 'Status' : statusFilter.title}
                                         <img className={cx('icon')} alt="" src={images.addIcon} />
                                     </div>
                                     <div
@@ -258,7 +283,7 @@ function Campaigns() {
                                             {FAKE_STATUS.map((item) => (
                                                 <div
                                                     key={item.id}
-                                                    onClick={() => setStatusFilter(item.title)}
+                                                    onClick={() => setStatusFilter(item)}
                                                     className={
                                                         item.title === statusFilter
                                                             ? cx('popper-item', 'active')
@@ -313,10 +338,26 @@ function Campaigns() {
                                         Filter
                                     </div>
                                 </div>
-                                <div className={cx('filter-select-wrap')}>
-                                    <div className={cx('main')}>
+                                <div ref={refSelectCalendar} className={cx('filter-select-wrap')}>
+                                    <div onClick={toggleShowPopperCalendar} className={cx('main')}>
                                         <img className={cx('icon')} alt="" src={images.clockIcon} />
                                         Calendar
+                                    </div>
+
+                                    <div
+                                        className={
+                                            showPopperCalendar === true
+                                                ? cx('wrap-list', 'calendar')
+                                                : cx('wrap-list', 'calendar', 'none')
+                                        }
+                                    >
+                                        <div className={cx('popper-list', 'calendar')}>
+                                            <div className={cx()}></div>
+                                            <DateRangePicker
+                                                ranges={[selectionRange]}
+                                                onChange={handleSelectDatePicker}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -330,7 +371,7 @@ function Campaigns() {
                                             type="text"
                                             value={searchValue}
                                             onChange={(e) => setSearchValue(e.target.value)}
-                                            placeholder="Search Campaign name"
+                                            placeholder="Search Campaign"
                                         />
                                     </form>
                                 </div>
@@ -351,17 +392,23 @@ function Campaigns() {
                                 <span>Status</span>
                             </div>
                             <div>
-                                <img className={cx('icon', 'icon-small')} alt="" src={images.nameIcon} />
-                                <span>Objective</span>
-                            </div>
-                            <div>
-                                <img className={cx('icon', 'icon-small')} alt="" src={images.channelIcon} />
-                                <span>Channel</span>
+                                <img className={cx('icon', 'icon-small')} alt="" src={images.sumIcon} />
+                                <span>Activities</span>
                             </div>
                             <div>
                                 <img className={cx('icon', 'icon-small')} alt="" src={images.dateIcon} />
                                 <span>Due Date</span>
                             </div>
+                            <div>
+                                <img className={cx('icon', 'icon-small')} alt="" src={images.channelIcon} />
+                                <span>Channel</span>
+                            </div>
+
+                            <div>
+                                <img className={cx('icon', 'icon-small')} alt="" src={images.nameIcon} />
+                                <span>Objective</span>
+                            </div>
+
                             <div>
                                 <img className={cx('icon', 'icon-small')} alt="" src={images.flowerIcon} />
                                 <span>Budget</span>
@@ -403,16 +450,26 @@ function Campaigns() {
                                                     {item.status === 3 && 'Complete'}
                                                 </span>
                                             </div>
-                                            <div className={cx('wrap-objective-campaign')}>
-                                                <p className={cx('text-data')}>{item.objective}</p>
-                                                <div className={cx('popper-objective')}>
-                                                    <span>{item.objective}</span>
+
+                                            <div className={cx('timetable-campaign')}>
+                                                <p className={cx('text-data', 'wrap-date')}>
+                                                    {item.activities.length > 0 ? (
+                                                        <span>{item.activities.length} acts</span>
+                                                    ) : (
+                                                        <span>no act</span>
+                                                    )}
+                                                </p>
+                                                <div className={cx('go-schedule')}>
+                                                    Go details
+                                                    <img
+                                                        className={cx('icon', 'icon-small')}
+                                                        alt=""
+                                                        src={images.gotoIcon}
+                                                    />
                                                 </div>
                                             </div>
-                                            <div>
-                                                <span>{item.channel}</span>
-                                            </div>
-                                            <div>
+
+                                            <div className={cx('timetable-campaign')}>
                                                 <p className={cx('text-data', 'wrap-date')}>
                                                     <span className={cx('start-date')}>
                                                         {formatDateFromBackend(item.start_date)}
@@ -422,27 +479,66 @@ function Campaigns() {
                                                         {formatDateFromBackend(item.end_date)}
                                                     </span>
                                                 </p>
+                                                <div className={cx('go-schedule')}>
+                                                    Go details
+                                                    <img
+                                                        className={cx('icon', 'icon-small')}
+                                                        alt=""
+                                                        src={images.gotoIcon}
+                                                    />
+                                                </div>
                                             </div>
-
-                                            <div className={cx('budget')}>
+                                            <div>
+                                                <span>{item.channel}</span>
+                                            </div>
+                                            <div className={cx('wrap-objective-campaign')}>
+                                                <p className={cx('text-data')}>{item.objective}</p>
+                                                <div className={cx('popper-objective')}>
+                                                    <span>{item.objective}</span>
+                                                </div>
+                                            </div>
+                                            <div onBlur={() => setBudgetClicked(null)} className={cx('budget')}>
                                                 {item.budget !== null ? (
-                                                    <span>{item.budget}</span>
+                                                    <span onClick={() => setBudgetClicked(item)}>{item.budget}</span>
                                                 ) : (
-                                                    <span className={cx('add-btn', 'add-budget')}>
-                                                        <img
-                                                            className={cx('icon', 'icon-small')}
-                                                            alt=""
-                                                            src={images.renameIcon}
-                                                        />
-                                                        Add
-                                                    </span>
+                                                    <>
+                                                        <span
+                                                            onClick={() => setBudgetClicked(item)}
+                                                            className={cx('add-btn', 'add-budget')}
+                                                        >
+                                                            <img
+                                                                className={cx('icon', 'icon-small')}
+                                                                alt=""
+                                                                src={images.renameIcon}
+                                                            />
+                                                            Add
+                                                        </span>
+                                                    </>
                                                 )}
+                                                <form
+                                                    className={
+                                                        budgetClicked !== null && budgetClicked.id === item.id
+                                                            ? cx('form-input')
+                                                            : cx('form-input', 'none')
+                                                    }
+                                                    onSubmit={(e) => e.preventDefault()}
+                                                >
+                                                    <input type="number" />
+                                                </form>
                                             </div>
-                                            <div className={cx('daily-budget')}>
+                                            <div
+                                                onBlur={() => setDailyBudgetclicked(null)}
+                                                className={cx('daily-budget')}
+                                            >
                                                 {item.daily_budget !== null ? (
-                                                    <span>{item.daily_budget}</span>
+                                                    <span onClick={() => setDailyBudgetclicked(item)}>
+                                                        {item.daily_budget}
+                                                    </span>
                                                 ) : (
-                                                    <span className={cx('add-btn', 'add-daily-budget')}>
+                                                    <span
+                                                        onClick={() => setDailyBudgetclicked(item)}
+                                                        className={cx('add-btn', 'add-daily-budget')}
+                                                    >
                                                         <img
                                                             className={cx('icon', 'icon-small')}
                                                             alt=""
@@ -451,6 +547,16 @@ function Campaigns() {
                                                         Add
                                                     </span>
                                                 )}
+                                                <form
+                                                    className={
+                                                        dailyBudgetClicked !== null && dailyBudgetClicked.id === item.id
+                                                            ? cx('form-input')
+                                                            : cx('form-input', 'none')
+                                                    }
+                                                    onSubmit={(e) => e.preventDefault()}
+                                                >
+                                                    <input type="number" />
+                                                </form>
                                             </div>
 
                                             <div className={cx('actions')}>
@@ -478,10 +584,10 @@ function Campaigns() {
                     </div>
                 </div>
 
-                {content !== null ? (
-                    <>
-                        {/* Preview Content */}
-                        <div id="popper-review-content" className={cx('popper-notofication', 'hide')}>
+                {/* Preview Content */}
+                <div id="popper-review-content" className={cx('popper-notofication', 'hide')}>
+                    {content !== null ? (
+                        <>
                             <div className={cx('notification-top')}>
                                 <div className={cx('title')}>Campaign:</div>
                                 <button className={cx('close-btn', 'js-toggle')} toggle-target="#popper-review-content">
@@ -552,13 +658,25 @@ function Campaigns() {
                                     )}
                                 </div>
                             </div>
-                        </div>
+                        </>
+                    ) : (
+                        <></>
+                    )}
+                </div>
 
-                        <div className={cx('popper-overlay', 'js-toggle')} toggle-target="#popper-review-content"></div>
-                    </>
-                ) : (
-                    <></>
-                )}
+                <div className={cx('popper-overlay', 'js-toggle')} toggle-target="#popper-review-content"></div>
+
+                {/* Edit Campaign */}
+                <div className={cx('popper-notofication-edit', '')}>
+                    <div className={cx('notification-top')}>
+                        <div className={cx('title')}>Campaign:</div>
+                        <button className={cx('close-btn')}>
+                            <img className={cx('icon')} alt="" src={images.xIcon} />
+                        </button>
+                    </div>
+                    <div className={cx('preview-content')}></div>
+                </div>
+                <div className={cx('popper-overlay-edit')}></div>
             </div>
 
             {loading && (
