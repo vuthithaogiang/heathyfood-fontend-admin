@@ -7,8 +7,9 @@ import { InfinitySpin } from 'react-loader-spinner';
 import useOnClickOutside from '~/hooks/useOnclickOutside';
 import { useNavigate } from 'react-router-dom';
 import HTMLREndered from '~/components/HTMLRendered';
-import CalendarComponent from '~/components/CalendarComponent';
 import { DateRangePicker } from 'react-date-range';
+import CalendarComponent from '~/components/CalendarComponent';
+import { Editor } from 'primereact/editor';
 
 const cx = classNames.bind(styles);
 
@@ -72,6 +73,41 @@ function Campaigns() {
     const refSelectTypeCamppaign = useRef();
     const refSelectCalendar = useRef();
 
+    const refTypeCampaignEdit = useRef();
+    const refStatusEdit = useRef();
+    const refchannelEdit = useRef();
+    const refStartDateEdit = useRef();
+    const refEndDateEdit = useState();
+
+    const [showPopperTypeCampaginEdit, setShowPopperTypeCampaignEdit] = useState(false);
+    const [showPopperStatusEdit, setShowPopperStatusEdit] = useState(false);
+    const [showPopperChannelEdit, setShowPopperChannelEdit] = useState(false);
+    const [showPopperStartDateEdit, setShowPopperStartDateEdit] = useState(false);
+    const [showPopperEndDateEdit, setShowPopperEndDateEdit] = useState(false);
+
+    const [budgetIsChecked, setBudgetIsCheced] = useState(false);
+    const [previewThumbnail, setPreviewThumbnail] = useState(null);
+
+    const handlePreviewThumbnail = (e) => {
+        const file = e.target.files[0];
+
+        if (file) {
+            file.preview = URL.createObjectURL(file);
+            setPreviewThumbnail(file.preview);
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            URL.revokeObjectURL(previewThumbnail);
+        };
+    }, [previewThumbnail]);
+
+    const handleCheckBoxBudgetChange = (event) => {
+        const isChecked = event.target.checked;
+        setBudgetIsCheced(isChecked);
+    };
+
     const selectionRange = {
         startDate: new Date(),
         endDate: new Date(),
@@ -124,6 +160,30 @@ function Campaigns() {
         return formattedDate;
     };
 
+    const toggleShowPopperTypeCampaignEdit = () => {
+        setShowPopperTypeCampaignEdit(!showPopperTypeCampaginEdit);
+    };
+
+    const hiddenPopperTypeCampaignEdit = () => {
+        setShowPopperTypeCampaignEdit(false);
+    };
+
+    const toggleShowPopperStatusEdit = () => {
+        setShowPopperStatusEdit(!showPopperStatusEdit);
+    };
+
+    const hiddenPopperStatusEdit = () => {
+        setShowPopperStatusEdit(false);
+    };
+
+    const toggleShowPopperChannelEdit = () => {
+        setShowPopperChannelEdit(!showPopperChannelEdit);
+    };
+
+    const hiddenPopperchannelEdit = () => {
+        setShowPopperChannelEdit(false);
+    };
+
     const toggleShowNavbar = () => {
         setShowPopperNavbar(!showPopperNavbar);
     };
@@ -156,10 +216,31 @@ function Campaigns() {
         setShowPopperCalendar(false);
     };
 
+    const togglePopperStartDateEdit = () => {
+        setShowPopperStartDateEdit(!showPopperStartDateEdit);
+    };
+
+    const hiddenPopperStartDateEdit = () => {
+        setShowPopperStartDateEdit(false);
+    };
+
+    const togglePopperEndDateEdit = () => {
+        setShowPopperEndDateEdit(!showPopperEndDateEdit);
+    };
+
+    const hiddenPopperEndDateEdit = () => {
+        setShowPopperEndDateEdit(false);
+    };
+
+    useOnClickOutside(refEndDateEdit, hiddenPopperEndDateEdit);
+    useOnClickOutside(refStartDateEdit, hiddenPopperStartDateEdit);
     useOnClickOutside(refSelectCalendar, hiddenPopperCalendar);
     useOnClickOutside(refSelectNavbar, hiddenPopperNavBar);
     useOnClickOutside(refSelectStatus, hiddenPopperStatus);
     useOnClickOutside(refSelectTypeCamppaign, hiddenPopperTypeCampaign);
+    useOnClickOutside(refTypeCampaignEdit, hiddenPopperTypeCampaignEdit);
+    useOnClickOutside(refStatusEdit, hiddenPopperStatusEdit);
+    useOnClickOutside(refchannelEdit, hiddenPopperchannelEdit);
 
     const fetListTypeOfCampaign = async () => {
         setLoading(true);
@@ -352,7 +433,6 @@ function Campaigns() {
                                         }
                                     >
                                         <div className={cx('popper-list', 'calendar')}>
-                                            <div className={cx()}></div>
                                             <DateRangePicker
                                                 ranges={[selectionRange]}
                                                 onChange={handleSelectDatePicker}
@@ -560,21 +640,24 @@ function Campaigns() {
                                             </div>
 
                                             <div className={cx('actions')}>
-                                                <span>1 selected</span>
-                                                <span>
+                                                <button>1 selected</button>
+                                                <button
+                                                    className={cx('js-toggle')}
+                                                    toggle-target="#popper-campaign-edit"
+                                                >
                                                     <img
                                                         className={cx('icon', 'icon-small')}
                                                         alt=""
                                                         src={images.editIcon}
                                                     />
-                                                </span>
-                                                <span>
+                                                </button>
+                                                <button>
                                                     <img
                                                         className={cx('icon', 'icon-small')}
                                                         alt=""
                                                         src={images.deleteIcon}
                                                     />
-                                                </span>
+                                                </button>
                                             </div>
                                         </div>
                                     ))}
@@ -667,16 +750,289 @@ function Campaigns() {
                 <div className={cx('popper-overlay', 'js-toggle')} toggle-target="#popper-review-content"></div>
 
                 {/* Edit Campaign */}
-                <div className={cx('popper-notofication-edit', '')}>
+                <div id="popper-campaign-edit" className={cx('popper-notofication-edit', 'hide')}>
                     <div className={cx('notification-top')}>
-                        <div className={cx('title')}>Campaign:</div>
-                        <button className={cx('close-btn')}>
+                        <div className={cx('title')}>
+                            <img className={cx('icon')} alt="" src={images.penIcon} />
+                        </div>
+                        <div className={cx('send')}>
+                            Send
+                            <img className={cx('icon', 'icon-small')} alt="" src={images.sendIcon} />
+                        </div>
+                        <button className={cx('close-btn', 'js-toggle')} toggle-target="#popper-campaign-edit">
                             <img className={cx('icon')} alt="" src={images.xIcon} />
                         </button>
                     </div>
-                    <div className={cx('preview-content')}></div>
+                    <div className={cx('content')}>
+                        <div className={cx('head-content')}>
+                            <div className={cx('name')}>
+                                <div className={cx('form-edit')}>
+                                    <img className={cx('icon')} alt="" src={images.renameIcon} />
+                                    <input type="text" value="Either include them or remove" />
+                                </div>
+                            </div>
+                            <div className={cx('group-btns')}>
+                                <button>On going</button>
+                                <button>Pause</button>
+                            </div>
+                        </div>
+
+                        {/* Type, Status, Channel */}
+                        <div className={cx('form-row')}>
+                            <div className={cx('form-group')}>
+                                <div className={cx('form-label')}>
+                                    <label>Type's Campaign</label>
+                                </div>
+                                <div ref={refTypeCampaignEdit} className={cx('form-wrap-select')}>
+                                    <div onClick={toggleShowPopperTypeCampaignEdit} className={cx('main')}>
+                                        <span>Type of campaign</span>
+                                        <img className={cx('icon')} alt="" src={images.addIcon} />
+                                    </div>
+                                    <div
+                                        className={
+                                            showPopperTypeCampaginEdit === true
+                                                ? cx('wrap-list')
+                                                : cx('wrap-list', 'none')
+                                        }
+                                    >
+                                        <div className={cx('popper-list')}>
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={cx('form-group')}>
+                                <div className={cx('form-label')}>
+                                    <label>Status Campaign</label>
+                                </div>
+                                <div ref={refStatusEdit} className={cx('form-wrap-select')}>
+                                    <div onClick={toggleShowPopperStatusEdit} className={cx('main')}>
+                                        <span>Campaign status</span>
+                                        <img className={cx('icon')} alt="" src={images.addIcon} />
+                                    </div>
+                                    <div
+                                        className={
+                                            showPopperStatusEdit === true ? cx('wrap-list') : cx('wrap-list', 'none')
+                                        }
+                                    >
+                                        <div className={cx('popper-list')}>
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={cx('form-group')}>
+                                <div className={cx('form-label')}>
+                                    <label>Channel</label>
+                                </div>
+                                <div ref={refchannelEdit} className={cx('form-wrap-select')}>
+                                    <div onClick={toggleShowPopperChannelEdit} className={cx('main')}>
+                                        <span>Channel</span>
+                                        <img className={cx('icon')} alt="" src={images.addIcon} />
+                                    </div>
+                                    <div
+                                        className={
+                                            showPopperChannelEdit === true ? cx('wrap-list') : cx('wrap-list', 'none')
+                                        }
+                                    >
+                                        <div className={cx('popper-list')}>
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+                                            <div className={cx('popper-item')}>
+                                                <span>Popper item</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Budget */}
+                        <div className={cx('form-row')}>
+                            <div className={cx('form-group')}>
+                                <div className={cx('form-row', 'margin-inital')}>
+                                    <div className={cx('form-group')}>
+                                        <div className={cx('form-label')}>
+                                            <label>Budget</label>
+                                        </div>
+                                        <div className={cx('form-control', 'no-border', 'inline')}>
+                                            <p className={cx('form-desc')}>Define how much you want to spend?</p>
+                                            <div className={cx('switch')}>
+                                                <input
+                                                    onChange={handleCheckBoxBudgetChange}
+                                                    hidden
+                                                    id="switch"
+                                                    type="checkbox"
+                                                    checked={budgetIsChecked}
+                                                />
+                                                <label htmlFor="switch"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {budgetIsChecked ? (
+                                    <>
+                                        <div className={cx('form-row', 'margin-inital')}>
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label', 'small')}>
+                                                    <label>Overall Budget</label>
+                                                </div>
+                                                <div className={cx('form-control')}>
+                                                    <input
+                                                        className={cx('form-input')}
+                                                        type="number"
+                                                        placeholder="Enter amount for campaign total"
+                                                    />
+                                                </div>
+                                                <div className={cx('form-desc', 'small')}>(In US dollars)</div>
+                                            </div>
+                                        </div>
+                                        <div className={cx('form-row', 'margin-inital')}>
+                                            <div className={cx('form-group')}>
+                                                <div className={cx('form-label', 'small')}>
+                                                    <label>Daily Budget</label>
+                                                </div>
+                                                <div className={cx('form-control')}>
+                                                    <input
+                                                        className={cx('form-input')}
+                                                        type="number"
+                                                        placeholder="Enter the overage you want to spend each day"
+                                                    />
+                                                </div>
+                                                <div className={cx('form-desc', 'small')}>(In US dollars)</div>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <></>
+                                )}
+                            </div>
+                            <div className={cx('form-group')}></div>
+                        </div>
+                        {/* Schedule */}
+                        <div className={cx('form-row')}>
+                            <div className={cx('form-group')}>
+                                <div className={cx('form-label')}>
+                                    <label>From:</label>
+                                </div>
+                                <div ref={refStartDateEdit} className={cx('form-wrap-select')}>
+                                    <div onClick={togglePopperStartDateEdit} className={cx('main')}>
+                                        <span>Start date</span>
+                                        <img className={cx('icon')} alt="" src={images.dateIcon} />
+                                    </div>
+                                    <div
+                                        className={
+                                            showPopperStartDateEdit === true ? cx('wrap-list') : cx('wrap-list', 'none')
+                                        }
+                                    >
+                                        <div className={cx('popper-list', 'calendar')}>
+                                            <CalendarComponent dateString={() => {}} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={cx('form-group')}>
+                                <div className={cx('form-label')}>
+                                    <label>To:</label>
+                                </div>
+                                <div ref={refEndDateEdit} className={cx('form-wrap-select')}>
+                                    <div onClick={togglePopperEndDateEdit} className={cx('main')}>
+                                        <span>End date</span>
+                                        <img className={cx('icon')} alt="" src={images.dateIcon} />
+                                    </div>
+                                    <div
+                                        className={
+                                            showPopperEndDateEdit === true ? cx('wrap-list') : cx('wrap-list', 'none')
+                                        }
+                                    >
+                                        <div className={cx('popper-list', 'calendar')}>
+                                            <CalendarComponent dateString={() => {}} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={cx('form-group')}>
+                                <div className={cx('form-group')}></div>
+                            </div>
+                        </div>
+                        {/* Thumbnail */}
+                        <div className={cx('form-row')}>
+                            <div className={cx('form-group')}>
+                                <div className={cx('form-label')}>
+                                    <label>Thumbnail</label>
+                                </div>
+                                <div className={cx('container-file')}>
+                                    <input type="file" onChange={handlePreviewThumbnail} id="uploadThumb" hidden />
+
+                                    {previewThumbnail !== null ? (
+                                        <label htmlFor="uploadThumb" className={cx('file-thumb', 'not-border')}>
+                                            <img className={cx('preview-img')} alt="" src={previewThumbnail} />
+                                        </label>
+                                    ) : (
+                                        <label htmlFor="uploadThumb" className={cx('file-thumb', 'not-border')}>
+                                            <img
+                                                className={cx('preview-img')}
+                                                alt=""
+                                                src="https://cdn.evbstatic.com/s3-build/fe/build/images/870dbf22443fa23480745089a0ac8de7-food.webp"
+                                            />
+                                        </label>
+                                    )}
+                                </div>
+                            </div>
+                            <div className={cx('form-group')}></div>
+                            <div className={cx('form-group')}></div>
+                        </div>
+
+                        {/* Description */}
+                        <div className={cx('form-row')}>
+                            <div className={cx('forn-group')}>
+                                <div className={cx('form-label')}>
+                                    <label>Description</label>
+                                </div>
+                                <Editor
+                                    style={{ height: '420px' }}
+                                    // value={content}
+                                    // onTextChange={(e) => setContent(e.htmlValue)}
+                                />
+                            </div>
+                            <div className={cx('form-group')}></div>
+                        </div>
+                    </div>
                 </div>
-                <div className={cx('popper-overlay-edit')}></div>
+
+                <div className={cx('popper-overlay-edit', 'js-toggle')} toggle-target="#popper-campaign-edit"></div>
             </div>
 
             {loading && (
