@@ -64,6 +64,7 @@ const images = {
     sumIcon: require('~/assets/images/sum-icon.svg').default,
     sendIcon: require('~/assets/images/send-icon.svg').default,
     hiddenIcon: require('~/assets/images/hidden-icon.svg').default,
+    spinnerIcon: require('~/assets/images/spinner-icon.svg').default,
 };
 
 export default images;

@@ -44,6 +44,16 @@ const useAxios = () => {
                     const newAccessToken = await refresh();
                     prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
                     return instance(prevRequest);
+                } else if (
+                    error?.response?.data &&
+                    error.response.data.message === 'Access Denied As You are not Authenticated.' &&
+                    !prevRequest?.sent
+                ) {
+                    console.log('Token expired!!');
+                    prevRequest.sent = true;
+                    const newAccessToken = await refresh();
+                    prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                    return instance(prevRequest);
                 }
                 return Promise.reject(error);
             },

@@ -104,7 +104,13 @@ function Campaigns() {
     const [thumnailEdit, setThumbnailEdit] = useState(null);
     const [channelEdit, setChannelEdit] = useState('Website');
 
+    const [editSuccess, setEditSuccess] = useState(null);
+
     //END
+
+    const [campaignDelete, setCampaignDelete] = useState(null);
+    const [messageDeleteSuccess, setMessageDeleteSuccess] = useState(null);
+    const [messageDeleleteError, setMessageDeleleError] = useState(null);
 
     const handlePreviewThumbnail = (e) => {
         const file = e.target.files[0];
@@ -136,6 +142,37 @@ function Campaigns() {
     const handleSelectDatePicker = (e) => {
         console.log(e);
     };
+    useEffect(() => {
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document);
+
+        function initJsToggle() {
+            $$('.js-toggle').forEach((button) => {
+                const target = button.getAttribute('toggle-target');
+                if (!target) {
+                    document.body.innerText = `Cần thêm toggle-target cho: ${button.outerHTML}`;
+                }
+                button.onclick = () => {
+                    if (!$(target)) {
+                        return (document.body.innerText = `Không tìm thấy phần tử "${target}"`);
+                    }
+                    const isHidden = $(target).classList.contains('hide');
+
+                    requestAnimationFrame(() => {
+                        $(target).classList.toggle('hide', !isHidden);
+                        $(target).classList.toggle('show', isHidden);
+
+                        // $(target).classList.toggle('hide', setEditSuccess(null));
+
+                        // $(target).classList.toggle('hide', setErrorMessageEdit(null));
+                        // $(target).classList.toggle('hide', setSuccessMessageEdit(null));
+                    });
+                };
+            });
+        }
+
+        initJsToggle();
+    }, []);
 
     useEffect(() => {
         const $ = document.querySelector.bind(document);
@@ -157,7 +194,7 @@ function Campaigns() {
                         $(target).classList.toggle('hide', !isHidden);
                         $(target).classList.toggle('show', isHidden);
 
-                        // $(target).classList.toggle('hide', setErrorMessageEdit(null));
+                        //  $(target).classList.toggle('hide', setEditSuccess(null));
                         // $(target).classList.toggle('hide', setSuccessMessageEdit(null));
                     });
                 };
@@ -303,7 +340,7 @@ function Campaigns() {
         setObjectiveEdit(item.objective);
 
         const dateStart = new Date(item.start_date);
-        const endDate = new Date();
+        const endDate = new Date(item.end_date);
 
         setStartDateEdit(format(dateStart, 'dd-MM-yyyy'));
         setEndDateEdit(format(endDate, 'dd-MM-yyyy'));
@@ -312,6 +349,104 @@ function Campaigns() {
         setBudgetEdit(item.budget);
         setDailyBudgetEdit(item.daily_budget);
         setStatusEdit(item.status);
+    };
+
+    const handleEditCampaign = async () => {
+        if (campaignEdit === null) {
+            return;
+        }
+        const formData = new FormData();
+
+        if (nameEdit !== campaignEdit.name) {
+            formData.append('name', nameEdit);
+        }
+
+        if (objectiveEdit !== campaignEdit.objective) {
+            formData.append('objective', objectiveEdit);
+        }
+
+        if (budgetEdit !== null && budgetEdit !== '') {
+            formData.append('budget', budgetEdit);
+        }
+
+        if (dailyBudgetEdit !== null && dailyBudgetEdit !== '') {
+            formData.append('dailyBudget', dailyBudgetEdit);
+        }
+
+        if (descriptionEdit !== null) {
+            formData.append('description', descriptionEdit);
+        }
+
+        if (thumnailEdit !== null) {
+            formData.append('thumb', thumnailEdit);
+        }
+
+        if (statusEdir !== null && statusEdir !== campaignEdit.status) {
+            formData.append('status', statusEdir);
+        }
+
+        if (typeCampaignEdit !== null && typeCampaignEdit !== campaignEdit.campaigns.id) {
+            formData.append('typeOfCampaignId', typeCampaignEdit);
+        }
+
+        const dateStart = new Date(campaignEdit.start_date);
+        const endDate = new Date(campaignEdit.end_date);
+
+        if (startDateEdit !== format(dateStart, 'dd-MM-yyyy')) {
+            formData.append('startDate', startDateEdit);
+        }
+
+        if (endDateEdit !== format(endDate, 'dd-MM-yyyy')) {
+            formData.append('endDate', endDateEdit);
+        }
+
+        setLoading(true);
+        try {
+            const response = await axios.post(`/api/campaign/edit/${campaignEdit.id}`, formData, {
+                withCredentials: true,
+            });
+            console.log(response.data);
+
+            if (response.data.success === 'true') {
+                fetchListCampaign();
+            }
+            setEditSuccess('success');
+            setLoading(false);
+        } catch (error) {
+            setEditSuccess('error');
+            console.log(error);
+            setLoading(false);
+        }
+    };
+
+    const handleRemoveCampaign = async (id) => {
+        console.log(id);
+
+        if (!id) {
+            return;
+        }
+        setLoading(true);
+
+        try {
+            const response = await axios.post(`/api/campaign/destroy/${id}`, {
+                withCredentials: true,
+            });
+
+            console.log(response.data);
+
+            if (response.data.success === 'true') {
+                fetchListCampaign();
+                setMessageDeleleError(null);
+                setMessageDeleteSuccess(response.data.message);
+                setCampaignDelete(null);
+            }
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setMessageDeleleError(error.response.data.message);
+            setMessageDeleteSuccess(null);
+            setLoading(false);
+        }
     };
 
     return (
@@ -687,6 +822,7 @@ function Campaigns() {
                                                     />
                                                 </button>
                                                 <button
+                                                    onClick={() => setCampaignDelete(item)}
                                                     className={cx('js-toggle')}
                                                     toggle-target="#popper-campaign-delete"
                                                 >
@@ -793,11 +929,27 @@ function Campaigns() {
                         <div className={cx('title')}>
                             <img className={cx('icon')} alt="" src={images.penIcon} />
                         </div>
-                        <div className={cx('send')}>
+                        <div onClick={handleEditCampaign} className={cx('send')}>
                             Send
                             <img className={cx('icon', 'icon-small')} alt="" src={images.sendIcon} />
                         </div>
-                        <button className={cx('close-btn', 'js-toggle')} toggle-target="#popper-campaign-edit">
+                        {editSuccess === 'success' && (
+                            <div className={cx('success')}>
+                                <img className={cx('icon', 'icon-small')} alt="" src={images.editIcon} />
+                                <span>Edit campaign success</span>
+                            </div>
+                        )}
+                        {editSuccess === 'error' && (
+                            <div className={cx('error')}>
+                                <img className={cx('icon', 'icon-small')} alt="" src={images.spinnerIcon} />
+                                <span>Edit campaign error</span>
+                            </div>
+                        )}
+                        <button
+                            onClick={() => setEditSuccess(null)}
+                            className={cx('close-btn', 'js-toggle')}
+                            toggle-target="#popper-campaign-edit"
+                        >
                             <img className={cx('icon')} alt="" src={images.xIcon} />
                         </button>
                     </div>
@@ -1181,23 +1333,54 @@ function Campaigns() {
                     )}
                 </div>
 
-                <div className={cx('popper-overlay-edit', 'js-toggle')} toggle-target="#popper-campaign-edit"></div>
+                <div
+                    onClick={() => setEditSuccess(null)}
+                    className={cx('popper-overlay-edit', 'js-toggle')}
+                    toggle-target="#popper-campaign-edit"
+                ></div>
 
                 {/* Delete Campagin */}
                 <div id="popper-campaign-delete" className={cx('popper-notification-delete', 'hide')}>
-                    <div className={cx('wrap-content')}>
-                        <p>Would you like to remove this Campaign: </p>
-                        <p className={cx('name')}>Healty Food Choice Campaign 2?</p>
-                        <div className={cx('btn')}>
-                            <button>Remove</button>
-                        </div>
-                        <div className={cx('btn', 'js-toggle')} toggle-target="#popper-campaign-delete">
-                            <button>Don't Remove</button>
-                        </div>
-                    </div>
+                    {campaignDelete !== null ? (
+                        <>
+                            <div className={cx('wrap-content')}>
+                                <p>Would you like to remove this Campaign? </p>
+                                <p className={cx('name')}>{campaignDelete.name}</p>
+                                <div className={cx('message', 'success')}>
+                                    {messageDeleteSuccess !== null && messageDeleteSuccess}
+                                </div>
+                                <div className={cx('message', 'error')}>
+                                    {messageDeleleteError !== null && messageDeleleteError}
+                                </div>
+
+                                <div onClick={() => handleRemoveCampaign(campaignDelete.id)} className={cx('btn')}>
+                                    <button>Remove</button>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        setMessageDeleleError(null);
+                                        setMessageDeleteSuccess(null);
+                                    }}
+                                    className={cx('btn', 'js-toggle')}
+                                    toggle-target="#popper-campaign-delete"
+                                >
+                                    Don't Remove
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <></>
+                    )}
                 </div>
 
-                <div className={cx('popper-overlay-delete', 'js-toggle')} toggle-target="#popper-campaign-delete"></div>
+                <div
+                    onClick={() => {
+                        setMessageDeleleError(null);
+                        setMessageDeleteSuccess(null);
+                    }}
+                    className={cx('popper-overlay-delete', 'js-toggle')}
+                    toggle-target="#popper-campaign-delete"
+                ></div>
             </div>
 
             {loading && (

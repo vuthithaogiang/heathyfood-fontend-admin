@@ -654,6 +654,7 @@ span.large {
     display: flex;
     align-items: center;
     gap: 8px;
+    position: relative;
 
     .title {
         font-size: 1.9rem;
@@ -673,13 +674,104 @@ span.large {
         font-size: 1.4rem;
         font-weight: 500;
         gap: 8px;
-        background-color: #f0f0f0;
+
+        background-color: #f5f5f5;
+
+        box-shadow: 0 3px 5px #9d929280;
         padding: 0 12px;
         cursor: pointer;
 
         img {
             filter: brightness(0) saturate(100%) invert(29%) sepia(62%) saturate(5824%) hue-rotate(203deg)
                 brightness(95%) contrast(93%) !important;
+        }
+    }
+
+    .success {
+        position: absolute;
+        top: 18px;
+        left: 16px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 8px;
+        background-color: #fff;
+        //    background-color: #f0f0f0;
+        box-shadow: 0 3px 11px #9d929280;
+        padding: 0 12px;
+        cursor: pointer;
+
+        span {
+            font-size: 1.4rem;
+            font-weight: 500;
+            position: relative;
+            color: #e2e3e9;
+
+            &::before {
+                position: absolute;
+                top: 0;
+                left: 0;
+                color: #a782c3;
+                content: 'Edit campaign success';
+                white-space: nowrap;
+                //  width: 100%;
+                overflow: hidden;
+                animation: run 2s infinite;
+            }
+        }
+
+        img {
+            filter: brightness(0) saturate(100%) invert(68%) sepia(12%) saturate(1346%) hue-rotate(229deg)
+                brightness(81%) contrast(85%) !important;
+        }
+    }
+    .error {
+        position: absolute;
+        top: 18px;
+        left: 16px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        font-weight: 500;
+        gap: 8px;
+        background-color: #fff;
+        //    background-color: #f0f0f0;
+        box-shadow: 0 3px 13px #9d929280;
+        padding: 0 12px;
+        cursor: pointer;
+
+        span {
+            font-size: 1.4rem;
+            font-weight: 500;
+            position: relative;
+            color: #e2e3e9;
+
+            &::before {
+                position: absolute;
+                top: 0;
+                left: 0;
+                color: #fc9797;
+                content: 'Edit campaign error';
+                white-space: nowrap;
+                //  width: 100%;
+                overflow: hidden;
+                animation: run 2s infinite;
+            }
+        }
+
+        img {
+            filter: brightness(0) saturate(100%) invert(62%) sepia(35%) saturate(622%) hue-rotate(313deg)
+                brightness(110%) contrast(98%) !important;
         }
     }
 
@@ -1306,6 +1398,22 @@ span.large {
                 }
             }
         }
+
+        .message {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.3rem;
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 16px;
+        }
+
+        .message.success {
+            color: green;
+        }
+
+        .message.error {
+            color: red;
+        }
     }
 }
 .popper-overlay-delete {
@@ -1330,3 +1438,12 @@ span.large {
 }
 
 //END
+
+@keyframes run {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
+}
