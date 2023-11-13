@@ -112,36 +112,11 @@ function Campaigns() {
     const [messageDeleteSuccess, setMessageDeleteSuccess] = useState(null);
     const [messageDeleleteError, setMessageDeleleError] = useState(null);
 
-    const handlePreviewThumbnail = (e) => {
-        const file = e.target.files[0];
-
-        if (file) {
-            file.preview = URL.createObjectURL(file);
-            setPreviewThumbnail(file.preview);
-            setThumbnailEdit(file);
-        }
-    };
-
     useEffect(() => {
-        return () => {
-            URL.revokeObjectURL(previewThumbnail);
-        };
-    }, [previewThumbnail]);
+        fetListTypeOfCampaign(); // eslint-disable-next-line
+        fetchListCampaign();
+    }, []);
 
-    const handleCheckBoxBudgetChange = (event) => {
-        const isChecked = event.target.checked;
-        setBudgetIsCheced(isChecked);
-    };
-
-    const selectionRange = {
-        startDate: new Date(),
-        endDate: new Date(),
-        key: 'selection',
-    };
-
-    const handleSelectDatePicker = (e) => {
-        console.log(e);
-    };
     useEffect(() => {
         const $ = document.querySelector.bind(document);
         const $$ = document.querySelectorAll.bind(document);
@@ -172,37 +147,57 @@ function Campaigns() {
         }
 
         initJsToggle();
-    }, []);
+    }, [listCampaign, content, campaignDelete, campaignEdit]);
 
     useEffect(() => {
-        const $ = document.querySelector.bind(document);
-        const $$ = document.querySelectorAll.bind(document);
+        const filterStatusAndType = () => {
+            if (statusFilter === null && typeCampaingFilter === null) {
+                return;
+            }
 
-        function initJsToggle() {
-            $$('.js-toggle').forEach((button) => {
-                const target = button.getAttribute('toggle-target');
-                if (!target) {
-                    document.body.innerText = `Cần thêm toggle-target cho: ${button.outerHTML}`;
-                }
-                button.onclick = () => {
-                    if (!$(target)) {
-                        return (document.body.innerText = `Không tìm thấy phần tử "${target}"`);
-                    }
-                    const isHidden = $(target).classList.contains('hide');
+            if (listCampaign === null && listCampaign.length === 0) {
+                return;
+            }
 
-                    requestAnimationFrame(() => {
-                        $(target).classList.toggle('hide', !isHidden);
-                        $(target).classList.toggle('show', isHidden);
+            if (statusFilter !== null) {
+                const filter = listCampaign.filter((item) => item.status === statusFilter.id);
+            }
 
-                        //  $(target).classList.toggle('hide', setEditSuccess(null));
-                        // $(target).classList.toggle('hide', setSuccessMessageEdit(null));
-                    });
-                };
-            });
+            if (typeCampaingFilter !== null) {
+            }
+        };
+    }, [statusFilter, typeCampaingFilter]);
+
+    const handlePreviewThumbnail = (e) => {
+        const file = e.target.files[0];
+
+        if (file) {
+            file.preview = URL.createObjectURL(file);
+            setPreviewThumbnail(file.preview);
+            setThumbnailEdit(file);
         }
+    };
 
-        initJsToggle();
-    }, [content, campaignEdit]);
+    useEffect(() => {
+        return () => {
+            URL.revokeObjectURL(previewThumbnail);
+        };
+    }, [previewThumbnail]);
+
+    const handleCheckBoxBudgetChange = (event) => {
+        const isChecked = event.target.checked;
+        setBudgetIsCheced(isChecked);
+    };
+
+    const selectionRange = {
+        startDate: new Date(),
+        endDate: new Date(),
+        key: 'selection',
+    };
+
+    const handleSelectDatePicker = (e) => {
+        console.log(e);
+    };
 
     const formatDateFromBackend = (dateString) => {
         const dateObject = new Date(dateString);
@@ -328,11 +323,6 @@ function Campaigns() {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        fetListTypeOfCampaign(); // eslint-disable-next-line
-        fetchListCampaign();
-    }, []);
 
     const handlePrepareStateEdit = (item) => {
         setCampaignEdit(item);
@@ -921,7 +911,11 @@ function Campaigns() {
                     )}
                 </div>
 
-                <div className={cx('popper-overlay', 'js-toggle')} toggle-target="#popper-review-content"></div>
+                <div
+                    onClick={() => setContent(null)}
+                    className={cx('popper-overlay', 'js-toggle')}
+                    toggle-target="#popper-review-content"
+                ></div>
 
                 {/* Edit Campaign */}
                 <div id="popper-campaign-edit" className={cx('popper-notofication-edit', 'hide')}>
@@ -946,9 +940,9 @@ function Campaigns() {
                             </div>
                         )}
                         <button
-                            onClick={() => setEditSuccess(null)}
                             className={cx('close-btn', 'js-toggle')}
                             toggle-target="#popper-campaign-edit"
+                            onClick={() => setEditSuccess(null)}
                         >
                             <img className={cx('icon')} alt="" src={images.xIcon} />
                         </button>
@@ -1357,12 +1351,12 @@ function Campaigns() {
                                     <button>Remove</button>
                                 </div>
                                 <button
+                                    className={cx('btn', 'js-toggle')}
+                                    toggle-target="#popper-campaign-delete"
                                     onClick={() => {
                                         setMessageDeleleError(null);
                                         setMessageDeleteSuccess(null);
                                     }}
-                                    className={cx('btn', 'js-toggle')}
-                                    toggle-target="#popper-campaign-delete"
                                 >
                                     Don't Remove
                                 </button>
