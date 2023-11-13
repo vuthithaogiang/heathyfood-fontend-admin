@@ -38,13 +38,14 @@ function Campaigns() {
             id: 1,
             title: 'On Going',
         },
+
         {
             id: 2,
-            title: 'Complete',
+            title: 'Paused',
         },
         {
             id: 3,
-            title: 'Paused',
+            title: 'Complete',
         },
     ];
 
@@ -112,9 +113,17 @@ function Campaigns() {
     const [messageDeleteSuccess, setMessageDeleteSuccess] = useState(null);
     const [messageDeleleteError, setMessageDeleleError] = useState(null);
 
+    //LOADING
+    const [fetchSearchForm, setFetchSearchForm] = useState(false);
+    const [fetchStatusFilter, setFetchStatusFilter] = useState(false);
+    const [fetchTypeCampaignFilter, setFetchTypeCampaignFilter] = useState(false);
+
+    const [fetchSwitchStatus, setFetchSwitchStatus] = useState(false);
+    const [switchStatus, setSwitchStatus] = useState(null);
+
     useEffect(() => {
         fetListTypeOfCampaign(); // eslint-disable-next-line
-        fetchListCampaign();
+        fetchListCampaign(); // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -148,25 +157,6 @@ function Campaigns() {
 
         initJsToggle();
     }, [listCampaign, content, campaignDelete, campaignEdit]);
-
-    useEffect(() => {
-        const filterStatusAndType = () => {
-            if (statusFilter === null && typeCampaingFilter === null) {
-                return;
-            }
-
-            if (listCampaign === null && listCampaign.length === 0) {
-                return;
-            }
-
-            if (statusFilter !== null) {
-                const filter = listCampaign.filter((item) => item.status === statusFilter.id);
-            }
-
-            if (typeCampaingFilter !== null) {
-            }
-        };
-    }, [statusFilter, typeCampaingFilter]);
 
     const handlePreviewThumbnail = (e) => {
         const file = e.target.files[0];
@@ -328,6 +318,7 @@ function Campaigns() {
         setCampaignEdit(item);
         setNameEdit(item.name);
         setObjectiveEdit(item.objective);
+        setTypeCampaignEdit(item.type_of_campaign);
 
         const dateStart = new Date(item.start_date);
         const endDate = new Date(item.end_date);
@@ -375,8 +366,8 @@ function Campaigns() {
             formData.append('status', statusEdir);
         }
 
-        if (typeCampaignEdit !== null && typeCampaignEdit !== campaignEdit.campaigns.id) {
-            formData.append('typeOfCampaignId', typeCampaignEdit);
+        if (typeCampaignEdit !== null && typeCampaignEdit !== campaignEdit.id) {
+            formData.append('typeOfCampaignId', typeCampaignEdit.id);
         }
 
         const dateStart = new Date(campaignEdit.start_date);
@@ -436,6 +427,104 @@ function Campaigns() {
             setMessageDeleleError(error.response.data.message);
             setMessageDeleteSuccess(null);
             setLoading(false);
+        }
+    };
+
+    const filterStatusAndType = async () => {
+        const formData = new FormData();
+
+        if (typeCampaingFilter !== null) {
+            formData.append('typeOfCampaignId', typeCampaingFilter.id);
+            setFetchTypeCampaignFilter(true);
+        }
+        if (statusFilter !== null) {
+            formData.append('status', statusFilter.id);
+            setFetchStatusFilter(true);
+        }
+        try {
+            const response = await axios.post('/api/campaign/filter', formData, {
+                withCredentials: true,
+            });
+
+            console.log(response.data);
+
+            if (response.data.data) {
+                setListCampaign(response.data.data);
+            }
+
+            setFetchStatusFilter(false);
+            setFetchTypeCampaignFilter(false);
+        } catch (error) {
+            console.log(error);
+            setFetchStatusFilter(false);
+            setFetchTypeCampaignFilter(false);
+        }
+    };
+    useEffect(() => {
+        filterStatusAndType(); // eslint-disable-next-line
+    }, [statusFilter, typeCampaingFilter]);
+
+    const handleSubmitFormSearch = async (e) => {
+        e.preventDefault();
+
+        if (searchValue.trim() === '') {
+            return;
+        }
+        setFetchSearchForm(true);
+        console.log(searchValue);
+        const response = await axios.post(
+            '/api/campaign/filter',
+            {
+                key: searchValue,
+            },
+            {
+                withCredentials: true,
+            },
+        );
+
+        console.log(response.data);
+        if (response.data.data) {
+            setListCampaign(response.data.data);
+        }
+
+        setFetchSearchForm(false);
+        try {
+        } catch (error) {
+            console.log(error);
+            setFetchSearchForm(false);
+        }
+    };
+
+    const handleSwitchStatusCampaign = async (campaignId, newStatus) => {
+        console.log(campaignId);
+        console.log(newStatus);
+
+        setSwitchStatus(newStatus);
+        setFetchSwitchStatus(true);
+
+        try {
+            const response = await axios.post(
+                `/api/campaign/update-status/${campaignId}`,
+                {
+                    status: newStatus,
+                },
+                {
+                    withCredentials: true,
+                },
+            );
+
+            console.log(response.data);
+
+            if (response.data.success === 'true') {
+                fetchListCampaign();
+            }
+
+            setSwitchStatus(null);
+            setFetchSwitchStatus(false);
+        } catch (error) {
+            console.log(error);
+            setSwitchStatus(null);
+            setFetchSwitchStatus(false);
         }
     };
 
@@ -509,12 +598,26 @@ function Campaigns() {
                             </div>
                         </div>
 
+                        {/* Overview */}
                         {typeOfNavbar === 'Overview' && (
                             <>
                                 <div ref={refSelectStatus} className={cx('filter-select-wrap')}>
                                     <div onClick={toggleShowPopperStatus} className={cx('main')}>
                                         {statusFilter === null ? 'Status' : statusFilter.title}
-                                        <img className={cx('icon')} alt="" src={images.addIcon} />
+
+                                        {fetchStatusFilter === true ? (
+                                            <>
+                                                <img
+                                                    className={cx('icon', 'icon-small', 'spinner-icon', 'not-margin')}
+                                                    alt=""
+                                                    src={images.spinnerIcon}
+                                                />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <img className={cx('icon')} alt="" src={images.addIcon} />
+                                            </>
+                                        )}
                                     </div>
                                     <div
                                         className={
@@ -522,12 +625,20 @@ function Campaigns() {
                                         }
                                     >
                                         <div className={cx('popper-list')}>
+                                            <div
+                                                onClick={() => {
+                                                    setStatusFilter(null);
+                                                }}
+                                                className={cx('popper-item')}
+                                            >
+                                                <span>All</span>
+                                            </div>
                                             {FAKE_STATUS.map((item) => (
                                                 <div
                                                     key={item.id}
                                                     onClick={() => setStatusFilter(item)}
                                                     className={
-                                                        item.title === statusFilter
+                                                        statusFilter !== null && item.id === statusFilter.id
                                                             ? cx('popper-item', 'active')
                                                             : cx('popper-item')
                                                     }
@@ -541,8 +652,21 @@ function Campaigns() {
 
                                 <div ref={refSelectTypeCamppaign} className={cx('filter-select-wrap')}>
                                     <div onClick={toggleShowPopperTypeCampaign} className={cx('main')}>
-                                        {typeCampaingFilter === null ? ' Types of Campaign' : typeCampaingFilter.name}
-                                        <img className={cx('icon')} alt="" src={images.addIcon} />
+                                        {typeCampaingFilter === null ? 'Types of Campaign' : typeCampaingFilter.name}
+
+                                        {fetchTypeCampaignFilter === true ? (
+                                            <>
+                                                <img
+                                                    className={cx('icon', 'icon-small', 'spinner-icon', 'not-margin')}
+                                                    alt=""
+                                                    src={images.spinnerIcon}
+                                                />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <img className={cx('icon')} alt="" src={images.addIcon} />
+                                            </>
+                                        )}
                                     </div>
 
                                     <div
@@ -551,6 +675,14 @@ function Campaigns() {
                                         }
                                     >
                                         <div className={cx('popper-list')}>
+                                            <div
+                                                onClick={() => {
+                                                    setTypeCampaignFilter(null);
+                                                }}
+                                                className={cx('popper-item')}
+                                            >
+                                                <span>All</span>
+                                            </div>
                                             {listTypeOfCampaign !== null &&
                                                 listTypeOfCampaign.map((item) => (
                                                     <div
@@ -572,6 +704,7 @@ function Campaigns() {
                         )}
                     </div>
                     <div className={cx('navbar-right')}>
+                        {/* Overview */}
                         {typeOfNavbar === 'Overview' && (
                             <>
                                 <div className={cx('filter-select-wrap')}>
@@ -603,7 +736,7 @@ function Campaigns() {
                                 </div>
 
                                 <div className={cx('form-search')}>
-                                    <form method="post" onSubmit={(e) => e.preventDefault()}>
+                                    <form method="post" onSubmit={handleSubmitFormSearch}>
                                         <button type="submit">
                                             <img className={cx('icon')} alt="" src={images.searchIncon} />
                                         </button>
@@ -614,6 +747,23 @@ function Campaigns() {
                                             onChange={(e) => setSearchValue(e.target.value)}
                                             placeholder="Search Campaign"
                                         />
+
+                                        {!fetchSearchForm && (
+                                            <img
+                                                className={cx('icon', 'icon-small', 'close-icon')}
+                                                alt=""
+                                                src={images.closeIcon}
+                                                onClick={() => setSearchValue('')}
+                                            />
+                                        )}
+
+                                        {fetchSearchForm && (
+                                            <img
+                                                className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                alt=""
+                                                src={images.spinnerIcon}
+                                            />
+                                        )}
                                     </form>
                                 </div>
                             </>
@@ -659,7 +809,7 @@ function Campaigns() {
                                 <span>Daily Budget</span>
                             </div>
                         </div>
-                        {listCampaign !== null && (
+                        {listCampaign !== null && listCampaign.length > 0 && (
                             <>
                                 <div className={cx('table-data')}>
                                     {listCampaign.map((item) => (
@@ -828,6 +978,16 @@ function Campaigns() {
                                 </div>
                             </>
                         )}
+
+                        {listCampaign !== null && listCampaign.length === 0 && (
+                            <div onClick={() => fetchListCampaign()} className={cx('no-data')}>
+                                <div>
+                                    <img className={cx('icon', 'icon-small')} alt="" src={images.tableIcon} />
+                                    Emty table
+                                </div>
+                                <img className={cx('icon', 'icon-small')} alt="" src={images.sendIcon} />
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -965,27 +1125,111 @@ function Campaigns() {
                                         {/* New */}
                                         {campaignEdit.status === 0 && (
                                             <>
-                                                <button className={cx('status-1')}>On going</button>
+                                                <button
+                                                    onClick={() => handleSwitchStatusCampaign(campaignEdit.id, 1)}
+                                                    className={
+                                                        fetchSwitchStatus === true && switchStatus === 1
+                                                            ? cx('status-1', 'sending')
+                                                            : cx('status-1')
+                                                    }
+                                                >
+                                                    On going
+                                                    <img
+                                                        className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                        alt=""
+                                                        src={images.spinnerIcon}
+                                                    />
+                                                </button>
                                             </>
                                         )}
                                         {/* On going */}
                                         {campaignEdit.status === 1 && (
                                             <>
-                                                <button className={cx('status-2')}>Pause</button>
-                                                <button className={cx('status-3')}>Conplete</button>
+                                                <button
+                                                    onClick={() => handleSwitchStatusCampaign(campaignEdit.id, 2)}
+                                                    className={
+                                                        fetchSwitchStatus === true && switchStatus === 2
+                                                            ? cx('status-2', 'sending')
+                                                            : cx('status-2')
+                                                    }
+                                                >
+                                                    Pause
+                                                    <img
+                                                        className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                        alt=""
+                                                        src={images.spinnerIcon}
+                                                    />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleSwitchStatusCampaign(campaignEdit.id, 3)}
+                                                    className={
+                                                        fetchSwitchStatus === true && switchStatus === 3
+                                                            ? cx('status-3', 'sending')
+                                                            : cx('status-3')
+                                                    }
+                                                >
+                                                    Conplete
+                                                    <img
+                                                        className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                        alt=""
+                                                        src={images.spinnerIcon}
+                                                    />
+                                                </button>
                                             </>
                                         )}
                                         {/* Pause */}
                                         {campaignEdit.status === 2 && (
                                             <>
-                                                <button className={cx('status-3')}>Complete</button>
-                                                <button className={cx('status-2')}>On going</button>
+                                                <button
+                                                    onClick={() => handleSwitchStatusCampaign(campaignEdit.id, 3)}
+                                                    className={
+                                                        fetchSwitchStatus === true && switchStatus === 3
+                                                            ? cx('status-3', 'sending')
+                                                            : cx('status-3')
+                                                    }
+                                                >
+                                                    Complete
+                                                    <img
+                                                        className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                        alt=""
+                                                        src={images.spinnerIcon}
+                                                    />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleSwitchStatusCampaign(campaignEdit.id, 1)}
+                                                    className={
+                                                        fetchSwitchStatus === true && switchStatus === 1
+                                                            ? cx('status-2', 'sending')
+                                                            : cx('status-2')
+                                                    }
+                                                >
+                                                    On going
+                                                    <img
+                                                        className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                        alt=""
+                                                        src={images.spinnerIcon}
+                                                    />
+                                                </button>
                                             </>
                                         )}
                                         {/* Complete */}
                                         {campaignEdit.status === 3 && (
                                             <>
-                                                <button className={cx('status-0')}>Start again</button>
+                                                <button
+                                                    onClick={() => handleSwitchStatusCampaign(campaignEdit.id, 0)}
+                                                    className={
+                                                        fetchSwitchStatus === true && switchStatus === 0
+                                                            ? cx('status-0', 'sending')
+                                                            : cx('status-0')
+                                                    }
+                                                >
+                                                    Start again
+                                                    <img
+                                                        className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                        alt=""
+                                                        src={images.spinnerIcon}
+                                                    />
+                                                </button>
                                             </>
                                         )}
                                     </div>

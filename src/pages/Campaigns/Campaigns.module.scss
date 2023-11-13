@@ -279,7 +279,26 @@
 
     input {
         width: 100%;
+        height: 100%;
         padding: 0 12px;
+        color: #585353;
+        font-size: 1.3rem;
+    }
+
+    input:not(:placeholder-shown) ~ .close-icon {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .close-icon {
+        width: 9px;
+        margin-right: 8px;
+        cursor: pointer;
+
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity, visibility;
+        transition-duration: 0.3s;
     }
 }
 span.large {
@@ -992,12 +1011,26 @@ span.large {
             gap: 12px;
 
             button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
                 width: 120px;
                 font-size: 1.4rem;
                 padding: 8px 0;
                 cursor: pointer;
                 border-radius: 6px;
                 font-weight: 500;
+
+                img {
+                    display: none;
+                }
+            }
+
+            button.sending {
+                img {
+                    display: inline-flex;
+                }
             }
 
             button.status-0 {
@@ -1439,11 +1472,53 @@ span.large {
 
 //END
 
+.spinner-icon {
+    margin-right: 12px;
+    animation: spinner 1s infinite;
+}
+
+.spinner-icon.not-margin {
+    margin-right: 0;
+}
+
+.no-data {
+    width: 100%;
+    padding: 0 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background-color: rgba(55, 53, 47, 0.08);
+    height: 38px;
+    border-bottom: 1px solid #ddd;
+
+    &:hover {
+        background-color: #dfebf9;
+    }
+    div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Inter', sans-serif;
+        font-size: 1.4rem;
+    }
+}
+
 @keyframes run {
     from {
         width: 0%;
     }
     to {
         width: 100%;
+    }
+}
+
+@keyframes spinner {
+    from {
+        rotate: 0;
+    }
+    to {
+        rotate: 180deg;
     }
 }

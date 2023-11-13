@@ -65,6 +65,8 @@ const images = {
     sendIcon: require('~/assets/images/send-icon.svg').default,
     hiddenIcon: require('~/assets/images/hidden-icon.svg').default,
     spinnerIcon: require('~/assets/images/spinner-icon.svg').default,
+    closeIcon: require('~/assets/images/close-icon.svg').default,
+    tableIcon: require('~/assets/images/table-icon.svg').default,
 };
 
 export default images;
