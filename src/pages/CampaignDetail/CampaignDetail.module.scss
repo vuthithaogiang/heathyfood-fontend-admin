@@ -383,6 +383,18 @@ span.large {
         // transform: translateX(50%);
     }
 
+    .wrap-list.sticky-top-left {
+        width: 300px;
+        //  top: 0;
+        left: 0;
+    }
+    .wrap-list.sticky-top-right {
+        width: 300px;
+        //   top: 0;
+        left: initial;
+        right: 0;
+    }
+
     .wrap-list.none {
         opacity: 0;
         visibility: hidden;
@@ -410,9 +422,9 @@ span.large {
         }
 
         span {
-            color: #0969da;
+            color: #0969da !important;
             background-color: #eeeef4;
-            font-size: 1.3rem;
+            font-size: 1.3rem !important;
             padding: 3px 6px;
             border-radius: 2px;
             display: -webkit-box;
@@ -548,20 +560,13 @@ span.large {
             margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 24px;
+            justify-content: space-between;
 
             span {
                 font-family: 'Inter', sans-serif;
                 font-size: 1.5rem;
                 color: #7e6d76;
                 transition: color 0.6s;
-            }
-
-            &:hover {
-                .push-btn {
-                    opacity: 1;
-                    visibility: visible;
-                }
             }
 
             .loading {
@@ -589,6 +594,11 @@ span.large {
                     animation: run 2s infinite;
                 }
             }
+            .inline {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
 
             .push-btn {
                 cursor: pointer;
@@ -603,23 +613,6 @@ span.large {
                 background-color: var(--primary-color);
                 border-radius: 4px;
                 position: relative;
-                visibility: hidden;
-                opacity: 0;
-
-                transition: opacity, visibility;
-                transition-duration: 0.4s;
-
-                &::before {
-                    position: absolute;
-                    top: 45%;
-                    left: -8px;
-                    content: '';
-                    width: 12px;
-                    height: 12px;
-                    background-color: var(--primary-color);
-                    transform: translateY(-50%);
-                    rotate: 50deg;
-                }
 
                 img {
                     width: 14px;
@@ -834,7 +827,7 @@ span.large {
                 top: 0;
                 left: 0;
                 color: #a782c3;
-                content: 'Edit campaign success';
+                content: 'Add new activity success';
                 white-space: nowrap;
                 //  width: 100%;
                 overflow: hidden;
@@ -878,7 +871,7 @@ span.large {
                 top: 0;
                 left: 0;
                 color: #fc9797;
-                content: 'Edit campaign error';
+                content: 'Add new activity error';
                 white-space: nowrap;
                 //  width: 100%;
                 overflow: hidden;

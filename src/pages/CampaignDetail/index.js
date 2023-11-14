@@ -8,6 +8,7 @@ import { InfinitySpin } from 'react-loader-spinner';
 import CalendarComponent from '~/components/CalendarComponent';
 import useOnClickOutside from '~/hooks/useOnclickOutside';
 import { Editor } from 'primereact/editor';
+import { format } from 'date-fns';
 
 const cx = classNames.bind(styles);
 
@@ -57,7 +58,6 @@ function CampaignDetail() {
 
     const [addNewSuccess, setAddNewSccess] = useState(null);
 
-    const [typeActitvity, setTypeActity] = useState(null);
     const [listSuggestActivity, setListSuggestActivity] = useState([]);
 
     const refCalendarNewStartDate = useRef();
@@ -67,12 +67,27 @@ function CampaignDetail() {
     const [showCalendarNewStartDate, setShowCalendarNewStartDate] = useState(false);
     const [showCalendarNewEndDate, setShowCalendarNewEndDate] = useState(false);
     const [showTypesActivity, setshowTypesActivity] = useState(false);
+    const [showSuggestActivities, setShowSugestActivities] = useState(false);
 
+    const [stateOpen, setStateOpen] = useState(null);
+    const [identityOpen, setIdentityOepn] = useState(null);
+    const refOpenCalendar = useRef();
+
+    const hiddenCalendar = () => {
+        setStateOpen(null);
+        // setIdentityOepn(null);
+    };
+    useOnClickOutside(refOpenCalendar, hiddenCalendar);
+
+    const [startDateScheduleEdit, setStartDateScheduleEdit] = useState(null);
+    const [endDateScheduleEdit, setEndDateScheduleEdit] = useState(null);
+
+    //New
     const [newStartDate, setNewStartDate] = useState(null);
     const [newEndDate, setNewEndDate] = useState(null);
-
-    const [showSuggestActivities, setShowSugestActivities] = useState(false);
     const [nameActivity, setNameActivity] = useState('');
+    const [typeActitvity, setTypeActity] = useState(null);
+    const [newDescriptionActivity, setNewDescriptionActivity] = useState('');
 
     // Edit
     const [scheduleEdit, setScheduleEdit] = useState(null);
@@ -294,6 +309,14 @@ function CampaignDetail() {
         setScheduleBelongToActivityToDelete(schedule);
     };
 
+    const handleSubmitAddScheduleActivity = async () => {
+        console.log('Start date: ', newStartDate);
+        console.log('End date: ', newEndDate);
+        console.log('Type activity: ', typeActitvity);
+        console.log('Name act: ', nameActivity);
+        console.log('Description: ', newDescriptionActivity);
+    };
+
     return (
         <>
             <div className={cx('wrapper')}>
@@ -398,6 +421,137 @@ function CampaignDetail() {
                                                                             </>
                                                                         )}
                                                                     </span>
+
+                                                                    <>
+                                                                        <div className={cx('inline')}>
+                                                                            <div
+                                                                                ref={refOpenCalendar}
+                                                                                className={cx(
+                                                                                    'form-wrap-select',
+                                                                                    'not-border',
+                                                                                )}
+                                                                            >
+                                                                                <div
+                                                                                    onClick={() => {
+                                                                                        setStateOpen('from');
+                                                                                        setIdentityOepn(item.id);
+                                                                                    }}
+                                                                                    className={cx('main')}
+                                                                                >
+                                                                                    <span>
+                                                                                        From:{' '}
+                                                                                        {identityOpen === item.id
+                                                                                            ? startDateScheduleEdit
+                                                                                            : format(
+                                                                                                  new Date(
+                                                                                                      item.start_date,
+                                                                                                  ),
+                                                                                                  'dd-MM-yyyy',
+                                                                                              )}
+                                                                                    </span>
+                                                                                    <img
+                                                                                        className={cx('icon')}
+                                                                                        alt=""
+                                                                                        src={images.penIcon}
+                                                                                    />
+                                                                                </div>
+
+                                                                                <div
+                                                                                    className={
+                                                                                        stateOpen === 'from' &&
+                                                                                        identityOpen === item.id
+                                                                                            ? cx(
+                                                                                                  'wrap-list',
+                                                                                                  'sticky-top-left',
+                                                                                              )
+                                                                                            : cx(
+                                                                                                  'wrap-list',
+                                                                                                  'sticky-top-left',
+                                                                                                  'none',
+                                                                                              )
+                                                                                    }
+                                                                                >
+                                                                                    <div
+                                                                                        className={cx(
+                                                                                            'popper-list',
+                                                                                            'calendar',
+                                                                                        )}
+                                                                                    >
+                                                                                        <CalendarComponent
+                                                                                            date={
+                                                                                                new Date(
+                                                                                                    item.start_date,
+                                                                                                )
+                                                                                            }
+                                                                                            setDateToString={
+                                                                                                setStartDateScheduleEdit
+                                                                                            }
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div
+                                                                                ref={refOpenCalendar}
+                                                                                className={cx('form-wrap-select')}
+                                                                            >
+                                                                                <div
+                                                                                    onClick={() => {
+                                                                                        setStateOpen('to');
+                                                                                        setIdentityOepn(item.id);
+                                                                                    }}
+                                                                                    className={cx('main')}
+                                                                                >
+                                                                                    <span>
+                                                                                        To:{' '}
+                                                                                        {identityOpen === item.id
+                                                                                            ? endDateScheduleEdit
+                                                                                            : format(
+                                                                                                  new Date(
+                                                                                                      item.end_date,
+                                                                                                  ),
+                                                                                                  'dd-MM-yyyy',
+                                                                                              )}
+                                                                                    </span>
+                                                                                    <img
+                                                                                        className={cx('icon')}
+                                                                                        alt=""
+                                                                                        src={images.penIcon}
+                                                                                    />
+                                                                                </div>
+                                                                                <div
+                                                                                    className={
+                                                                                        stateOpen === 'to' &&
+                                                                                        identityOpen === item.id
+                                                                                            ? cx(
+                                                                                                  'wrap-list',
+                                                                                                  'sticky-top-right',
+                                                                                              )
+                                                                                            : cx(
+                                                                                                  'wrap-list',
+                                                                                                  'sticky-top-right',
+                                                                                                  'none',
+                                                                                              )
+                                                                                    }
+                                                                                >
+                                                                                    <div
+                                                                                        className={cx(
+                                                                                            'popper-list',
+                                                                                            'calendar',
+                                                                                        )}
+                                                                                    >
+                                                                                        <CalendarComponent
+                                                                                            date={
+                                                                                                new Date(item.end_date)
+                                                                                            }
+                                                                                            setDateToString={
+                                                                                                setEndDateScheduleEdit
+                                                                                            }
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </>
                                                                 </div>
                                                                 <div className={cx('multi-activity')}>
                                                                     {item.activities.length > 0 ? (
@@ -559,26 +713,27 @@ function CampaignDetail() {
                     </div>
                 </div>
             )}
+
             {/* Add new Schedule */}
             <div id="add-new-schedule" className={cx('popper-notofication-edit', 'hide')}>
                 <div className={cx('notification-top')}>
                     <div className={cx('title')}>
                         <img className={cx('icon')} alt="" src={images.penIcon} />
                     </div>
-                    <div className={cx('send')}>
+                    <div onClick={handleSubmitAddScheduleActivity} className={cx('send')}>
                         Send
                         <img className={cx('icon', 'icon-small')} alt="" src={images.sendIcon} />
                     </div>
                     {addNewSuccess === 'success' && (
                         <div className={cx('success')}>
                             <img className={cx('icon', 'icon-small')} alt="" src={images.editIcon} />
-                            <span>Edit campaign success</span>
+                            <span>Add new activity success</span>
                         </div>
                     )}
                     {addNewSuccess === 'error' && (
                         <div className={cx('error')}>
                             <img className={cx('icon', 'icon-small')} alt="" src={images.spinnerIcon} />
-                            <span>Edit campaign error</span>
+                            <span>Add new activity error</span>
                         </div>
                     )}
                     <button
@@ -738,6 +893,7 @@ function CampaignDetail() {
                                                     <div
                                                         onClick={() => {
                                                             setTypeActity(null);
+                                                            setListSuggestActivity([]);
                                                         }}
                                                         className={cx('popper-item')}
                                                     >
@@ -755,7 +911,7 @@ function CampaignDetail() {
                             <div className={cx('form-row')}>
                                 <div className={cx('form-group')}>
                                     <div className={cx('form-label')}>
-                                        <label htmlFor="name">Title Actitvity*</label>
+                                        <label htmlFor="nameA">Title Actitvity*</label>
                                     </div>
                                     <div className={cx('form-control', 'no-border', 'form-activity-name')}>
                                         <input
@@ -765,7 +921,7 @@ function CampaignDetail() {
                                                     : cx('form-input', 'special')
                                             }
                                             type="text"
-                                            id="name"
+                                            id="nameA"
                                             placeholder="Untitled"
                                             value={nameActivity}
                                             onChange={(e) => setNameActivity(e.target.value)}
@@ -807,7 +963,12 @@ function CampaignDetail() {
                                         <label htmlFor="name">Description</label>
                                     </div>
                                     <div className={cx('form-control', 'no-border', 'form-activity-name')}>
-                                        <Editor headerTemplate={header} style={{ height: '220px' }} />
+                                        <Editor
+                                            value={newDescriptionActivity}
+                                            onTextChange={(e) => setNewDescriptionActivity(e.delta.htmlValue)}
+                                            headerTemplate={header}
+                                            style={{ height: '220px' }}
+                                        />
                                     </div>
                                 </div>
                             </div>
