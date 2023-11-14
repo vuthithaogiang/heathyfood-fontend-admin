@@ -38,6 +38,18 @@ function CampaignDetail() {
     let params = useParams();
     const axios = useAxios();
 
+    const renderHeader = () => {
+        return (
+            <span className="ql-formats">
+                <button className="ql-bold" aria-label="Bold"></button>
+                <button className="ql-italic" aria-label="Italic"></button>
+                <button className="ql-underline" aria-label="Underline"></button>
+            </span>
+        );
+    };
+
+    const header = renderHeader();
+
     const [campaignInfo, setCampaignInfo] = useState(null);
     const [schedules, setSchedules] = useState(null);
     const [itemNavActive, setItemNavActive] = useState(NAVBAR[0]);
@@ -83,17 +95,8 @@ function CampaignDetail() {
     useOnClickOutside(refTypeOfActivitydit, hiddenTypeOfActivityEdit);
 
     // Delete
-    const renderHeader = () => {
-        return (
-            <span className="ql-formats">
-                <button className="ql-bold" aria-label="Bold"></button>
-                <button className="ql-italic" aria-label="Italic"></button>
-                <button className="ql-underline" aria-label="Underline"></button>
-            </span>
-        );
-    };
-
-    const header = renderHeader();
+    const [activityDelete, setActivityDelete] = useState(null);
+    const [scheduleBelongToActivityToDelete, setScheduleBelongToActivityToDelete] = useState(null);
 
     const toggleShowTypesActivity = () => {
         setshowTypesActivity(!showTypesActivity);
@@ -229,7 +232,7 @@ function CampaignDetail() {
         }
 
         initJsToggle();
-    }, [campaignInfo, scheduleEdit]);
+    }, [campaignInfo, activityEdit, activityDelete]);
 
     const fetchActivityByType = async (campaignId, id) => {
         if (!campaignId || !id) {
@@ -261,7 +264,7 @@ function CampaignDetail() {
         e.prevenDefault();
     };
 
-    const handlePrepareSatementForEditSchedule = (act, schedule) => {
+    const handlePrepareSatementForEditActivity = (act, schedule) => {
         console.log(act);
         console.log(schedule);
 
@@ -280,6 +283,15 @@ function CampaignDetail() {
         } else {
             setDescriptionActivityEdit('');
         }
+    };
+
+    const handlePrepareStatementForDeleteActivity = (act, schedule) => {
+        if (!act || !schedule) {
+            return;
+        }
+
+        setActivityDelete(act);
+        setScheduleBelongToActivityToDelete(schedule);
     };
 
     return (
@@ -417,7 +429,7 @@ function CampaignDetail() {
                                                                                         )}
                                                                                         toggle-target="#popper-edit-activity"
                                                                                         onClick={() =>
-                                                                                            handlePrepareSatementForEditSchedule(
+                                                                                            handlePrepareSatementForEditActivity(
                                                                                                 act,
                                                                                                 item,
                                                                                             )
@@ -432,7 +444,19 @@ function CampaignDetail() {
                                                                                             src={images.editIcon}
                                                                                         />
                                                                                     </button>
-                                                                                    <button className={cx('remove')}>
+                                                                                    <button
+                                                                                        className={cx(
+                                                                                            'remove',
+                                                                                            'js-toggle',
+                                                                                        )}
+                                                                                        toggle-target="#popper-activity-delete"
+                                                                                        onClick={() =>
+                                                                                            handlePrepareStatementForDeleteActivity(
+                                                                                                act,
+                                                                                                item,
+                                                                                            )
+                                                                                        }
+                                                                                    >
                                                                                         <img
                                                                                             className={cx('icon')}
                                                                                             alt=""
@@ -1009,7 +1033,32 @@ function CampaignDetail() {
                 )}
             </div>
             <div className={cx('popper-overlay-schedule', 'js-toggle')} toggle-target="#popper-edit-activity"></div>
+            {/* End */}
 
+            {/* Delete Activity */}
+            <div id="popper-activity-delete" className={cx('popper-notification-delete', 'hide')}>
+                {activityDelete !== null ? (
+                    <>
+                        <div className={cx('wrap-content')}>
+                            <p>Would you like to remove this Activity? </p>
+                            <p className={cx('name')}>{activityDelete.name}</p>
+                            <div className={cx('message', 'success')}></div>
+                            <div className={cx('message', 'error')}></div>
+
+                            <div className={cx('btn')}>
+                                <button>Remove</button>
+                            </div>
+                            <button className={cx('btn', 'js-toggle')} toggle-target="#popper-activity-delete">
+                                Don't Remove
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <></>
+                )}
+            </div>
+
+            <div className={cx('popper-overlay-delete', 'js-toggle')} toggle-target="#popper-activity-delete"></div>
             {/* End */}
         </>
     );
