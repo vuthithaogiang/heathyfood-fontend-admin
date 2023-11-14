@@ -67,6 +67,13 @@ const images = {
     spinnerIcon: require('~/assets/images/spinner-icon.svg').default,
     closeIcon: require('~/assets/images/close-icon.svg').default,
     tableIcon: require('~/assets/images/table-icon.svg').default,
+    multiUser: require('~/assets/images/multi-user.svg').default,
+    processIcon: require('~/assets/images/process-icon.svg').default,
+    layoutIcon: require('~/assets/images/layout-icon.svg').default,
+    groupIcon: require('~/assets/images/group-icon.svg').default,
+    listElementIcon: require('~/assets/images/list-element-icon.svg').default,
+    lockIocn1: require('~/assets/images/lock-icon-1.svg').default,
+    noDataSource: require('~/assets/images/no-data-source.svg').default,
 };
 
 export default images;

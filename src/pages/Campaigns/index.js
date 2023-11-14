@@ -17,6 +17,7 @@ const cx = classNames.bind(styles);
 const BASE_URL_IMAGE = 'http://127.0.0.1:8000/uploads/';
 function Campaigns() {
     const axios = useAxios();
+
     const navigate = useNavigate();
     const NAVBAR = [
         {
@@ -848,7 +849,10 @@ function Campaigns() {
                                                         <span>no act</span>
                                                     )}
                                                 </p>
-                                                <div className={cx('go-schedule')}>
+                                                <div
+                                                    onClick={() => navigate(`/admin/campaign-details/${item.slug}`)}
+                                                    className={cx('go-schedule')}
+                                                >
                                                     Go details
                                                     <img
                                                         className={cx('icon', 'icon-small')}
@@ -868,7 +872,10 @@ function Campaigns() {
                                                         {formatDateFromBackend(item.end_date)}
                                                     </span>
                                                 </p>
-                                                <div className={cx('go-schedule')}>
+                                                <div
+                                                    onClick={() => navigate(`/admin/campaign-details/${item.slug}`)}
+                                                    className={cx('go-schedule')}
+                                                >
                                                     Go details
                                                     <img
                                                         className={cx('icon', 'icon-small')}

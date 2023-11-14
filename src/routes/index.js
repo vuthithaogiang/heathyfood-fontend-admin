@@ -6,6 +6,7 @@ import Customers from '~/pages/Customers';
 import TypesOfCampaign from '~/pages/TypesOfCampaign';
 import Campaigns from '~/pages/Campaigns';
 import AddNewCampaign from '~/pages/AddNewCampaign';
+import CampaignDetail from '~/pages/CampaignDetail';
 
 const privateRoutes = [
     { path: '/', component: Home },
@@ -29,6 +30,10 @@ const privateRoutes = [
     {
         path: '/admin/add-new-campaign',
         component: AddNewCampaign,
+    },
+    {
+        path: '/admin/campaign-details/:campaignSlug',
+        component: CampaignDetail,
     },
 ];
 

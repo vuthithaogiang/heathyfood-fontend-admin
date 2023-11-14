@@ -294,52 +294,22 @@
 
 .form-wrap-select {
     position: relative;
-    .main {
-        min-width: 72px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        justify-content: space-between;
-        font-family: 'Inter', sans-serif;
-        font-size: 1.4rem;
-        border: 1px solid #d0d7de;
-        padding-right: 11px;
-        cursor: pointer;
-        border-radius: 6px;
-
-        span {
-            margin-left: 11px;
-        }
-
-        img {
-            width: 13px;
-            transition: rotate 0.5s;
-        }
-
-        img.icon-rotate {
-            rotate: 180deg;
-        }
-    }
-    .channel-value {
-        color: #6059e7;
-    }
 
     .wrap-list {
         width: 100%;
         position: absolute;
-        top: 44px;
+        top: 36px;
         left: 0;
         z-index: 1;
-        background-color: var(--primary-color);
+        background-color: #fff;
         border-radius: 6px;
-        box-shadow: 0px 40px 90px #9b9ba833;
+        box-shadow: 0 3px 5px #9d929280;
 
         opacity: 1;
         visibility: visible;
 
-        transition: opacity, visibility, position;
-        transition-duration: 0.3s;
+        transition: opacity, visibility;
+        transition-duration: 0.5s;
 
         .popper-list {
             width: 100%;
@@ -347,42 +317,37 @@
             font-family: 'Inter', sans-serif;
         }
 
+        .popper-list.calendar {
+            padding: 0;
+        }
+
         .popper-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
             width: 100%;
             border-radius: 6px;
             transition: background-color 0.3s;
             cursor: pointer;
 
-            padding-left: 16px;
-
             &:hover {
-                background-color: #3b3838;
+                background-color: #f1f1f1;
 
                 span {
-                    color: #c4c1ff;
-                }
-
-                img {
-                    filter: brightness(0) saturate(100%) invert(89%) sepia(18%) saturate(5503%) hue-rotate(191deg)
-                        brightness(104%) contrast(102%);
+                    color: #17171a;
                 }
             }
 
             span {
-                display: block;
-                padding: 11px 11px;
+                //   display: block;
+                padding: 0 6px;
                 min-width: 96px;
                 font-size: 1.4rem;
                 font-weight: 500;
-                color: #fff;
-            }
-            img {
-                width: 15px;
-                filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(214deg)
-                    brightness(103%) contrast(102%);
+                color: #7d7c85;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                word-break: break-all;
+                line-height: 28px;
             }
 
             + .popper-item {
@@ -390,10 +355,12 @@
             }
         }
         .popper-item.active {
-            background-color: #626466;
+            background-color: #e6ebf1;
+            span {
+                color: #17171a;
+            }
         }
     }
-
     .wrap-list.calendar {
         position: absolute;
         top: initial;
@@ -407,6 +374,41 @@
     .wrap-list.none {
         opacity: 0;
         visibility: hidden;
+    }
+    .main {
+        min-width: 72px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: space-between;
+        font-family: 'Inter', sans-serif;
+        font-size: 1.4rem;
+        border: 1px solid #d0d7de;
+        padding: 6px 6px;
+        cursor: pointer;
+        border-radius: 6px;
+
+        img {
+            width: 13px;
+            transition: rotate 0.4s;
+        }
+
+        img.icon-rotate {
+            rotate: 180deg;
+        }
+
+        span {
+            color: #0969da;
+            background-color: #eeeef4;
+            font-size: 1.3rem;
+            padding: 3px 6px;
+            border-radius: 2px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-all;
+        }
     }
 }
 

@@ -185,7 +185,7 @@ function AddNewCampaign() {
             setDateActivityValid(true);
         } else {
             setDateActivityValid(false);
-        }
+        } // eslint-disable-next-line
     }, [startDateActivity, endDateActivity]);
 
     const toggleShowTypesActivity = () => {
