@@ -62,6 +62,27 @@ function CampaignDetail() {
     const [showSuggestActivities, setShowSugestActivities] = useState(false);
     const [nameActivity, setNameActivity] = useState('');
 
+    // Edit
+    const [scheduleEdit, setScheduleEdit] = useState(null);
+    const [activityEdit, setActivityEdit] = useState(null);
+    const [nameActivityEdit, setNameActivityEdit] = useState(null);
+    const [typeActivityEdit, setTypeActivityEdit] = useState(null);
+    const [descriptionActivityEdit, setDescriptionActivityEdit] = useState(null);
+
+    const refTypeOfActivitydit = useRef();
+    const [showTypeOfActivittyEdit, setShowTypeOfActivityEdit] = useState(false);
+
+    const toggleTypeOfActivityEdit = () => {
+        setShowTypeOfActivityEdit(!showTypeOfActivittyEdit);
+    };
+
+    const hiddenTypeOfActivityEdit = () => {
+        setShowTypeOfActivityEdit(false);
+    };
+
+    useOnClickOutside(refTypeOfActivitydit, hiddenTypeOfActivityEdit);
+
+    // Delete
     const renderHeader = () => {
         return (
             <span className="ql-formats">
@@ -208,7 +229,7 @@ function CampaignDetail() {
         }
 
         initJsToggle();
-    }, [campaignInfo]);
+    }, [campaignInfo, scheduleEdit]);
 
     const fetchActivityByType = async (campaignId, id) => {
         if (!campaignId || !id) {
@@ -238,6 +259,27 @@ function CampaignDetail() {
 
     const handleSubmitFormSearch = async (e) => {
         e.prevenDefault();
+    };
+
+    const handlePrepareSatementForEditSchedule = (act, schedule) => {
+        console.log(act);
+        console.log(schedule);
+
+        if (!act || !schedule) {
+            return;
+        }
+
+        setScheduleEdit(schedule);
+        setActivityEdit(act);
+
+        setNameActivityEdit(act.name);
+        setTypeActivityEdit(act.type_of_activity_id);
+
+        if (act.description !== null) {
+            setDescriptionActivityEdit(act.description);
+        } else {
+            setDescriptionActivityEdit('');
+        }
     };
 
     return (
@@ -347,27 +389,40 @@ function CampaignDetail() {
                                                                 </div>
                                                                 <div className={cx('multi-activity')}>
                                                                     {item.activities.length > 0 ? (
-                                                                        item.activities.map((item, index) => (
+                                                                        item.activities.map((act, index) => (
                                                                             <div
                                                                                 key={index}
                                                                                 className={cx('activity-item')}
                                                                             >
                                                                                 <div>
-                                                                                    <p>{item.name}</p>
+                                                                                    <p>{act.name}</p>
                                                                                     <p>
                                                                                         Belong to:{' '}
                                                                                         <span>
-                                                                                            {item.type_of_activity_id ===
+                                                                                            {act.type_of_activity_id ===
                                                                                             3
                                                                                                 ? 'System-genereated content'
                                                                                                 : 'User-generated Content'}
                                                                                         </span>
                                                                                     </p>
                                                                                 </div>
+                                                                                {/* Edit  / Delete */}
                                                                                 <div
                                                                                     className={cx('group-action-btns')}
                                                                                 >
-                                                                                    <button className={cx('edit')}>
+                                                                                    <button
+                                                                                        className={cx(
+                                                                                            'edit',
+                                                                                            'js-toggle',
+                                                                                        )}
+                                                                                        toggle-target="#popper-edit-activity"
+                                                                                        onClick={() =>
+                                                                                            handlePrepareSatementForEditSchedule(
+                                                                                                act,
+                                                                                                item,
+                                                                                            )
+                                                                                        }
+                                                                                    >
                                                                                         <img
                                                                                             className={cx(
                                                                                                 'icon',
@@ -738,6 +793,223 @@ function CampaignDetail() {
             </div>
 
             <div className={cx('popper-overlay-edit', 'js-toggle')} toggle-target="#add-new-schedule"></div>
+            {/* End */}
+
+            {/* Edit Schedule */}
+            <div id="popper-edit-activity" className={cx('popper-edit-schedule', 'hide')}>
+                <div className={cx('notification-top')}>
+                    <div className={cx('title')}>
+                        <img className={cx('icon')} alt="" src={images.penIcon} />
+                    </div>
+                    <div className={cx('send')}>
+                        Send
+                        <img className={cx('icon', 'icon-small')} alt="" src={images.sendIcon} />
+                    </div>
+
+                    <button className={cx('close-btn', 'js-toggle')} toggle-target="#popper-edit-activity">
+                        <img className={cx('icon')} alt="" src={images.xIcon} />
+                    </button>
+                </div>
+
+                {scheduleEdit !== null ? (
+                    <>
+                        <div className={cx('content')}>
+                            <div className={cx('head-content')}>
+                                <div className={cx('name')}>
+                                    <div className={cx('form-edit')}>
+                                        <input
+                                            type="text"
+                                            value={campaignInfo !== null && campaignInfo.name}
+                                            placeholder="Name's Campaign"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={cx('form-row')}>
+                                <div className={cx('form-label', 'label-schedule')}>
+                                    <div className={cx('label')}>Schedule:</div>
+                                </div>
+                            </div>
+                            <div className={cx('separate')}>
+                                <span className={cx('first')}></span>
+                                <span className={cx('')}></span>
+                                <span className={cx('')}></span>
+                                <span className={cx('small')}></span>
+                            </div>
+
+                            {/* New Schedule */}
+                            <div className={cx('form-row')}>
+                                <div className={cx('form-group')}>
+                                    <div className={cx('form-label')}>
+                                        <label>From:</label>
+                                    </div>
+                                    <div className={cx('form-wrap-select')}>
+                                        <div onClick={toggleShowCalendarNewStartDate} className={cx('main')}>
+                                            <span>{formatDateFromBackend(scheduleEdit.start_date)}</span>
+                                            <img className={cx('icon')} alt="" src={images.dateIcon} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className={cx('form-group')}>
+                                    <div className={cx('form-label')}>
+                                        <label>To:</label>
+                                    </div>
+                                    <div className={cx('form-wrap-select')}>
+                                        <div onClick={toggleShowCalendarNewEndDate} className={cx('main')}>
+                                            <span className={cx('date-value')}>
+                                                {formatDateFromBackend(scheduleEdit.end_date)}
+                                            </span>
+                                            <img className={cx('icon')} alt="" src={images.dateIcon} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Type Activity */}
+                            <div className={cx('form-row')}>
+                                <div className={cx('form-group')}>
+                                    <div className={cx('form-label')}>
+                                        <label>Type of Activity*</label>
+                                    </div>
+                                    <div ref={refTypeOfActivitydit} className={cx('filter-form-group')}>
+                                        <div onClick={toggleTypeOfActivityEdit} className={cx('filter-select-wrap')}>
+                                            <div className={cx('wrap-select')}>
+                                                <span className={cx('value')}>
+                                                    {typeActivityEdit === null && 'Choose tyoe of activity'}
+                                                    {typeActivityEdit === 1 && 'User-generated Content'}
+                                                    {typeActivityEdit === 3 && 'System-generated Content'}
+                                                </span>
+
+                                                <span className={cx('group-btn')}>
+                                                    <span>
+                                                        <img className={cx('icon')} alt="" src={images.addIcon} />
+                                                    </span>
+                                                    <span>
+                                                        {' '}
+                                                        <img className={cx('icon')} alt="" src={images.arrowDownIcon} />
+                                                    </span>
+                                                </span>
+                                            </div>
+
+                                            <div
+                                                className={
+                                                    showTypeOfActivittyEdit === true
+                                                        ? cx('category-list')
+                                                        : cx('category-list', 'none')
+                                                }
+                                            >
+                                                <img className={cx('arrow-up')} alt="" src={images.arrowUp} />
+                                                <div className={cx('popper-list')}>
+                                                    <div
+                                                        onClick={() => {
+                                                            setTypeActivityEdit(1);
+                                                        }}
+                                                        className={
+                                                            typeActivityEdit === 1
+                                                                ? cx('popper-item', 'active')
+                                                                : cx('popper-item')
+                                                        }
+                                                    >
+                                                        <img className={cx('icon')} alt="" src={images.pushIcon} />
+                                                        <span>User-generated Content</span>
+                                                    </div>
+                                                    <div
+                                                        onClick={() => {
+                                                            setTypeActivityEdit(3);
+                                                        }}
+                                                        className={
+                                                            typeActivityEdit === 3
+                                                                ? cx('popper-item', 'active')
+                                                                : cx('popper-item')
+                                                        }
+                                                    >
+                                                        <img className={cx('icon')} alt="" src={images.pushIcon} />
+                                                        <span>System-generated Content</span>
+                                                    </div>
+                                                    <div onClick={() => {}} className={cx('popper-item')}>
+                                                        <img className={cx('icon')} alt="" src={images.pushIcon} />
+                                                        <span>Other</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Name Activity  */}
+                            <div className={cx('form-row')}>
+                                <div className={cx('form-group')}>
+                                    <div className={cx('form-label')}>
+                                        <label htmlFor="name">Title Actitvity*</label>
+                                    </div>
+                                    <div className={cx('form-control', 'no-border', 'form-activity-name')}>
+                                        <input
+                                            className={
+                                                showSuggestActivities === true
+                                                    ? cx('form-input', 'special', 'active')
+                                                    : cx('form-input', 'special')
+                                            }
+                                            type="text"
+                                            id="name"
+                                            placeholder="Untitled"
+                                            value={nameActivityEdit}
+                                            onChange={(e) => setNameActivityEdit(e.target.value)}
+                                            onFocus={() => setShowSugestActivities(true)}
+                                            onDoubleClick={() => setShowSugestActivities(false)}
+                                            onBlur={() => setShowSugestActivities(false)}
+                                        />
+                                        <div
+                                            className={
+                                                showSuggestActivities === true && listSuggestActivity.length > 0
+                                                    ? cx('suggest-open')
+                                                    : cx('suggest-open', 'none')
+                                            }
+                                        >
+                                            {listSuggestActivity.length > 0 &&
+                                                listSuggestActivity.map((item) => (
+                                                    <div
+                                                        onClick={() => setNameActivity(item.name)}
+                                                        className={cx('item')}
+                                                    >
+                                                        <span>{item.name}</span>
+                                                        <img
+                                                            className={cx('icon', 'suggest-icon')}
+                                                            alt=""
+                                                            src={images.suggestIcon}
+                                                        />
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Description Activity  */}
+
+                            <div className={cx('form-row')}>
+                                <div className={cx('form-group')}>
+                                    <div className={cx('form-label')}>
+                                        <label htmlFor="name">Description</label>
+                                    </div>
+                                    <div className={cx('form-control', 'no-border', 'form-activity-name')}>
+                                        <Editor
+                                            value={descriptionActivityEdit}
+                                            onTextChange={(e) => setDescriptionActivityEdit(e.htmlValue)}
+                                            headerTemplate={header}
+                                            style={{ height: '220px' }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <></>
+                )}
+            </div>
+            <div className={cx('popper-overlay-schedule', 'js-toggle')} toggle-target="#popper-edit-activity"></div>
+
             {/* End */}
         </>
     );
