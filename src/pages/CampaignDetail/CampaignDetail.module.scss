@@ -383,6 +383,10 @@ span.large {
         // transform: translateX(50%);
     }
 
+    .wrap-list.not-border {
+        border: none;
+    }
+
     .wrap-list.sticky-top-left {
         width: 300px;
         //  top: 0;
@@ -433,6 +437,10 @@ span.large {
             overflow: hidden;
             word-break: break-all;
         }
+    }
+
+    .main.not-border {
+        border: none;
     }
 }
 
@@ -554,13 +562,43 @@ span.large {
         .activities {
             margin-bottom: 20px;
             flex: 1;
+
+            position: relative;
+
+            .row-schedule-edit {
+                visibility: hidden;
+                opacity: 0;
+                z-index: 2;
+                transition: visibility, opacity, height;
+                transition-duration: 0.4s;
+
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 560px;
+
+                .main {
+                    background-color: #fff;
+
+                    span {
+                        background-color: transparent;
+                    }
+                }
+            }
+
+            .row-schedule-edit[class$='show'] {
+                visibility: visible;
+                opacity: 1;
+                margin-bottom: 12px;
+            }
         }
 
         .schedule {
             margin-bottom: 24px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 12px;
+            // justify-content: space-between;
 
             span {
                 font-family: 'Inter', sans-serif;
@@ -602,23 +640,22 @@ span.large {
 
             .push-btn {
                 cursor: pointer;
-                padding: 0 12px;
-                color: #fff;
-                font-family: 'Inter', sans-serif;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 6px;
-                height: 24px;
-                background-color: var(--primary-color);
+                height: 28px;
+                width: 28px;
                 border-radius: 4px;
-                position: relative;
+                // background-color: #e7e7e0;
+
+                transition: background-color 0.3s;
+
+                &:hover {
+                    background-color: #e7e7e7;
+                }
 
                 img {
                     width: 14px;
-                    object-fit: contain;
-                    filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(351deg)
-                        brightness(103%) contrast(104%);
                 }
             }
 
@@ -628,6 +665,7 @@ span.large {
         }
 
         .multi-activity {
+            //   margin-top: 12px;
             border-top: 1px solid #d8dee4;
             border-left: 1px solid #d8dee4;
             border-right: 1px solid #d8dee4;
@@ -905,7 +943,8 @@ span.large {
 }
 
 .popper-notofication-edit,
-.popper-edit-schedule {
+.popper-edit-schedule,
+.popper-edit-timetable {
     translate: 100%;
     position: fixed;
     z-index: 91;
@@ -923,7 +962,8 @@ span.large {
 }
 
 .popper-overlay-edit,
-.popper-overlay-schedule {
+.popper-overlay-schedule,
+.popper-overlay-timetable {
     visibility: hidden;
     opacity: 0;
     position: fixed;
@@ -949,8 +989,18 @@ span.large {
     opacity: 1;
 }
 
+.popper-edit-timetable[class$='show'] {
+    translate: 0;
+}
+
+.popper-edit-timetable[class$='show'] ~ .popper-overlay-timetable {
+    visibility: visible;
+    opacity: 1;
+}
+
 .popper-notofication-edit,
-.popper-edit-schedule {
+.popper-edit-schedule,
+.popper-edit-timetable {
     font-family: 'Inter', sans-serif;
     .content {
         padding: 16px;
