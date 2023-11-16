@@ -838,7 +838,7 @@ span.large {
     .success {
         position: absolute;
         top: 18px;
-        left: 16px;
+        right: 16px;
         height: 34px;
         display: flex;
         align-items: center;
@@ -881,7 +881,7 @@ span.large {
     .error {
         position: absolute;
         top: 18px;
-        left: 16px;
+        right: 16px;
         height: 34px;
         display: flex;
         align-items: center;
@@ -1488,3 +1488,21 @@ img.deco-icon {
 }
 
 //END
+
+@keyframes spinner {
+    from {
+        rotate: 0;
+    }
+    to {
+        rotate: 180deg;
+    }
+}
+
+@keyframes run {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
+}

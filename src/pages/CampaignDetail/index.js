@@ -55,8 +55,6 @@ function CampaignDetail() {
     const [itemNavActive, setItemNavActive] = useState(NAVBAR[0]);
     const [loading, setLoading] = useState(false);
 
-    const [addNewSuccess, setAddNewSccess] = useState(null);
-
     const [listSuggestActivity, setListSuggestActivity] = useState([]);
 
     const refCalendarNewStartDate = useRef();
@@ -74,6 +72,9 @@ function CampaignDetail() {
     const [nameActivity, setNameActivity] = useState('');
     const [typeActitvity, setTypeActity] = useState(null);
     const [newDescriptionActivity, setNewDescriptionActivity] = useState('');
+
+    const [addNewSuccess, setAddNewSccess] = useState(null);
+    const [messageErrorAddNew, setMessageErrorAddNew] = useState(null);
 
     // Edit Activity
     const [scheduleEdit, setScheduleEdit] = useState(null);
@@ -195,6 +196,8 @@ function CampaignDetail() {
 
             if (response.data.data) {
                 setCampaignInfo(response.data.data);
+
+                fetSchedule(response.data.data.id);
             }
 
             setLoading(false);
@@ -204,14 +207,14 @@ function CampaignDetail() {
         }
     };
 
-    const fetSchedule = async () => {
-        if (campaignInfo === null) {
+    const fetSchedule = async (id) => {
+        if (id === null) {
             return;
         }
 
         setLoading(true);
         try {
-            const response = await axios.get(`api/campaign/get-schedule-activity/${campaignInfo.id}`, {
+            const response = await axios.get(`api/campaign/get-schedule-activity/${id}`, {
                 withCredentials: true,
             });
 
@@ -232,9 +235,9 @@ function CampaignDetail() {
         fetInfoCampaign(); // eslint-disable-next-line
     }, [params.campaignSlug]);
 
-    useEffect(() => {
-        fetSchedule(); // eslint-disable-next-line
-    }, [campaignInfo]);
+    //  useEffect(() => {
+    //      fetSchedule(campaignInfo.id); // eslint-disable-next-line
+    //  }, [campaignInfo]);
 
     useEffect(() => {
         const $ = document.querySelector.bind(document);
@@ -335,12 +338,121 @@ function CampaignDetail() {
         setScheduleEditTimetable(schedule);
     };
 
+    // ADD NEW SCHEDULE - ACTIVITY
     const handleSubmitAddScheduleActivity = async () => {
+        if (campaignInfo == null) {
+            return;
+        }
+
         console.log('Start date: ', newStartDate);
         console.log('End date: ', newEndDate);
         console.log('Type activity: ', typeActitvity);
         console.log('Name act: ', nameActivity);
         console.log('Description: ', newDescriptionActivity);
+
+        if (newStartDate === null || newEndDate === null || typeActitvity === null || nameActivity.trim() === '') {
+            return;
+        }
+
+        let activityObject = {};
+        let typeOfActivityId;
+
+        if (typeActitvity === 'User-generated Content') {
+            typeOfActivityId = 1;
+        } else if (typeActitvity === 'System-generated Content') {
+            typeOfActivityId = 3;
+        }
+
+        if (newDescriptionActivity !== '') {
+            activityObject = {
+                name: nameActivity,
+                typeOfActivityId: typeOfActivityId,
+                description: newDescriptionActivity,
+            };
+        } else {
+            activityObject = {
+                name: nameActivity,
+                typeOfActivityId: typeOfActivityId,
+            };
+        }
+
+        // console.log(activityObject);
+
+        const multiActivity = [];
+        multiActivity[0] = activityObject;
+
+        console.log(multiActivity);
+        console.log('send');
+
+        setLoading(true);
+
+        // Check Name is existed?
+        try {
+            const response = await axios.post(
+                `/api/campaign/store-activity-schedule/${campaignInfo.id}`,
+                {
+                    startDate: newStartDate,
+                    endDate: newEndDate,
+                    multiActivity: multiActivity,
+                },
+                {
+                    withCredentials: true,
+                },
+            );
+
+            fetSchedule(campaignInfo.id);
+            setAddNewSccess('success');
+            setMessageErrorAddNew(null);
+            setNameActivity('');
+            setNewDescriptionActivity('');
+            setTypeActity(null);
+
+            console.log(response.data);
+
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setAddNewSccess('error');
+
+            if (error.response.data.dateErrors) {
+                console.log('Date error: ', error.response.data.dateErrors);
+
+                setMessageErrorAddNew('The Date is conflict with schedule in Campaign.');
+            } else {
+                setAddNewSccess('error');
+            }
+            setLoading(false);
+        }
+    };
+
+    // EDIT DATE IN SCHEDULE
+    const handleEditTimetableInCampaign = async () => {
+        if (scheduleEditTimetable == null) {
+            return;
+        }
+
+        console.log(startDateTimetableEdit);
+        console.log(endDateTimetableEdit);
+    };
+
+    // EDIT ACTIVITY IN CAMPAIGN
+    const handleEditActivityBelongToSchedule = async () => {
+        console.log(scheduleEdit);
+        console.log(activityEdit);
+
+        if (scheduleEdit == null) {
+            return;
+        }
+
+        console.log(typeActivityEdit);
+        console.log(nameActivityEdit);
+        console.log(descriptionActivityEdit);
+    };
+
+    // DELETE ACTIVITY IN CAMOIGN
+    const handleDeleteActivitiBelongToSchedule = async () => {
+        console.log(activityDelete);
+        console.log(scheduleBelongToActivityToDelete);
     };
 
     return (
@@ -658,7 +770,15 @@ function CampaignDetail() {
                     <button
                         className={cx('close-btn', 'js-toggle')}
                         toggle-target="#add-new-schedule"
-                        onClick={() => setAddNewSccess(null)}
+                        onClick={() => {
+                            setAddNewSccess(null);
+                            setMessageErrorAddNew(null);
+                            setNewStartDate(null);
+                            setNewEndDate(null);
+                            setTypeActity(null);
+                            setNameActivity('');
+                            setNewDescriptionActivity('');
+                        }}
                     >
                         <img className={cx('icon')} alt="" src={images.xIcon} />
                     </button>
@@ -747,6 +867,10 @@ function CampaignDetail() {
                                     </div>
                                 </div>
                             </div>
+
+                            {messageErrorAddNew !== null && (
+                                <div className={cx('form-error')}>{messageErrorAddNew} </div>
+                            )}
 
                             {/* Type Activity */}
                             <div className={cx('form-row')}>
@@ -875,7 +999,6 @@ function CampaignDetail() {
                             </div>
 
                             {/* Description Activity  */}
-
                             <div className={cx('form-row')}>
                                 <div className={cx('form-group')}>
                                     <div className={cx('form-label')}>
@@ -884,7 +1007,8 @@ function CampaignDetail() {
                                     <div className={cx('form-control', 'no-border', 'form-activity-name')}>
                                         <Editor
                                             value={newDescriptionActivity}
-                                            onTextChange={(e) => setNewDescriptionActivity(e.delta.htmlValue)}
+                                            onTextChange={(e) => setNewDescriptionActivity(e.textValue)}
+                                            //  onTextChange={(e) => setNewDescriptionActivity(e.htmlValue)}
                                             headerTemplate={header}
                                             style={{ height: '220px' }}
                                         />
@@ -896,16 +1020,28 @@ function CampaignDetail() {
                 )}
             </div>
 
-            <div className={cx('popper-overlay-edit', 'js-toggle')} toggle-target="#add-new-schedule"></div>
+            <div
+                className={cx('popper-overlay-edit', 'js-toggle')}
+                toggle-target="#add-new-schedule"
+                onClick={() => {
+                    setAddNewSccess(null);
+                    setMessageErrorAddNew(null);
+                    setNewStartDate(null);
+                    setNewEndDate(null);
+                    setTypeActity(null);
+                    setNameActivity('');
+                    setNewDescriptionActivity('');
+                }}
+            ></div>
             {/* End */}
 
-            {/* Edit activity Schedule */}
+            {/* Edit activity  */}
             <div id="popper-edit-activity" className={cx('popper-edit-schedule', 'hide')}>
                 <div className={cx('notification-top')}>
                     <div className={cx('title')}>
                         <img className={cx('icon')} alt="" src={images.penIcon} />
                     </div>
-                    <div className={cx('send')}>
+                    <div onClick={handleEditActivityBelongToSchedule} className={cx('send')}>
                         Send
                         <img className={cx('icon', 'icon-small')} alt="" src={images.sendIcon} />
                     </div>
@@ -941,7 +1077,7 @@ function CampaignDetail() {
                                 <span className={cx('small')}></span>
                             </div>
 
-                            {/* New Schedule */}
+                            {/* Schedule */}
                             <div className={cx('form-row')}>
                                 <div className={cx('form-group')}>
                                     <div className={cx('form-label')}>
@@ -1121,7 +1257,7 @@ function CampaignDetail() {
                     <div className={cx('title')}>
                         <img className={cx('icon')} alt="" src={images.penIcon} />
                     </div>
-                    <div className={cx('send')}>
+                    <div onClick={handleEditTimetableInCampaign} className={cx('send')}>
                         Send
                         <img className={cx('icon', 'icon-small')} alt="" src={images.sendIcon} />
                     </div>
@@ -1231,7 +1367,7 @@ function CampaignDetail() {
                             <div className={cx('message', 'success')}></div>
                             <div className={cx('message', 'error')}></div>
 
-                            <div className={cx('btn')}>
+                            <div onClick={handleDeleteActivitiBelongToSchedule} className={cx('btn')}>
                                 <button>Remove</button>
                             </div>
                             <button className={cx('btn', 'js-toggle')} toggle-target="#popper-activity-delete">
