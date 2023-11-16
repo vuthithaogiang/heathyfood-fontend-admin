@@ -8,6 +8,7 @@ import { InfinitySpin } from 'react-loader-spinner';
 import CalendarComponent from '~/components/CalendarComponent';
 import useOnClickOutside from '~/hooks/useOnclickOutside';
 import { Editor } from 'primereact/editor';
+import { format } from 'date-fns';
 
 const cx = classNames.bind(styles);
 
@@ -112,6 +113,9 @@ function CampaignDetail() {
 
     const [startDateTimetableEdit, setStartDateTimetableEdit] = useState(null);
     const [endDateTimetableEdit, setEndDateTimetableEdit] = useState(null);
+
+    const [editTimetableSuccess, setEditTimetableSuccess] = useState(null);
+    const [messageErrorEditTimetable, setMessageErrorEditTimetable] = useState(null);
 
     const toggleShowCalendarStartDateEditTimetable = () => {
         setShowCalendarStartDateEditTimetable(!showCalendarStartDateEditTimetable);
@@ -342,6 +346,8 @@ function CampaignDetail() {
         }
 
         setScheduleEditTimetable(schedule);
+        setStartDateTimetableEdit(format(new Date(schedule.start_date), 'dd-MM-yyyy'));
+        setEndDateTimetableEdit(format(new Date(schedule.end_date), 'dd-MM-yyyy'));
     };
 
     // ADD NEW SCHEDULE - ACTIVITY
@@ -530,6 +536,35 @@ function CampaignDetail() {
 
         console.log(startDateTimetableEdit);
         console.log(endDateTimetableEdit);
+
+        setLoading(true);
+
+        try {
+            const response = await axios.post(
+                `/api/campaign/update-schedule/${campaignInfo.id}`,
+                {
+                    scheduleCampaignId: scheduleEditTimetable.id,
+                    startDate: startDateTimetableEdit,
+                    endDate: endDateTimetableEdit,
+                },
+                {
+                    withCredentials: true,
+                },
+            );
+
+            console.log(response.data);
+            setEditTimetableSuccess('success');
+            setMessageErrorEditTimetable(null);
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setEditTimetableSuccess('error');
+
+            if (error.response.data.message) {
+                setMessageErrorEditTimetable(error.response.data.message);
+            }
+            setLoading(false);
+        }
     };
 
     // DELETE ACTIVITY IN CAMOIGN
@@ -1481,7 +1516,27 @@ function CampaignDetail() {
                         <img className={cx('icon', 'icon-small')} alt="" src={images.sendIcon} />
                     </div>
 
-                    <button className={cx('close-btn', 'js-toggle')} toggle-target="#edit-timetable-schedule">
+                    {editTimetableSuccess === 'success' && (
+                        <div className={cx('success')}>
+                            <img className={cx('icon', 'icon-small')} alt="" src={images.editIcon} />
+                            <span data-text="Edit Schedule success">Edit Schedule success</span>
+                        </div>
+                    )}
+                    {editTimetableSuccess === 'error' && (
+                        <div className={cx('error')}>
+                            <img className={cx('icon', 'icon-small')} alt="" src={images.spinnerIcon} />
+                            <span data-text="Edit Schedule error">Edit Schedule error</span>
+                        </div>
+                    )}
+
+                    <button
+                        className={cx('close-btn', 'js-toggle')}
+                        toggle-target="#edit-timetable-schedule"
+                        onClick={() => {
+                            setEditTimetableSuccess(null);
+                            setMessageErrorEditTimetable(null);
+                        }}
+                    >
                         <img className={cx('icon')} alt="" src={images.xIcon} />
                     </button>
                 </div>
@@ -1500,6 +1555,7 @@ function CampaignDetail() {
                                     </div>
                                 </div>
                             </div>
+
                             <div className={cx('form-row')}>
                                 <div className={cx('form-label', 'label-schedule')}>
                                     <div className={cx('label')}>Schedule:</div>
@@ -1511,6 +1567,11 @@ function CampaignDetail() {
                                 <span className={cx('')}></span>
                                 <span className={cx('small')}></span>
                             </div>
+                            {messageErrorEditTimetable !== null && (
+                                <>
+                                    <div className={cx('form-error')}>{messageErrorEditTimetable}</div>
+                                </>
+                            )}
 
                             <div className={cx('form-row')}>
                                 <div className={cx('form-group')}>
@@ -1572,7 +1633,16 @@ function CampaignDetail() {
                     <></>
                 )}
             </div>
-            <div className={cx('popper-overlay-timetable', 'js-toggle')} toggle-target="#edit-timetable-schedule"></div>
+            <div
+                className={cx('popper-overlay-timetable', 'js-toggle')}
+                toggle-target="#edit-timetable-schedule"
+                onClick={() => {
+                    setEditTimetableSuccess(null);
+                    setMessageErrorEditTimetable(null);
+                }}
+            >
+                {' '}
+            </div>
 
             {/* End */}
 
