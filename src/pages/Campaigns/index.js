@@ -1083,6 +1083,7 @@ function Campaigns() {
                     className={cx('popper-overlay', 'js-toggle')}
                     toggle-target="#popper-review-content"
                 ></div>
+                {/* End */}
 
                 {/* Edit Campaign */}
                 <div id="popper-campaign-edit" className={cx('popper-notofication-edit', 'hide')}>
@@ -1206,8 +1207,8 @@ function Campaigns() {
                                                     onClick={() => handleSwitchStatusCampaign(campaignEdit.id, 1)}
                                                     className={
                                                         fetchSwitchStatus === true && switchStatus === 1
-                                                            ? cx('status-2', 'sending')
-                                                            : cx('status-2')
+                                                            ? cx('status-1', 'sending')
+                                                            : cx('status-1')
                                                     }
                                                 >
                                                     On going
@@ -1583,6 +1584,7 @@ function Campaigns() {
                     className={cx('popper-overlay-edit', 'js-toggle')}
                     toggle-target="#popper-campaign-edit"
                 ></div>
+                {/* End */}
 
                 {/* Delete Campagin */}
                 <div id="popper-campaign-delete" className={cx('popper-notification-delete', 'hide')}>
@@ -1626,6 +1628,7 @@ function Campaigns() {
                     className={cx('popper-overlay-delete', 'js-toggle')}
                     toggle-target="#popper-campaign-delete"
                 ></div>
+                {/* End */}
             </div>
 
             {loading && (

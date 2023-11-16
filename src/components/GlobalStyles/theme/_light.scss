@@ -4,4 +4,10 @@ html {
     --text-color: #1a162e;
     --icon-color: brightness(0) saturate(100%) invert(43%) sepia(6%) saturate(799%) hue-rotate(171deg) brightness(93%)
         contrast(84%);
+
+    --status-new-bg-color: #f1f0ef;
+    --status-ongoing-bg-color: #fdecc8;
+    --status-paused-bg-color: #ffe2dd;
+    --status-complete-bg-color: #dbeddb;
+    --status-text-colof: #1a162e;
 }

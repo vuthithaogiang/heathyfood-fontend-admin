@@ -681,6 +681,12 @@ span.large {
 
             transition: background-color 0.3s;
 
+            .right-item {
+                display: flex;
+                align-items: center;
+                gap: 24px;
+            }
+
             .group-action-btns {
                 display: flex;
                 align-items: center;
@@ -697,6 +703,29 @@ span.large {
 
                 opacity: 1;
                 visibility: visible;
+            }
+
+            .status {
+                font-size: 1.3rem;
+                font-family: 'Inter', sans-serif;
+                font-weight: 500;
+                color: var(--status-text-color);
+                padding: 4px;
+                border-radius: 4px;
+            }
+            .status-0 {
+                background-color: #f1f0ef;
+            }
+
+            .status-1 {
+                background-color: #fdecc8;
+            }
+            .status-2 {
+                background-color: #ffe2dd;
+            }
+
+            .status-3 {
+                background-color: #dbeddb;
             }
 
             &:hover {
@@ -865,7 +894,7 @@ span.large {
                 top: 0;
                 left: 0;
                 color: #a782c3;
-                content: 'Add new activity success';
+                content: attr(data-text);
                 white-space: nowrap;
                 //  width: 100%;
                 overflow: hidden;
@@ -909,7 +938,7 @@ span.large {
                 top: 0;
                 left: 0;
                 color: #fc9797;
-                content: 'Add new activity error';
+                content: attr(data-text);
                 white-space: nowrap;
                 //  width: 100%;
                 overflow: hidden;
@@ -1030,6 +1059,50 @@ span.large {
                         flex: 1;
                     }
                 }
+            }
+        }
+
+        .group-btns {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                width: 120px;
+                font-size: 1.4rem;
+                padding: 8px 0;
+                cursor: pointer;
+                border-radius: 6px;
+                font-weight: 500;
+
+                img {
+                    display: none;
+                }
+            }
+
+            button.sending {
+                img {
+                    display: inline-flex;
+                }
+            }
+
+            button.status-0 {
+                background-color: #f1f0ef;
+            }
+
+            button.status-1 {
+                background-color: #fdecc8 !important;
+            }
+            button.status-2 {
+                background-color: #ffe2dd;
+            }
+
+            button.status-3 {
+                background-color: #dbeddb;
             }
         }
     }
@@ -1488,6 +1561,11 @@ img.deco-icon {
 }
 
 //END
+
+.spinner-icon {
+    margin-right: 12px;
+    animation: spinner 1s infinite;
+}
 
 @keyframes spinner {
     from {

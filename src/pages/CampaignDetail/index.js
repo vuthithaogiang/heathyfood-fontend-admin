@@ -83,8 +83,14 @@ function CampaignDetail() {
     const [typeActivityEdit, setTypeActivityEdit] = useState(null);
     const [descriptionActivityEdit, setDescriptionActivityEdit] = useState(null);
 
+    const [editActivitySuccess, setEditActivitySuccess] = useState(null);
+    const [messageErrorEditActivity, setMessageErrorEditActivity] = useState(null);
+
     const refTypeOfActivitydit = useRef();
     const [showTypeOfActivittyEdit, setShowTypeOfActivityEdit] = useState(false);
+
+    const [fetchingSendStatus, setFetchingSendStatus] = useState(false);
+    const [switchToStatus, setSwitchToStatus] = useState(null);
 
     const toggleTypeOfActivityEdit = () => {
         setShowTypeOfActivityEdit(!showTypeOfActivittyEdit);
@@ -425,6 +431,97 @@ function CampaignDetail() {
         }
     };
 
+    // EDIT ACTIVITY IN CAMPAIGN
+    const handleEditActivityBelongToSchedule = async () => {
+        //  console.log(scheduleEdit);
+        //  console.log(activityEdit);
+
+        if (scheduleEdit == null || activityEdit == null) {
+            return;
+        }
+
+        console.log(typeActivityEdit);
+        console.log(nameActivityEdit);
+        console.log(descriptionActivityEdit);
+
+        if (typeActivityEdit === null || nameActivityEdit.trim() === '') {
+            return;
+        }
+
+        if (
+            activityEdit.name === nameActivityEdit &&
+            activityEdit.type_of_activity_id === typeActivityEdit &&
+            descriptionActivityEdit.trim() === ''
+        ) {
+            setMessageErrorEditActivity('Nothing to edit.');
+            return;
+        }
+
+        console.log('send');
+
+        const formData = new FormData();
+        formData.append('activityId', activityEdit.id);
+
+        if (nameActivityEdit.trim() !== '' && nameActivityEdit !== activityEdit.name) {
+            formData.append('name', nameActivityEdit);
+        }
+
+        if (descriptionActivityEdit.trim() !== '') {
+            formData.append('description', descriptionActivityEdit);
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await axios.post(`/api/campaign/update-activity/${campaignInfo.id}`, formData, {
+                withCredentials: true,
+            });
+
+            console.log(response.data);
+            setEditActivitySuccess('success');
+            setMessageErrorEditActivity(null);
+            fetSchedule(campaignInfo.id);
+
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setEditActivitySuccess('error');
+            setMessageErrorEditActivity("The name's activity is existed in another.");
+
+            setLoading(false);
+        }
+    };
+
+    const handelSwitchStatusActivity = async (activityId, newStaus) => {
+        console.log(activityId);
+        console.log(newStaus);
+
+        setSwitchToStatus(newStaus);
+        setFetchingSendStatus(true);
+
+        try {
+            const response = await axios.post(
+                `/api/activity/update-status/${activityId}`,
+                {
+                    status: newStaus,
+                },
+                {
+                    withCredentials: true,
+                },
+            );
+
+            console.log(response.data);
+            fetSchedule(campaignInfo.id);
+
+            setSwitchToStatus(null);
+            setFetchingSendStatus(false);
+        } catch (error) {
+            console.log(error);
+            setSwitchToStatus(null);
+            setFetchingSendStatus(false);
+        }
+    };
+
     // EDIT DATE IN SCHEDULE
     const handleEditTimetableInCampaign = async () => {
         if (scheduleEditTimetable == null) {
@@ -433,20 +530,6 @@ function CampaignDetail() {
 
         console.log(startDateTimetableEdit);
         console.log(endDateTimetableEdit);
-    };
-
-    // EDIT ACTIVITY IN CAMPAIGN
-    const handleEditActivityBelongToSchedule = async () => {
-        console.log(scheduleEdit);
-        console.log(activityEdit);
-
-        if (scheduleEdit == null) {
-            return;
-        }
-
-        console.log(typeActivityEdit);
-        console.log(nameActivityEdit);
-        console.log(descriptionActivityEdit);
     };
 
     // DELETE ACTIVITY IN CAMOIGN
@@ -603,51 +686,73 @@ function CampaignDetail() {
                                                                                         </span>
                                                                                     </p>
                                                                                 </div>
-                                                                                {/* Edit  / Delete */}
-                                                                                <div
-                                                                                    className={cx('group-action-btns')}
-                                                                                >
-                                                                                    <button
-                                                                                        className={cx(
-                                                                                            'edit',
-                                                                                            'js-toggle',
-                                                                                        )}
-                                                                                        toggle-target="#popper-edit-activity"
-                                                                                        onClick={() =>
-                                                                                            handlePrepareSatementForEditActivity(
-                                                                                                act,
-                                                                                                item,
-                                                                                            )
-                                                                                        }
-                                                                                    >
-                                                                                        <img
+
+                                                                                <div className={cx('right-item')}>
+                                                                                    <div className={cx('')}>
+                                                                                        <span
                                                                                             className={cx(
-                                                                                                'icon',
-                                                                                                'icon-small',
+                                                                                                `status-${act.status}`,
+                                                                                                'status',
                                                                                             )}
-                                                                                            alt=""
-                                                                                            src={images.editIcon}
-                                                                                        />
-                                                                                    </button>
-                                                                                    <button
+                                                                                        >
+                                                                                            {act.status === 0 &&
+                                                                                                'New created'}
+                                                                                            {act.status === 1 &&
+                                                                                                'On going'}
+                                                                                            {act.status === 2 &&
+                                                                                                'Paused'}
+                                                                                            {act.status === 3 &&
+                                                                                                'Complete'}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    {/* Edit  / Delete */}
+                                                                                    <div
                                                                                         className={cx(
-                                                                                            'remove',
-                                                                                            'js-toggle',
+                                                                                            'group-action-btns',
                                                                                         )}
-                                                                                        toggle-target="#popper-activity-delete"
-                                                                                        onClick={() =>
-                                                                                            handlePrepareStatementForDeleteActivity(
-                                                                                                act,
-                                                                                                item,
-                                                                                            )
-                                                                                        }
                                                                                     >
-                                                                                        <img
-                                                                                            className={cx('icon')}
-                                                                                            alt=""
-                                                                                            src={images.xIcon}
-                                                                                        />
-                                                                                    </button>
+                                                                                        <button
+                                                                                            className={cx(
+                                                                                                'edit',
+                                                                                                'js-toggle',
+                                                                                            )}
+                                                                                            toggle-target="#popper-edit-activity"
+                                                                                            onClick={() =>
+                                                                                                handlePrepareSatementForEditActivity(
+                                                                                                    act,
+                                                                                                    item,
+                                                                                                )
+                                                                                            }
+                                                                                        >
+                                                                                            <img
+                                                                                                className={cx(
+                                                                                                    'icon',
+                                                                                                    'icon-small',
+                                                                                                )}
+                                                                                                alt=""
+                                                                                                src={images.editIcon}
+                                                                                            />
+                                                                                        </button>
+                                                                                        <button
+                                                                                            className={cx(
+                                                                                                'remove',
+                                                                                                'js-toggle',
+                                                                                            )}
+                                                                                            toggle-target="#popper-activity-delete"
+                                                                                            onClick={() =>
+                                                                                                handlePrepareStatementForDeleteActivity(
+                                                                                                    act,
+                                                                                                    item,
+                                                                                                )
+                                                                                            }
+                                                                                        >
+                                                                                            <img
+                                                                                                className={cx('icon')}
+                                                                                                alt=""
+                                                                                                src={images.xIcon}
+                                                                                            />
+                                                                                        </button>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         ))
@@ -758,13 +863,13 @@ function CampaignDetail() {
                     {addNewSuccess === 'success' && (
                         <div className={cx('success')}>
                             <img className={cx('icon', 'icon-small')} alt="" src={images.editIcon} />
-                            <span>Add new activity success</span>
+                            <span data-text="Add new activity success">Add new activity success</span>
                         </div>
                     )}
                     {addNewSuccess === 'error' && (
                         <div className={cx('error')}>
                             <img className={cx('icon', 'icon-small')} alt="" src={images.spinnerIcon} />
-                            <span>Add new activity error</span>
+                            <span data-text="Add new activity error">Add new activity error</span>
                         </div>
                     )}
                     <button
@@ -1046,7 +1151,27 @@ function CampaignDetail() {
                         <img className={cx('icon', 'icon-small')} alt="" src={images.sendIcon} />
                     </div>
 
-                    <button className={cx('close-btn', 'js-toggle')} toggle-target="#popper-edit-activity">
+                    {editActivitySuccess === 'success' && (
+                        <div className={cx('success')}>
+                            <img className={cx('icon', 'icon-small')} alt="" src={images.editIcon} />
+                            <span data-text="Edit activity success">Edit activity success</span>
+                        </div>
+                    )}
+                    {editActivitySuccess === 'error' && (
+                        <div className={cx('error')}>
+                            <img className={cx('icon', 'icon-small')} alt="" src={images.spinnerIcon} />
+                            <span data-text="Edit activity error">Edit activity error</span>
+                        </div>
+                    )}
+
+                    <button
+                        className={cx('close-btn', 'js-toggle')}
+                        toggle-target="#popper-edit-activity"
+                        onClick={() => {
+                            setMessageErrorEditActivity(null);
+                            setEditActivitySuccess(null);
+                        }}
+                    >
                         <img className={cx('icon')} alt="" src={images.xIcon} />
                     </button>
                 </div>
@@ -1064,7 +1189,120 @@ function CampaignDetail() {
                                         />
                                     </div>
                                 </div>
+                                <div className={cx('group-btns')}>
+                                    {/* New */}
+                                    {activityEdit.status === 0 && (
+                                        <>
+                                            <button
+                                                onClick={() => handelSwitchStatusActivity(activityEdit.id, 1)}
+                                                className={
+                                                    fetchingSendStatus === true && switchToStatus === 1
+                                                        ? cx('status-1', 'sending')
+                                                        : cx('status-1')
+                                                }
+                                            >
+                                                On going
+                                                <img
+                                                    className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                    alt=""
+                                                    src={images.spinnerIcon}
+                                                />
+                                            </button>
+                                        </>
+                                    )}
+                                    {/* On going */}
+                                    {activityEdit.status === 1 && (
+                                        <>
+                                            <button
+                                                onClick={() => handelSwitchStatusActivity(activityEdit.id, 2)}
+                                                className={
+                                                    fetchingSendStatus === true && switchToStatus === 2
+                                                        ? cx('status-2', 'sending')
+                                                        : cx('status-2')
+                                                }
+                                            >
+                                                Pause
+                                                <img
+                                                    className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                    alt=""
+                                                    src={images.spinnerIcon}
+                                                />
+                                            </button>
+                                            <button
+                                                onClick={() => handelSwitchStatusActivity(activityEdit.id, 3)}
+                                                className={
+                                                    fetchingSendStatus === true && switchToStatus === 3
+                                                        ? cx('status-3', 'sending')
+                                                        : cx('status-3')
+                                                }
+                                            >
+                                                Conplete
+                                                <img
+                                                    className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                    alt=""
+                                                    src={images.spinnerIcon}
+                                                />
+                                            </button>
+                                        </>
+                                    )}
+                                    {/* Pause */}
+                                    {activityEdit.status === 2 && (
+                                        <>
+                                            <button
+                                                onClick={() => handelSwitchStatusActivity(activityEdit.id, 3)}
+                                                className={
+                                                    fetchingSendStatus === true && switchToStatus === 3
+                                                        ? cx('status-3', 'sending')
+                                                        : cx('status-3')
+                                                }
+                                            >
+                                                Complete
+                                                <img
+                                                    className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                    alt=""
+                                                    src={images.spinnerIcon}
+                                                />
+                                            </button>
+                                            <button
+                                                onClick={() => handelSwitchStatusActivity(activityEdit.id, 1)}
+                                                className={
+                                                    fetchingSendStatus === true && switchToStatus === 1
+                                                        ? cx('status-1', 'sending')
+                                                        : cx('status-1')
+                                                }
+                                            >
+                                                On going
+                                                <img
+                                                    className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                    alt=""
+                                                    src={images.spinnerIcon}
+                                                />
+                                            </button>
+                                        </>
+                                    )}
+                                    {/* Complete */}
+                                    {activityEdit.status === 3 && (
+                                        <>
+                                            <button
+                                                onClick={() => handelSwitchStatusActivity(activityEdit.id, 0)}
+                                                className={
+                                                    fetchingSendStatus === true && switchToStatus === 0
+                                                        ? cx('status-0', 'sending')
+                                                        : cx('status-0')
+                                                }
+                                            >
+                                                Start again
+                                                <img
+                                                    className={cx('icon', 'icon-small', 'spinner-icon')}
+                                                    alt=""
+                                                    src={images.spinnerIcon}
+                                                />
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
                             </div>
+
                             <div className={cx('form-row')}>
                                 <div className={cx('form-label', 'label-schedule')}>
                                     <div className={cx('label')}>Schedule:</div>
@@ -1076,6 +1314,11 @@ function CampaignDetail() {
                                 <span className={cx('')}></span>
                                 <span className={cx('small')}></span>
                             </div>
+                            {messageErrorEditActivity !== null && (
+                                <>
+                                    <div className={cx('form-error')}>{messageErrorEditActivity}</div>
+                                </>
+                            )}
 
                             {/* Schedule */}
                             <div className={cx('form-row')}>
@@ -1086,7 +1329,6 @@ function CampaignDetail() {
                                     <div className={cx('form-wrap-select')}>
                                         <div className={cx('main')}>
                                             <span>{formatDateFromBackend(scheduleEdit.start_date)}</span>
-                                            <img className={cx('icon')} alt="" src={images.dateIcon} />
                                         </div>
                                     </div>
                                 </div>
@@ -1099,7 +1341,6 @@ function CampaignDetail() {
                                             <span className={cx('date-value')}>
                                                 {formatDateFromBackend(scheduleEdit.end_date)}
                                             </span>
-                                            <img className={cx('icon')} alt="" src={images.dateIcon} />
                                         </div>
                                     </div>
                                 </div>
@@ -1185,42 +1426,13 @@ function CampaignDetail() {
                                     </div>
                                     <div className={cx('form-control', 'no-border', 'form-activity-name')}>
                                         <input
-                                            className={
-                                                showSuggestActivities === true
-                                                    ? cx('form-input', 'special', 'active')
-                                                    : cx('form-input', 'special')
-                                            }
+                                            className={cx('form-input', 'special')}
                                             type="text"
                                             id="name"
                                             placeholder="Untitled"
                                             value={nameActivityEdit}
                                             onChange={(e) => setNameActivityEdit(e.target.value)}
-                                            onFocus={() => setShowSugestActivities(true)}
-                                            onDoubleClick={() => setShowSugestActivities(false)}
-                                            onBlur={() => setShowSugestActivities(false)}
                                         />
-                                        <div
-                                            className={
-                                                showSuggestActivities === true && listSuggestActivity.length > 0
-                                                    ? cx('suggest-open')
-                                                    : cx('suggest-open', 'none')
-                                            }
-                                        >
-                                            {listSuggestActivity.length > 0 &&
-                                                listSuggestActivity.map((item) => (
-                                                    <div
-                                                        onClick={() => setNameActivity(item.name)}
-                                                        className={cx('item')}
-                                                    >
-                                                        <span>{item.name}</span>
-                                                        <img
-                                                            className={cx('icon', 'suggest-icon')}
-                                                            alt=""
-                                                            src={images.suggestIcon}
-                                                        />
-                                                    </div>
-                                                ))}
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1235,7 +1447,7 @@ function CampaignDetail() {
                                     <div className={cx('form-control', 'no-border', 'form-activity-name')}>
                                         <Editor
                                             value={descriptionActivityEdit}
-                                            onTextChange={(e) => setDescriptionActivityEdit(e.htmlValue)}
+                                            onTextChange={(e) => setDescriptionActivityEdit(e.textValue)}
                                             headerTemplate={header}
                                             style={{ height: '220px' }}
                                         />
@@ -1248,7 +1460,14 @@ function CampaignDetail() {
                     <></>
                 )}
             </div>
-            <div className={cx('popper-overlay-schedule', 'js-toggle')} toggle-target="#popper-edit-activity"></div>
+            <div
+                className={cx('popper-overlay-schedule', 'js-toggle')}
+                toggle-target="#popper-edit-activity"
+                onClick={() => {
+                    setMessageErrorEditActivity(null);
+                    setEditActivitySuccess(null);
+                }}
+            ></div>
             {/* End */}
 
             {/* Edit Timetable Schedule */}
