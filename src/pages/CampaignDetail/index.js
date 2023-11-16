@@ -141,6 +141,9 @@ function CampaignDetail() {
     const [activityDelete, setActivityDelete] = useState(null);
     const [scheduleBelongToActivityToDelete, setScheduleBelongToActivityToDelete] = useState(null);
 
+    const [deleteActivitySuccess, setDeleteActivitySuccess] = useState(false);
+    const [messageErrorDeleteActivity, setMessageErrorDeleteActivity] = useState(null);
+
     const toggleShowTypesActivity = () => {
         setshowTypesActivity(!showTypesActivity);
     };
@@ -555,6 +558,7 @@ function CampaignDetail() {
             console.log(response.data);
             setEditTimetableSuccess('success');
             setMessageErrorEditTimetable(null);
+            fetSchedule(campaignInfo.id);
             setLoading(false);
         } catch (error) {
             console.log(error);
@@ -571,6 +575,36 @@ function CampaignDetail() {
     const handleDeleteActivitiBelongToSchedule = async () => {
         console.log(activityDelete);
         console.log(scheduleBelongToActivityToDelete);
+
+        setLoading(true);
+
+        try {
+            const response = await axios.post(
+                `/api/campaign/remove-activity-in-schedule/${campaignInfo.id}`,
+                {
+                    activityId: activityDelete.id,
+                    scheduleCampaignId: scheduleBelongToActivityToDelete.id,
+                },
+                {
+                    withCredentials: true,
+                },
+            );
+
+            console.log(response.data);
+
+            setDeleteActivitySuccess(true);
+            setMessageErrorDeleteActivity(null);
+            fetSchedule(campaignInfo.id);
+
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            if (error.response.data.message) {
+                setMessageErrorDeleteActivity(error.response.data.message);
+            }
+            setDeleteActivitySuccess(false);
+            setLoading(false);
+        }
     };
 
     return (
@@ -1643,7 +1677,6 @@ function CampaignDetail() {
             >
                 {' '}
             </div>
-
             {/* End */}
 
             {/* Delete Activity */}
@@ -1653,13 +1686,29 @@ function CampaignDetail() {
                         <div className={cx('wrap-content')}>
                             <p>Would you like to remove this Activity? </p>
                             <p className={cx('name')}>{activityDelete.name}</p>
-                            <div className={cx('message', 'success')}></div>
-                            <div className={cx('message', 'error')}></div>
+                            {deleteActivitySuccess === true ? (
+                                <>
+                                    <div className={cx('message', 'success')}>Delete activity success.</div>
+                                </>
+                            ) : (
+                                <>
+                                    {messageErrorDeleteActivity !== null && (
+                                        <div className={cx('message', 'error')}> {messageErrorDeleteActivity} </div>
+                                    )}
+                                </>
+                            )}
 
                             <div onClick={handleDeleteActivitiBelongToSchedule} className={cx('btn')}>
                                 <button>Remove</button>
                             </div>
-                            <button className={cx('btn', 'js-toggle')} toggle-target="#popper-activity-delete">
+                            <button
+                                className={cx('btn', 'js-toggle')}
+                                toggle-target="#popper-activity-delete"
+                                onClick={() => {
+                                    setMessageErrorDeleteActivity(null);
+                                    setDeleteActivitySuccess(false);
+                                }}
+                            >
                                 Don't Remove
                             </button>
                         </div>
@@ -1669,7 +1718,14 @@ function CampaignDetail() {
                 )}
             </div>
 
-            <div className={cx('popper-overlay-delete', 'js-toggle')} toggle-target="#popper-activity-delete"></div>
+            <div
+                className={cx('popper-overlay-delete', 'js-toggle')}
+                toggle-target="#popper-activity-delete"
+                onClick={() => {
+                    setMessageErrorDeleteActivity(null);
+                    setDeleteActivitySuccess(false);
+                }}
+            ></div>
             {/* End */}
         </>
     );
